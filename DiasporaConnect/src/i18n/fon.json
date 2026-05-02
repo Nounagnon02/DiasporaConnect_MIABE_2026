@@ -1,0 +1,22 @@
+{
+  "app": { "name": "DiasporaConnect", "tagline": "Flon tɔ gbɔn. Mɛ fio ɖe." },
+  "onboarding": {
+    "slide1": { "title": "Flon tɔ gbɔn.", "titleAccent": "Mɛ fio ɖe.", "subtitle": "Sɛ́ xɔgbɛ ɖo Bénin tɔn kpo blɔ̌ 1% tɔn gbeɖé, wɛkɛ blockchain Celo tɔn dó bló nùɖuɖu tɔn." },
+    "slide2": { "title": "Bo ɖè", "titleAccent": "30$ gbeɖé", "subtitle": "Western Union ɖè 14%. Mǐ ɖè 1% sín nú. Vɔsisa ɔ nɔ yi hwɛ̌ kú hwɛ̌ tɔn bɔ." },
+    "slide3": { "title": "Mɛ ɖaxó,", "titleAccent": "hwenu bǐ.", "subtitle": "Bló nùkplɔnkplɔn xá hagbɛ̌ 4 287 tɔn e ɖó linlin ɖo DiasporaConnect wu." },
+    "next": "Nɔví",
+    "skip": "Yì",
+    "getStarted": "Bɛ́ ɖaxó",
+    "createAccount": "Wlán compte",
+    "login": "Sɛ̀n"
+  },
+  "common": {
+    "back": "Vɔ",
+    "cancel": "Gbɛ́",
+    "confirm": "Dó gesí",
+    "loading": "Dó blɔ̌...",
+    "fcfa": "FCFA",
+    "usd": "USD",
+    "eur": "EUR"
+  }
+}

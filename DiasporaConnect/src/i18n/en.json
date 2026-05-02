@@ -1,0 +1,158 @@
+{
+  "app": {
+    "name": "DiasporaConnect",
+    "tagline": "Send Money. Not Fees."
+  },
+  "onboarding": {
+    "slide1": {
+      "title": "Send Money.",
+      "titleAccent": "Not Fees.",
+      "subtitle": "Transfer to Benin with less than 1% fees, secured by the Celo blockchain."
+    },
+    "slide2": {
+      "title": "Save up to",
+      "titleAccent": "$30 per transfer",
+      "subtitle": "Western Union charges 14%. We charge less than 1%. The difference stays in your family's pocket."
+    },
+    "slide3": {
+      "title": "Connected,",
+      "titleAccent": "no matter what.",
+      "subtitle": "Join 4,287 families who trust DiasporaConnect to stay connected."
+    },
+    "next": "Next",
+    "skip": "Skip",
+    "getStarted": "Get Started",
+    "createAccount": "Create Account",
+    "login": "Log In"
+  },
+  "auth": {
+    "chooseRole": "Who are you?",
+    "sender": "I send money",
+    "senderDesc": "I live abroad and send funds to Benin",
+    "recipient": "I receive money",
+    "recipientDesc": "I am in Benin and waiting for a transfer",
+    "connectWallet": "Connect my wallet",
+    "walletConnect": "Connect via MetaMask / WalletConnect",
+    "phoneNumber": "Phone number",
+    "enterPhone": "Enter your number",
+    "sendOTP": "Send OTP code",
+    "enterOTP": "Enter your OTP code",
+    "verifyOTP": "Verify",
+    "resendOTP": "Resend code"
+  },
+  "home": {
+    "greeting": "Hello",
+    "balance": "Wallet balance",
+    "sendMoney": "Send a transfer",
+    "savedLabel": "Total savings",
+    "recentTransfers": "Recent transfers",
+    "viewAll": "View all",
+    "noTransactions": "No transfers yet",
+    "impact": "View impact"
+  },
+  "calculator": {
+    "title": "Calculate my transfer",
+    "youSend": "You send",
+    "recipientGets": "Recipient gets",
+    "fee": "DiasporaConnect fee",
+    "feeComparison": "Fee comparison",
+    "savings": "You save",
+    "sendThisAmount": "Send this amount",
+    "liveRate": "LIVE RATE",
+    "gasEstimate": "Celo network gas fee"
+  },
+  "transfer": {
+    "step1": "Amount",
+    "step2": "Recipient",
+    "step3": "Confirm",
+    "step4": "Success",
+    "enterAmount": "How much do you want to send?",
+    "selectRecipient": "Choose a recipient",
+    "enterPhone": "Mobile Money number",
+    "scanQR": "Scan QR Code",
+    "recentContacts": "Recent contacts",
+    "confirm": "Confirm and send",
+    "processing": "Processing...",
+    "celoConfirming": "Confirming on Celo... (< 60s)",
+    "success": "Your transfer is on its way!",
+    "txHash": "Transaction ID",
+    "viewTracking": "Track transfer",
+    "newTransfer": "New transfer",
+    "backHome": "Back to home",
+    "copyHash": "Copy",
+    "copied": "Copied!",
+    "savedThisTransfer": "Saved on this transfer"
+  },
+  "history": {
+    "title": "History",
+    "all": "All",
+    "sent": "Sent",
+    "received": "Received",
+    "noHistory": "No transfers",
+    "details": "Details",
+    "txHash": "Celo TX Hash",
+    "viewExplorer": "View on explorer"
+  },
+  "recipient": {
+    "available": "Available to withdraw",
+    "withdraw": "Withdraw via Mobile Money",
+    "selectOperator": "Choose your operator",
+    "mtn": "MTN Money",
+    "moov": "Moov Money",
+    "mtnDesc": "Instant transfer to MTN Mobile Money",
+    "moovDesc": "Instant transfer to Moov Money",
+    "confirmWithdraw": "Confirm withdrawal",
+    "withdrawing": "Processing withdrawal...",
+    "withdrawSuccess": "Withdrawal being processed",
+    "withdrawDesc": "Funds will arrive in your account within seconds.",
+    "receivedTransfers": "Received transfers"
+  },
+  "profile": {
+    "title": "Profile",
+    "language": "Language",
+    "security": "Security",
+    "biometrics": "Biometric authentication",
+    "pin": "PIN code",
+    "about": "About",
+    "impact": "SDG Impact",
+    "version": "Version",
+    "logout": "Log out",
+    "walletAddress": "Wallet address"
+  },
+  "impact": {
+    "title": "Our Impact",
+    "subtitle": "Together, we're building a fairer world",
+    "familiesHelped": "Families helped",
+    "totalSaved": "USD saved in fees",
+    "transfersCompleted": "Transfers completed",
+    "odd1": "SDG 1 — No Poverty",
+    "odd1Desc": "We reduce remittance costs for the most vulnerable families.",
+    "odd8": "SDG 8 — Decent Work",
+    "odd8Desc": "We support the Beninese economy by returning more money to households.",
+    "odd10": "SDG 10 — Reduced Inequalities",
+    "odd10Desc": "We democratize access to financial services for all, including in rural areas.",
+    "testimonials": "Testimonials"
+  },
+  "status": {
+    "completed": "Completed",
+    "pending": "Pending",
+    "failed": "Failed",
+    "available": "Available",
+    "withdrawn": "Withdrawn",
+    "processing": "Processing"
+  },
+  "common": {
+    "back": "Back",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "close": "Close",
+    "share": "Share",
+    "copy": "Copy",
+    "fcfa": "FCFA",
+    "usd": "USD",
+    "eur": "EUR"
+  }
+}

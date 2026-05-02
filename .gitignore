@@ -1,0 +1,19 @@
+# Documentation locale (non versionnée)
+Docs/
+
+# Dépendances
+node_modules/
+
+# Expo / React Native
+.expo/
+dist/
+web-build/
+
+# Environnement
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
