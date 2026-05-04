@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Historique</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="../assets/js/nav.js"></script>
+    <style>
+        .hist-header { padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-sm); }
+        .hist-title {
+            font-family: var(--font-display); font-size: 28px; color: var(--on-surface);
+            letter-spacing: -0.56px;
+        }
+
+        /* Filtres */
+        .filters {
+            display: flex; padding: 0 var(--spacing-xl);
+            margin-bottom: var(--spacing-md); gap: var(--spacing-sm);
+        }
+        .pill {
+            padding: 7px var(--spacing-md); border-radius: 6px;
+            background: var(--surface-low); cursor: pointer;
+            font-family: var(--font-label); font-size: 13px; color: var(--on-surface-variant);
+            border: none; transition: all 0.2s;
+        }
+        .pill.active {
+            background: rgba(117,91,0,0.1); color: var(--primary);
+            font-family: var(--font-title);
+        }
+
+        .hist-scroll { padding: 0 var(--spacing-xl); padding-bottom: 120px; }
+
+        /* Group label */
+        .group-label {
+            font-family: var(--font-label); font-size: 11px; color: var(--on-surface-variant);
+            text-transform: uppercase; letter-spacing: 0.5px;
+            margin-top: var(--spacing-lg); margin-bottom: var(--spacing-sm);
+        }
+
+        /* TX item */
+        .tx-item {
+            display: flex; align-items: center;
+            padding: var(--spacing-md) 0;
+            border-bottom: 1px solid rgba(208,197,178,0.15);
+            gap: var(--spacing-md); cursor: pointer;
+        }
+        .tx-avatar {
+            width: 40px; height: 40px; border-radius: var(--radius-sm);
+            background: var(--surface-low);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-title); font-size: 15px; color: var(--primary); flex-shrink: 0;
+        }
+        .tx-info { flex: 1; }
+        .tx-name { font-family: var(--font-body); font-size: 15px; color: var(--on-surface); margin-bottom: 2px; }
+        .tx-date { font-family: var(--font-label); font-size: 12px; color: var(--on-surface-variant); }
+        .tx-right { text-align: right; }
+        .tx-amount { font-family: var(--font-label); font-size: 14px; color: var(--on-surface); }
+        .tx-status { font-family: var(--font-label); font-size: 11px; color: var(--primary); }
+    </style>
+</head>
+<body>
+    <div class="mobile-view">
+        <div id="dc-nav" data-active="dashboard"></div>
+        <div class="hist-header">
+            <div class="hist-title">Historique</div>
+        </div>
+
+        <!-- Filtres : 3 pills -->
+        <div class="filters">
+            <button type="button" class="pill active" onclick="setFilter(this,'ALL')">Tous</button>
+            <button type="button" class="pill" onclick="setFilter(this,'SENT')">Envoyés</button>
+            <button type="button" class="pill" onclick="setFilter(this,'RECEIVED')">Reçus</button>
+        </div>
+
+        <div class="hist-scroll" id="histList">
+            <!-- Groupe : Aujourd'hui -->
+            <div class="group-label">Aujourd'hui</div>
+
+            <div class="tx-item" onclick="window.location.href='transaction-detail.html'">
+                <div class="tx-avatar">FA</div>
+                <div class="tx-info">
+                    <div class="tx-name">Fatou Amoussou</div>
+                    <div class="tx-date">Aujourd'hui, 14:20 · MTN</div>
+                </div>
+                <div class="tx-right">
+                    <div class="tx-amount">- 200.00 USD</div>
+                    <div class="tx-status">Confirmé</div>
+                </div>
+            </div>
+
+            <!-- Groupe : Cette semaine -->
+            <div class="group-label">Cette semaine</div>
+
+            <div class="tx-item" onclick="window.location.href='transaction-detail.html'">
+                <div class="tx-avatar">KD</div>
+                <div class="tx-info">
+                    <div class="tx-name">Kofi Dossou</div>
+                    <div class="tx-date">28/04/2026 · Moov</div>
+                </div>
+                <div class="tx-right">
+                    <div class="tx-amount">- 150.00 USD</div>
+                    <div class="tx-status">Confirmé</div>
+                </div>
+            </div>
+
+            <!-- Groupe : Ce mois -->
+            <div class="group-label">Ce mois</div>
+
+            <div class="tx-item" onclick="window.location.href='transaction-detail.html'">
+                <div class="tx-avatar">SA</div>
+                <div class="tx-info">
+                    <div class="tx-name">Séraphin Adjovi</div>
+                    <div class="tx-date">15/04/2026 · MTN</div>
+                </div>
+                <div class="tx-right">
+                    <div class="tx-amount">- 500.00 USD</div>
+                    <div class="tx-status">Confirmé</div>
+                </div>
+            </div>
+
+            <div class="tx-item" onclick="window.location.href='transaction-detail.html'">
+                <div class="tx-avatar">AB</div>
+                <div class="tx-info">
+                    <div class="tx-name">Adjoa Bello</div>
+                    <div class="tx-date">10/04/2026 · MTN</div>
+                </div>
+                <div class="tx-right">
+                    <div class="tx-amount">- 100.00 USD</div>
+                    <div class="tx-status">Confirmé</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function setFilter(el, filter) {
+            document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+            el.classList.add('active');
+        }
+    </script>
+</body>
+</html>

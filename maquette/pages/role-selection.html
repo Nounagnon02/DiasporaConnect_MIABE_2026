@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Choisir un rôle</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="../assets/js/nav.js"></script>
+    <style>
+        .rs-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: var(--spacing-md) var(--spacing-xl) var(--spacing-sm);
+        }
+        .rs-brand { font-family: var(--font-display); font-size: 17px; color: var(--primary); }
+        .rs-back {
+            width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+            color: var(--primary); font-size: 22px; text-decoration: none;
+        }
+        .rs-placeholder { width: 36px; }
+
+        .hero-bg {
+            margin: 0 var(--spacing-xl) var(--spacing-xl);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg) var(--spacing-xl);
+            background: linear-gradient(135deg, rgba(117,91,0,0.07) 0%, rgba(201,168,76,0.11) 100%);
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .hero-icons-row {
+            display: flex; align-items: center; width: 100%; margin-bottom: var(--spacing-md);
+        }
+        .hero-node { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .hero-emoji { font-size: 36px; }
+        .hero-node-label {
+            font-family: var(--font-label); font-size: 11px; color: var(--on-surface-variant);
+        }
+        .hero-arrow-track {
+            flex: 1; display: flex; align-items: center; margin: 0 var(--spacing-md);
+        }
+        .hero-arrow-line { flex: 1; height: 2px; background: var(--primary-container); opacity: 0.6; }
+        .hero-arrow-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: var(--primary); margin: 0 4px;
+        }
+        .hero-caption {
+            font-family: var(--font-label); font-size: 13px; color: var(--primary);
+            letter-spacing: 0.2px; text-align: center;
+        }
+
+        .rs-scroll { padding: 0 var(--spacing-xl) var(--spacing-xxl); }
+        .rs-title {
+            font-family: var(--font-display); font-size: 32px; color: var(--on-surface);
+            margin-bottom: var(--spacing-sm); letter-spacing: -0.5px; line-height: 40px;
+        }
+        .rs-subtitle {
+            font-family: var(--font-body); font-size: 15px; color: var(--on-surface-variant);
+            margin-bottom: var(--spacing-xl); line-height: 24px;
+        }
+
+        .role-card {
+            display: flex; align-items: center;
+            background: var(--surface-lowest);
+            border-radius: var(--radius-md); padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            border: 1px solid rgba(117,91,0,0.15);
+            box-shadow: var(--shadow-diffuse);
+            text-decoration: none; color: inherit; cursor: pointer;
+        }
+        .role-card-secondary {
+            background: var(--surface-low);
+            border: 1px solid rgba(208,197,178,0.3);
+            box-shadow: none;
+        }
+        .role-icon-wrap {
+            width: 52px; height: 52px; border-radius: 26px;
+            background: rgba(117,91,0,0.06);
+            display: flex; align-items: center; justify-content: center;
+            margin-right: var(--spacing-md); flex-shrink: 0;
+            font-size: 28px;
+        }
+        .role-text { flex: 1; margin-right: var(--spacing-md); }
+        .role-title {
+            font-family: var(--font-title); font-size: 16px;
+            color: var(--on-surface); margin-bottom: 4px;
+        }
+        .role-desc {
+            font-family: var(--font-body); font-size: 13px;
+            color: var(--on-surface-variant); line-height: 20px;
+        }
+        .role-arrow { color: var(--primary); font-size: 20px; flex-shrink: 0; }
+
+        .foot-note {
+            display: flex; align-items: center; justify-content: center;
+            gap: 5px; margin-top: var(--spacing-lg);
+        }
+        .foot-note-text {
+            font-family: var(--font-body); font-size: 12px; color: var(--on-surface-variant);
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-view">
+        <div id="dc-nav" data-active="onboarding"></div>
+        <!-- Header -->
+        <div class="rs-header">
+            <a href="onboarding.html" class="rs-back">←</a>
+            <span class="rs-brand">DiasporaConnect</span>
+            <div class="rs-placeholder"></div>
+        </div>
+
+        <!-- Hero -->
+        <div class="hero-bg">
+            <div class="hero-icons-row">
+                <div class="hero-node">
+                    <span class="hero-emoji">🌍</span>
+                    <span class="hero-node-label">Diaspora</span>
+                </div>
+                <div class="hero-arrow-track">
+                    <div class="hero-arrow-line"></div>
+                    <div class="hero-arrow-dot"></div>
+                    <div class="hero-arrow-line"></div>
+                </div>
+                <div class="hero-node">
+                    <span class="hero-emoji">🇧🇯</span>
+                    <span class="hero-node-label">Bénin</span>
+                </div>
+            </div>
+            <div class="hero-caption">Transferts instantanés · Frais &lt; 1 %</div>
+        </div>
+
+        <!-- Content -->
+        <div class="rs-scroll">
+            <div class="rs-title">Quel est votre<br>rôle ?</div>
+            <div class="rs-subtitle">Sélectionnez votre profil pour continuer l'inscription ou la connexion.</div>
+
+            <a href="auth-sender.html" class="role-card">
+                <div class="role-icon-wrap">🌍</div>
+                <div class="role-text">
+                    <div class="role-title">Expéditeur (Diaspora)</div>
+                    <div class="role-desc">J'envoie de l'argent vers le Bénin depuis l'étranger.</div>
+                </div>
+                <span class="role-arrow">›</span>
+            </a>
+
+            <a href="auth-receiver.html" class="role-card role-card-secondary">
+                <div class="role-icon-wrap">🇧🇯</div>
+                <div class="role-text">
+                    <div class="role-title">Destinataire (Bénin)</div>
+                    <div class="role-desc">Je reçois de l'argent sur mon compte Mobile Money (MTN / Moov).</div>
+                </div>
+                <span class="role-arrow">›</span>
+            </a>
+
+            <div class="foot-note">
+                <span style="font-size:12px;">🔒</span>
+                <span class="foot-note-text">Vos données sont protégées par la blockchain Celo</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -6,7 +6,6 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": false,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -14,14 +13,16 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.miabe2026.diasporaconnect"
+      "bundleIdentifier": "com.miabe2026.diasporaconnect",
+      "buildNumber": "1"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#C75B39"
       },
-      "package": "com.miabe2026.diasporaconnect"
+      "package": "com.miabe2026.diasporaconnect",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -30,6 +31,7 @@
     "plugins": [
       "expo-font",
       "expo-splash-screen"
-    ]
+    ],
+    "newArchEnabled": false
   }
 }

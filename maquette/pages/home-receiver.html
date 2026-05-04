@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Accueil Destinataire</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="../assets/js/nav.js"></script>
+    <style>
+        .hr-scroll { padding: var(--spacing-lg) var(--spacing-xl) 120px; }
+
+        .hr-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: var(--spacing-xl);
+        }
+        .hr-greeting-small { font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant); }
+        .hr-username { font-family: var(--font-display); font-size: 24px; color: var(--on-surface); }
+        .profile-badge {
+            width: 48px; height: 48px; border-radius: var(--radius-round);
+            background: var(--surface-lowest);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: var(--shadow-diffuse); flex-shrink: 0; text-decoration: none;
+        }
+        .profile-initials { font-family: var(--font-title); font-size: 18px; color: var(--primary); }
+
+        /* Hero */
+        .hero-section { margin-bottom: var(--spacing-xl); }
+        .balance-label { font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant); margin-bottom: var(--spacing-xs); }
+        .balance-fcfa {
+            font-family: var(--font-display); font-size: clamp(28px, 9vw, 40px);
+            color: var(--on-surface); letter-spacing: -0.02em;
+        }
+
+        /* CTA */
+        .cta-wrapper {
+            margin-bottom: var(--spacing-lg); border-radius: var(--radius-md);
+            box-shadow: var(--shadow-diffuse); text-decoration: none; display: block;
+        }
+        .cta-card {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: var(--spacing-lg); border-radius: var(--radius-md);
+            background: linear-gradient(90deg, #755B00 0%, #C9A84C 100%);
+        }
+        .cta-text { flex: 1; margin-right: var(--spacing-md); }
+        .cta-title { font-family: var(--font-title); font-size: 20px; color: #fff; margin-bottom: 2px; }
+        .cta-sub { font-family: var(--font-body); font-size: 13px; color: rgba(255,255,255,0.8); }
+        .cta-arrow-circle {
+            width: 44px; height: 44px; border-radius: 22px;
+            background: rgba(255,255,255,0.2);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; font-size: 18px; color: #fff;
+        }
+
+        /* Info row */
+        .info-row { display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+        .info-card {
+            flex: 1; background: var(--surface-low);
+            border-radius: var(--radius-md); padding: var(--spacing-md);
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
+        }
+        .info-icon { font-size: 20px; }
+        .info-label { font-family: var(--font-label); font-size: 11px; color: var(--on-surface-variant); text-align: center; }
+
+        /* Transactions */
+        .section-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: var(--spacing-md);
+        }
+        .section-title { font-family: var(--font-title); font-size: 17px; color: var(--on-surface); }
+        .see-all { font-family: var(--font-label); font-size: 12px; color: var(--primary); text-decoration: none; }
+
+        .tx-item {
+            display: flex; align-items: center;
+            padding: var(--spacing-md) 0;
+            border-bottom: 1px solid rgba(208,197,178,0.15);
+            gap: var(--spacing-md);
+        }
+        .tx-avatar {
+            width: 40px; height: 40px; border-radius: var(--radius-sm);
+            background: var(--surface-low);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-title); font-size: 14px; color: var(--primary); flex-shrink: 0;
+        }
+        .tx-info { flex: 1; }
+        .tx-name { font-family: var(--font-body); font-size: 15px; color: var(--on-surface); margin-bottom: 2px; }
+        .tx-date { font-family: var(--font-label); font-size: 12px; color: var(--on-surface-variant); }
+        .tx-amount { font-family: var(--font-label); font-size: 14px; color: var(--primary); text-align: right; }
+        .tx-status { font-family: var(--font-label); font-size: 11px; color: var(--on-surface-variant); text-align: right; }
+    </style>
+</head>
+<body>
+    <div class="mobile-view">
+        <div id="dc-nav" data-active="receive"></div>
+        <div class="hr-scroll">
+            <!-- Header -->
+            <div class="hr-header">
+                <div style="flex:1;margin-right:var(--spacing-md);">
+                    <div class="hr-greeting-small">Bonjour,</div>
+                    <div class="hr-username">Adjoua</div>
+                </div>
+                <a href="profile.html" class="profile-badge">
+                    <span class="profile-initials">A</span>
+                </a>
+            </div>
+
+            <!-- Hero Balance -->
+            <div class="hero-section">
+                <div class="balance-label">Disponible à retirer</div>
+                <div class="balance-fcfa">131 191 FCFA</div>
+            </div>
+
+            <!-- CTA Retrait -->
+            <a href="withdraw-operator.html" class="cta-wrapper">
+                <div class="cta-card">
+                    <div class="cta-text">
+                        <div class="cta-title">Retirer maintenant</div>
+                        <div class="cta-sub">Vers MTN ou Moov Money</div>
+                    </div>
+                    <div class="cta-arrow-circle">›</div>
+                </div>
+            </a>
+
+            <!-- Info rapide -->
+            <div class="info-row">
+                <div class="info-card">
+                    <span class="info-icon">⚡</span>
+                    <span class="info-label">Instantané</span>
+                </div>
+                <div class="info-card">
+                    <span class="info-icon">🔒</span>
+                    <span class="info-label">Sécurisé</span>
+                </div>
+                <div class="info-card">
+                    <span class="info-icon">💵</span>
+                    <span class="info-label">Sans frais</span>
+                </div>
+            </div>
+
+            <!-- Transferts reçus -->
+            <div class="section-header">
+                <span class="section-title">Transferts reçus</span>
+                <a href="history.html" class="see-all">Voir tout</a>
+            </div>
+
+            <div class="tx-item">
+                <div class="tx-avatar">KD</div>
+                <div class="tx-info">
+                    <div class="tx-name">Kofi Dossou</div>
+                    <div class="tx-date">03/05/2026 · Celo</div>
+                </div>
+                <div>
+                    <div class="tx-amount">+ 131 191 FCFA</div>
+                    <div class="tx-status">En attente</div>
+                </div>
+            </div>
+
+            <div class="tx-item">
+                <div class="tx-avatar">KD</div>
+                <div class="tx-info">
+                    <div class="tx-name">Kofi Dossou</div>
+                    <div class="tx-date">15/04/2026 · Celo</div>
+                </div>
+                <div>
+                    <div class="tx-amount">+ 73 500 FCFA</div>
+                    <div class="tx-status">Retiré</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

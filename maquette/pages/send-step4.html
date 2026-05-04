@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Transfert envoyé</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="../assets/js/nav.js"></script>
+    <style>
+        .s4-scroll {
+            padding: var(--spacing-xxl) var(--spacing-xl) 160px;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        /* Check carré */
+        .check-wrapper {
+            width: 80px; height: 80px; border-radius: 8px;
+            background: var(--primary);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: var(--spacing-xl);
+            box-shadow: var(--shadow-diffuse);
+            animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+        }
+        .check-text { font-family: var(--font-title); font-size: 40px; color: #fff; }
+
+        @keyframes popIn {
+            from { transform: scale(0); opacity: 0; }
+            to   { transform: scale(1); opacity: 1; }
+        }
+
+        .s4-title {
+            font-family: var(--font-display); font-size: 30px; color: var(--on-surface);
+            letter-spacing: -0.6px; text-align: center; margin-bottom: var(--spacing-sm);
+        }
+        .s4-subtitle {
+            font-family: var(--font-body); font-size: 15px; color: var(--on-surface-variant);
+            text-align: center; margin-bottom: var(--spacing-xl); line-height: 23px;
+            padding: 0 var(--spacing-sm);
+        }
+        .s4-recipient { font-family: var(--font-title); color: var(--on-surface); }
+        .s4-amount-inline { font-family: var(--font-label); color: var(--primary); }
+
+        /* TX Card */
+        .tx-card {
+            width: 100%; background: var(--surface-lowest);
+            border-radius: var(--radius-md); padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg); box-shadow: var(--shadow-diffuse);
+        }
+        .tx-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: var(--spacing-sm) 0; gap: var(--spacing-sm);
+        }
+        .tx-sep { height: 1px; background: rgba(208,197,178,0.15); }
+        .tx-label { font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant); flex-shrink: 0; }
+        .tx-value { font-family: var(--font-label); font-size: 13px; color: var(--on-surface); flex-shrink: 1; text-align: right; }
+        .tx-hash-row { display: flex; align-items: center; gap: 8px; flex: 1; justify-content: flex-end; }
+        .tx-hash-text { font-family: var(--font-label); font-size: 12px; color: var(--on-surface); flex-shrink: 1; }
+        .copy-btn {
+            padding: 3px 8px; background: rgba(117,91,0,0.1); border-radius: 4px;
+            font-family: var(--font-label); font-size: 11px; color: var(--primary);
+            border: none; cursor: pointer; flex-shrink: 0;
+        }
+        .status-row { display: flex; align-items: center; gap: 6px; }
+        .status-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--primary);
+            animation: blink 1.2s ease-in-out infinite;
+        }
+        @keyframes blink {
+            0%,100% { opacity: 1; } 50% { opacity: 0.3; }
+        }
+        .status-text { font-family: var(--font-label); font-size: 13px; color: var(--primary); }
+
+        /* Progress */
+        .progress-section { width: 100%; margin-bottom: var(--spacing-lg); }
+        .progress-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .progress-label { font-family: var(--font-label); font-size: 13px; color: var(--on-surface); }
+        .progress-sub { font-family: var(--font-label); font-size: 12px; color: var(--on-surface-variant); }
+        .progress-track { height: 4px; background: var(--surface-low); border-radius: 2px; overflow: hidden; }
+        .progress-fill {
+            height: 100%; background: var(--primary); border-radius: 2px;
+            width: 0%; animation: fillBar 60s linear forwards;
+        }
+        @keyframes fillBar { to { width: 100%; } }
+
+        /* Savings box */
+        .savings-box {
+            width: 100%; background: rgba(117,91,0,0.06);
+            border-radius: var(--radius-md); padding: var(--spacing-lg);
+            border-left: 3px solid var(--primary);
+        }
+        .savings-text { font-family: var(--font-body); font-size: 14px; color: var(--on-surface-variant); text-align: center; line-height: 22px; }
+        .savings-amount { font-family: var(--font-label); color: var(--primary); }
+
+        /* Footer */
+        .s4-footer {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 430px;
+            padding: var(--spacing-lg) var(--spacing-xl);
+            padding-bottom: max(40px, env(safe-area-inset-bottom, 16px));
+            background: var(--surface);
+        }
+        .btn-secondary-outline {
+            display: flex; align-items: center; justify-content: center;
+            padding: var(--spacing-md); border-radius: var(--radius-md);
+            border: 1px solid rgba(208,197,178,0.4); background: transparent;
+            font-family: var(--font-title); font-size: 15px; color: var(--on-surface);
+            text-decoration: none; margin-top: var(--spacing-md);
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-view" style="overflow-y:auto;">
+        <div id="dc-nav" data-active="send"></div>
+        <div class="s4-scroll">
+            <!-- Check carré -->
+            <div class="check-wrapper">
+                <span class="check-text">✓</span>
+            </div>
+
+            <div class="s4-title">Transfert envoyé !</div>
+            <div class="s4-subtitle">
+                <span class="s4-recipient">Fatou Amoussou</span>
+                recevra
+                <span class="s4-amount-inline">198.40 USD</span>
+            </div>
+
+            <!-- Card TX -->
+            <div class="tx-card">
+                <div class="tx-row">
+                    <span class="tx-label">Réf. transaction</span>
+                    <span class="tx-value">TX-2026-05-001</span>
+                </div>
+                <div class="tx-sep"></div>
+                <div class="tx-row">
+                    <span class="tx-label">Hash Celo</span>
+                    <div class="tx-hash-row">
+                        <span class="tx-hash-text">0x3f4a8b2c...e6f8a0b</span>
+                        <button class="copy-btn" onclick="this.textContent='✓';setTimeout(()=>this.textContent='Copier',2000)">Copier</button>
+                    </div>
+                </div>
+                <div class="tx-sep"></div>
+                <div class="tx-row">
+                    <span class="tx-label">Statut</span>
+                    <div class="status-row">
+                        <div class="status-dot"></div>
+                        <span class="status-text">En confirmation</span>
+                    </div>
+                </div>
+                <div class="tx-sep"></div>
+                <div class="tx-row">
+                    <span class="tx-label">Réseau</span>
+                    <span class="tx-value">Celo Alfajores</span>
+                </div>
+            </div>
+
+            <!-- Barre progression -->
+            <div class="progress-section">
+                <div class="progress-header">
+                    <span class="progress-label">Confirmation Celo</span>
+                    <span class="progress-sub">~60 secondes</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill"></div>
+                </div>
+            </div>
+
+            <!-- Économies -->
+            <div class="savings-box">
+                <div class="savings-text">
+                    Vous avez économisé
+                    <span class="savings-amount">26.20 USD</span>
+                    vs. Western Union
+                </div>
+            </div>
+        </div>
+
+        <div class="s4-footer">
+            <a href="calculator.html" class="btn btn-primary">Nouveau transfert</a>
+            <a href="history.html" class="btn-secondary-outline">Voir l'historique</a>
+        </div>
+    </div>
+</body>
+</html>

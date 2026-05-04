@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Accueil Expéditeur</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="../assets/js/nav.js"></script>
+    <style>
+        .hs-scroll { padding: var(--spacing-lg) var(--spacing-xl) 120px; }
+
+        /* Header */
+        .hs-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: var(--spacing-xl);
+        }
+        .hs-greeting-small { font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant); }
+        .hs-greeting { font-family: var(--font-title); font-size: 20px; color: var(--on-surface); }
+        .profile-badge {
+            width: 44px; height: 44px; border-radius: var(--radius-round);
+            background: var(--surface-lowest);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: var(--shadow-diffuse); flex-shrink: 0;
+            text-decoration: none;
+        }
+        .profile-initials { font-family: var(--font-title); font-size: 16px; color: var(--primary); }
+
+        /* Hero balance */
+        .hero-section { margin-bottom: var(--spacing-xl); }
+        .balance-label { font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant); margin-bottom: var(--spacing-xs); }
+        .balance-usd {
+            font-family: var(--font-display); font-size: 40px; color: var(--on-surface);
+            letter-spacing: -0.02em; margin-bottom: var(--spacing-xs);
+        }
+        .balance-fcfa { font-family: var(--font-label); font-size: 15px; color: var(--on-surface-variant); }
+
+        /* CTA */
+        .cta-wrapper {
+            margin-bottom: var(--spacing-xl); border-radius: var(--radius-md);
+            box-shadow: var(--shadow-diffuse); text-decoration: none;
+        }
+        .cta-card {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: var(--spacing-lg); border-radius: var(--radius-md);
+            background: linear-gradient(90deg, #755B00 0%, #C9A84C 100%);
+        }
+        .cta-text { flex: 1; margin-right: var(--spacing-md); }
+        .cta-title { font-family: var(--font-title); font-size: clamp(17px, 4.5vw, 20px); color: #fff; margin-bottom: 2px; }
+        .cta-sub { font-family: var(--font-body); font-size: 13px; color: rgba(255,255,255,0.8); }
+        .cta-arrow-circle {
+            width: 48px; height: 48px; border-radius: 24px;
+            background: rgba(255,255,255,0.2);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; font-size: 20px; color: #fff;
+        }
+
+        /* Glass savings card */
+        .savings-card {
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(208,197,178,0.15);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-glass);
+            margin-bottom: var(--spacing-xl);
+        }
+        .savings-label { font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant); margin-bottom: var(--spacing-xs); }
+        .savings-amount { font-family: var(--font-label); font-size: 24px; color: var(--primary); letter-spacing: -0.02em; margin-bottom: 2px; }
+        .savings-sub { font-family: var(--font-label); font-size: 12px; color: var(--on-surface-variant); line-height: 17px; }
+
+        /* Transactions */
+        .section-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: var(--spacing-md);
+        }
+        .section-title { font-family: var(--font-title); font-size: 17px; color: var(--on-surface); }
+        .see-all { font-family: var(--font-label); font-size: 13px; color: var(--primary); text-decoration: none; }
+
+        .tx-item {
+            display: flex; align-items: center;
+            padding: var(--spacing-md) 0;
+            border-bottom: 1px solid rgba(208,197,178,0.15);
+            gap: var(--spacing-md); cursor: pointer;
+        }
+        .tx-avatar {
+            width: 40px; height: 40px; border-radius: var(--radius-sm);
+            background: var(--surface-low);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-title); font-size: 14px; color: var(--primary);
+            flex-shrink: 0;
+        }
+        .tx-info { flex: 1; }
+        .tx-name { font-family: var(--font-body); font-size: 15px; color: var(--on-surface); margin-bottom: 2px; }
+        .tx-date { font-family: var(--font-label); font-size: 12px; color: var(--on-surface-variant); }
+        .tx-amount { font-family: var(--font-label); font-size: 14px; color: var(--on-surface); text-align: right; }
+        .tx-status { font-family: var(--font-label); font-size: 11px; color: var(--primary); text-align: right; }
+    </style>
+</head>
+<body>
+    <div class="mobile-view">
+        <div id="dc-nav" data-active="dashboard"></div>
+        <div class="hs-scroll">
+            <!-- Header -->
+            <div class="hs-header">
+                <div style="flex:1;margin-right:var(--spacing-md);">
+                    <div class="hs-greeting-small">Bonjour,</div>
+                    <div class="hs-greeting">Kossi</div>
+                </div>
+                <a href="profile.html" class="profile-badge">
+                    <span class="profile-initials">K</span>
+                </a>
+            </div>
+
+            <!-- Hero Balance -->
+            <div class="hero-section">
+                <div class="balance-label">Votre solde</div>
+                <div class="balance-usd">1 242,80 USD</div>
+                <div class="balance-fcfa">≈ 761 465 FCFA</div>
+            </div>
+
+            <!-- CTA Transfert -->
+            <a href="calculator.html" class="cta-wrapper" style="display:block;">
+                <div class="cta-card">
+                    <div class="cta-text">
+                        <div class="cta-title">Faire un transfert</div>
+                        <div class="cta-sub">Frais &lt; 1 % · Actif sur Celo</div>
+                    </div>
+                    <div class="cta-arrow-circle">›</div>
+                </div>
+            </a>
+
+            <!-- Savings GlassCard -->
+            <div class="savings-card">
+                <div class="savings-label">Économies réalisées ce mois-ci</div>
+                <div class="savings-amount">41.30 USD</div>
+                <div class="savings-sub">Soit environ 25 296 FCFA économisés</div>
+            </div>
+
+            <!-- Transactions récentes -->
+            <div class="section-header">
+                <span class="section-title">Transferts récents</span>
+                <a href="history.html" class="see-all">Voir tout</a>
+            </div>
+
+            <div onclick="window.location.href='transaction-detail.html'" class="tx-item">
+                <div class="tx-avatar">FA</div>
+                <div class="tx-info">
+                    <div class="tx-name">Fatou Amoussou</div>
+                    <div class="tx-date">03/05/2026 · MTN</div>
+                </div>
+                <div>
+                    <div class="tx-amount">- 200.00 USD</div>
+                    <div class="tx-status">Confirmé</div>
+                </div>
+            </div>
+
+            <div onclick="window.location.href='transaction-detail.html'" class="tx-item">
+                <div class="tx-avatar">KD</div>
+                <div class="tx-info">
+                    <div class="tx-name">Kofi Dossou</div>
+                    <div class="tx-date">28/04/2026 · Moov</div>
+                </div>
+                <div>
+                    <div class="tx-amount">- 150.00 USD</div>
+                    <div class="tx-status">Confirmé</div>
+                </div>
+            </div>
+
+            <div onclick="window.location.href='transaction-detail.html'" class="tx-item">
+                <div class="tx-avatar">SA</div>
+                <div class="tx-info">
+                    <div class="tx-name">Séraphin Adjovi</div>
+                    <div class="tx-date">15/04/2026 · MTN</div>
+                </div>
+                <div>
+                    <div class="tx-amount">- 500.00 USD</div>
+                    <div class="tx-status">Confirmé</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

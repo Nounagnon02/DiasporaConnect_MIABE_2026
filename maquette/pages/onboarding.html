@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Onboarding</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="../assets/js/nav.js"></script>
+    <style>
+        /* background déjà défini dans style.css */
+        .ob-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: var(--spacing-md) var(--spacing-xl) var(--spacing-sm);
+        }
+        .ob-brand {
+            font-family: var(--font-display); font-size: 20px;
+            color: var(--primary); font-weight: 700;
+        }
+        .ob-skip {
+            font-family: var(--font-title); font-size: 14px;
+            color: var(--on-surface-variant); text-decoration: none;
+            padding: var(--spacing-xs) 0;
+        }
+        .slides-wrapper { flex: 1; overflow: hidden; height: 0; }
+        .slide {
+            display: none; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 0 var(--spacing-xl);
+            animation: fadeIn 0.4s ease;
+        }
+        .slide.active { display: flex; }
+        .illustration-layer {
+            width: 100%; height: 220px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: var(--spacing-xxl);
+        }
+
+        /* Slide 1 — Connection Anim */
+        .conn-anim {
+            display: flex; align-items: center; gap: 12px;
+        }
+        .conn-node {
+            width: 56px; height: 56px; border-radius: 50%;
+            background: rgba(117,91,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px;
+        }
+        .conn-line {
+            flex: 1; height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-container));
+            position: relative; max-width: 80px;
+        }
+        .conn-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: var(--primary);
+            position: absolute; top: -4px; left: 0;
+            animation: slideDot 1.8s ease-in-out infinite;
+        }
+        @keyframes slideDot {
+            0%   { left: 0; opacity: 1; }
+            80%  { left: calc(100% - 10px); opacity: 1; }
+            100% { left: calc(100% - 10px); opacity: 0; }
+        }
+
+        /* Slide 2 — Fee bars */
+        .fee-chart {
+            display: flex; align-items: flex-end;
+            gap: var(--spacing-md); height: 130px;
+        }
+        .fee-bar-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .fee-bar {
+            width: 44px; border-radius: 4px;
+            transition: height 0.9s ease;
+        }
+        .fee-bar-label {
+            font-family: var(--font-label); font-size: 11px;
+            color: var(--on-surface-variant);
+        }
+        .fee-bar-label.dc { color: var(--primary); font-weight: 700; }
+        .fee-badge {
+            margin-top: var(--spacing-md);
+            background: rgba(117,91,0,0.1);
+            padding: 6px var(--spacing-md);
+            border-radius: var(--radius-round);
+            font-family: var(--font-label); font-size: 13px;
+            color: var(--primary);
+        }
+
+        /* Slide 3 — Security */
+        .shield-outer {
+            width: 120px; height: 120px; border-radius: 50%;
+            background: rgba(117,91,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: var(--spacing-xl);
+        }
+        .shield-inner {
+            width: 78px; height: 78px; border-radius: 50%;
+            background: rgba(117,91,0,0.15);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 36px;
+        }
+        .security-pills {
+            display: flex; flex-direction: column;
+            align-items: center; gap: var(--spacing-sm);
+        }
+        .sec-pill {
+            display: flex; align-items: center; gap: 6px;
+            background: var(--surface-low);
+            padding: 7px var(--spacing-md);
+            border-radius: var(--radius-round);
+            font-family: var(--font-label); font-size: 13px;
+            color: var(--on-surface);
+        }
+        .sec-pill-icon { font-size: 14px; }
+
+        /* Text */
+        .slide-title {
+            font-family: var(--font-display); font-size: 34px;
+            color: var(--on-surface); line-height: 44px;
+            letter-spacing: -0.02em; margin-bottom: var(--spacing-md);
+            width: 100%;
+        }
+        .slide-desc {
+            font-family: var(--font-body); font-size: 16px;
+            color: var(--on-surface-variant); line-height: 26px;
+            width: 100%;
+        }
+
+        /* Footer */
+        .ob-footer {
+            padding: var(--spacing-md) var(--spacing-xl) var(--spacing-xxl);
+        }
+        .ob-dots {
+            display: flex; justify-content: center; align-items: center;
+            gap: 6px; margin-bottom: var(--spacing-xl);
+        }
+        .ob-dot {
+            height: 8px; border-radius: 4px;
+            background: var(--primary); opacity: 0.3;
+            width: 8px; transition: width 0.3s, opacity 0.3s;
+        }
+        .ob-dot.active { width: 24px; opacity: 1; }
+    </style>
+</head>
+<body>
+    <div class="mobile-view" style="display:flex;flex-direction:column;">
+        <div id="dc-nav" data-active="onboarding"></div>
+        <!-- Header -->
+        <div class="ob-header">
+            <span class="ob-brand">DiasporaConnect</span>
+            <a href="role-selection.html" class="ob-skip">Passer</a>
+        </div>
+
+        <!-- Slides -->
+        <div class="slides-wrapper" style="flex:1;">
+            <!-- Slide 1 -->
+            <div class="slide active" id="slide1" style="height:100%;">
+                <div class="illustration-layer">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:var(--spacing-xl);">
+                        <div class="conn-anim">
+                            <div class="conn-node">🌍</div>
+                            <div class="conn-line"><div class="conn-dot"></div></div>
+                            <div class="conn-node" style="background:rgba(117,91,0,0.15);">🇧🇯</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slide-title">Une technologie<br>qui vous rapproche.</div>
+                <div class="slide-desc">DiasporaConnect lie la diaspora béninoise à ses familles grâce à la blockchain Celo.</div>
+            </div>
+
+            <!-- Slide 2 -->
+            <div class="slide" id="slide2" style="height:100%;">
+                <div class="illustration-layer">
+                    <div style="display:flex;flex-direction:column;align-items:center;">
+                        <div class="fee-chart" id="feeChart">
+                            <div class="fee-bar-wrap">
+                                <div class="fee-bar" style="height:110px;background:#C0392B;opacity:0.55;"></div>
+                                <span class="fee-bar-label">WU</span>
+                            </div>
+                            <div class="fee-bar-wrap">
+                                <div class="fee-bar" style="height:86px;background:#E67E22;opacity:0.55;"></div>
+                                <span class="fee-bar-label">MG</span>
+                            </div>
+                            <div class="fee-bar-wrap">
+                                <div class="fee-bar" style="height:55px;background:#F39C12;opacity:0.55;"></div>
+                                <span class="fee-bar-label">WR</span>
+                            </div>
+                            <div class="fee-bar-wrap">
+                                <div class="fee-bar" style="height:6px;background:var(--primary);"></div>
+                                <span class="fee-bar-label dc">DC</span>
+                            </div>
+                        </div>
+                        <div class="fee-badge">&lt; 1 % de frais</div>
+                    </div>
+                </div>
+                <div class="slide-title">Moins de frais.<br>Plus pour eux.</div>
+                <div class="slide-desc">Les frais d'envoi internationaux sont de 7 à 15 %. Avec le Private Ledger, ils passent sous 1 %.</div>
+            </div>
+
+            <!-- Slide 3 -->
+            <div class="slide" id="slide3" style="height:100%;">
+                <div class="illustration-layer">
+                    <div style="display:flex;flex-direction:column;align-items:center;">
+                        <div class="shield-outer">
+                            <div class="shield-inner">🔒</div>
+                        </div>
+                        <div class="security-pills">
+                            <div class="sec-pill"><span class="sec-pill-icon">🛡️</span> Blockchain Celo</div>
+                            <div class="sec-pill"><span class="sec-pill-icon">🔐</span> Chiffrement E2E</div>
+                            <div class="sec-pill"><span class="sec-pill-icon">👥</span> Zéro intermédiaire</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slide-title">Entrez dans le<br>Private Ledger.</div>
+                <div class="slide-desc">Une plateforme humaine, sécurisée de bout en bout, et enracinée dans notre culture.</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="ob-footer">
+            <div class="ob-dots">
+                <div class="ob-dot active" id="dot0"></div>
+                <div class="ob-dot" id="dot1"></div>
+                <div class="ob-dot" id="dot2"></div>
+            </div>
+            <button class="btn btn-primary" id="nextBtn">Suivant</button>
+        </div>
+    </div>
+
+    <script>
+        let current = 0;
+        const total = 3;
+        const nextBtn = document.getElementById('nextBtn');
+
+        nextBtn.addEventListener('click', () => {
+            if (current < total - 1) {
+                document.getElementById(`slide${current+1}`).classList.remove('active');
+                document.getElementById(`dot${current}`).classList.remove('active');
+                current++;
+                document.getElementById(`slide${current+1}`).classList.add('active');
+                document.getElementById(`dot${current}`).classList.add('active');
+                nextBtn.textContent = current === total - 1 ? 'Commencer' : 'Suivant';
+            } else {
+                window.location.href = 'role-selection.html';
+            }
+        });
+    </script>
+</body>
+</html>

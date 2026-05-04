@@ -3,20 +3,32 @@
   "onboarding": {
     "slide1": { "title": "Flon tɔ gbɔn.", "titleAccent": "Mɛ fio ɖe.", "subtitle": "Sɛ́ xɔgbɛ ɖo Bénin tɔn kpo blɔ̌ 1% tɔn gbeɖé, wɛkɛ blockchain Celo tɔn dó bló nùɖuɖu tɔn." },
     "slide2": { "title": "Bo ɖè", "titleAccent": "30$ gbeɖé", "subtitle": "Western Union ɖè 14%. Mǐ ɖè 1% sín nú. Vɔsisa ɔ nɔ yi hwɛ̌ kú hwɛ̌ tɔn bɔ." },
-    "slide3": { "title": "Mɛ ɖaxó,", "titleAccent": "hwenu bǐ.", "subtitle": "Bló nùkplɔnkplɔn xá hagbɛ̌ 4 287 tɔn e ɖó linlin ɖo DiasporaConnect wu." },
-    "next": "Nɔví",
+    "slide3": { "title": "Mɛ ɖaxó,", "titleAccent": "hwenu bǐ.", "subtitle": "Bló nùkplɔnkplɔn xá hagbɛ̌ 4 287 tɔn e ɖó linlin xá DiasporaConnect wu." },
+    "next": "Yì ya!",
     "skip": "Yì",
-    "getStarted": "Bɛ́ ɖaxó",
+    "getStarted": "Bɛ́ azɔ̌",
     "createAccount": "Wlán compte",
-    "login": "Sɛ̀n"
+    "login": "Byɔ mɛ"
+  },
+  "home": {
+    "greeting": "A kú do, ",
+    "balance": "Kwɛ e ɖo kpan",
+    "withdraw": "Sè kwɛ",
+    "send": "Sɛ́ kwɛ",
+    "history": "Hwenu e wá yi",
+    "impact": "Nǔ e bló"
+  },
+  "withdraw": {
+    "chooseOperator": "Nɛ̌ a na sè kwɛ ɔ ?",
+    "confirm": "Dó gesí",
+    "success": "Kwɛ to we"
   },
   "common": {
-    "back": "Vɔ",
+    "back": "Gubɔ",
     "cancel": "Gbɛ́",
     "confirm": "Dó gesí",
-    "loading": "Dó blɔ̌...",
+    "loading": "Dó bló...",
     "fcfa": "FCFA",
-    "usd": "USD",
-    "eur": "EUR"
+    "usd": "USD"
   }
 }

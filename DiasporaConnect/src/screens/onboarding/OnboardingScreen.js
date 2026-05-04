@@ -1,29 +1,125 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, Dimensions, Animated, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
+import {
+  View, Text, StyleSheet, Dimensions, Animated, TouchableOpacity,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing, radius } from '../../theme/theme';
 import GoldButton from '../../components/ui/GoldButton';
+import ConnectionAnim from '../../components/animations/ConnectionAnim';
 
 const { width, height } = Dimensions.get('window');
+const isSmall = height < 700;
+
+// ─── Slide 2 : graphique comparaison frais ───────────────────────────────────
+function FeeIllustration() {
+  const barAnim = useRef(new Animated.Value(0)).current;
+  React.useEffect(() => {
+    Animated.timing(barAnim, {
+      toValue: 1, duration: 900, delay: 200, useNativeDriver: false,
+    }).start();
+  }, []);
+
+  const W = width * 0.78;
+  const bars = [
+    { label: 'WU',  pct: 0.14,  color: '#C0392B' },
+    { label: 'MG',  pct: 0.11,  color: '#E67E22' },
+    { label: 'WR',  pct: 0.07,  color: '#F39C12' },
+    { label: 'DC',  pct: 0.008, color: colors.primary },
+  ];
+  const maxH = isSmall ? 90 : 110;
+  const barW = (W - spacing.xl * 2 - spacing.md * 3) / 4;
+
+  return (
+    <View style={{ width: W, alignItems: 'center' }}>
+      <View style={{ flexDirection: 'row', alignItems: 'flex-end', height: maxH + 32, gap: spacing.md }}>
+        {bars.map((b) => {
+          const h = barAnim.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, maxH * (b.pct / 0.14)],
+          });
+          const isDC = b.label === 'DC';
+          return (
+            <View key={b.label} style={{ alignItems: 'center', width: barW }}>
+              <Animated.View style={{
+                width: barW, height: h,
+                backgroundColor: isDC ? colors.primary : b.color,
+                borderRadius: 4,
+                opacity: isDC ? 1 : 0.55,
+              }} />
+              <Text style={{
+                fontFamily: fonts.label, fontSize: 11, marginTop: 6,
+                color: isDC ? colors.primary : colors.onSurfaceVariant,
+                fontWeight: isDC ? '700' : '400',
+              }}>
+                {b.label}
+              </Text>
+            </View>
+          );
+        })}
+      </View>
+      <View style={styles.feeBadge}>
+        <Text style={styles.feeBadgeText}>{'< 1 %'} de frais</Text>
+      </View>
+    </View>
+  );
+}
+
+// ─── Slide 3 : sécurité — STATIQUE, pas d'animation ─────────────────────────
+function SecurityIllustration() {
+  const S = isSmall ? 110 : 130;
+  const pills = [
+    { icon: 'shield-checkmark-outline', label: 'Blockchain Celo' },
+    { icon: 'lock-closed-outline',      label: 'Chiffrement E2E' },
+    { icon: 'people-outline',           label: 'Zéro intermédiaire' },
+  ];
+
+  return (
+    <View style={{ alignItems: 'center' }}>
+      {/* Cadenas statique — aucune animation */}
+      <View style={[styles.shieldOuter, { width: S, height: S }]}>
+        <View style={[styles.shieldInner, { width: S * 0.65, height: S * 0.65 }]}>
+          <Ionicons
+            name="lock-closed"
+            size={isSmall ? 36 : 44}
+            color={colors.primary}
+          />
+        </View>
+      </View>
+
+      {/* Pills avec vraies icônes Ionicons */}
+      <View style={styles.securityPills}>
+        {pills.map((p) => (
+          <View key={p.label} style={styles.securityPill}>
+            <Ionicons name={p.icon} size={14} color={colors.primary} />
+            <Text style={styles.securityPillText}>{p.label}</Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
 
 const SLIDES = [
   {
     id: '1',
-    title: 'Une technologie qui vous rapproche.',
+    title: 'Une technologie\nqui vous rapproche.',
     description: 'DiasporaConnect lie la diaspora béninoise à ses familles grâce à la blockchain Celo.',
-    // Here we'd map to ConnectionAnim
+    illustration: <ConnectionAnim />,
   },
   {
     id: '2',
     title: 'Moins de frais.\nPlus pour eux.',
-    description: 'Les frais d\'envoi internationaux sont de 7 à 15%. Avec le smart contract The Private Ledger, ils passent sous 1%.',
-    // Here we'd feature the animated counter
+    description: "Les frais d'envoi internationaux sont de 7 à 15 %. Avec le Private Ledger, ils passent sous 1 %.",
+    illustration: <FeeIllustration />,
   },
   {
     id: '3',
     title: 'Entrez dans le\nPrivate Ledger.',
     description: 'Une plateforme humaine, sécurisée de bout en bout, et enracinée dans notre culture.',
-  }
+    illustration: <SecurityIllustration />,
+  },
 ];
 
 export default function OnboardingScreen({ navigation }) {
@@ -32,7 +128,7 @@ export default function OnboardingScreen({ navigation }) {
   const slidesRef = useRef(null);
 
   const viewableItemsChanged = useRef(({ viewableItems }) => {
-    if (viewableItems[0]) setCurrentIndex(viewableItems[0].index);
+    if (viewableItems?.length > 0) setCurrentIndex(viewableItems[0].index);
   }).current;
 
   const viewConfig = useRef({ viewAreaCoveragePercentThreshold: 50 }).current;
@@ -45,24 +141,32 @@ export default function OnboardingScreen({ navigation }) {
     }
   };
 
-  const skip = () => navigation.navigate('RoleSelect');
-
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="dark" />
+
+      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.brand}>DiasporaConnect</Text>
-        <TouchableOpacity onPress={skip}><Text style={styles.skip}>Passer</Text></TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('RoleSelect')}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Text style={styles.skip}>Passer</Text>
+        </TouchableOpacity>
       </View>
 
-      <View style={{ flex: 3 }}>
+      {/* Slides */}
+      <View style={styles.slidesWrapper}>
         <Animated.FlatList
           data={SLIDES}
           renderItem={({ item }) => (
             <View style={styles.slide}>
-              <View style={styles.illustrationPlaceholder} />
+              <View style={styles.illustrationLayer}>
+                {item.illustration}
+              </View>
               <View style={styles.textContainer}>
-                <Text style={styles.title}>{item.title}</Text>
+                <Text style={styles.title} numberOfLines={3}>{item.title}</Text>
                 <Text style={styles.description}>{item.description}</Text>
               </View>
             </View>
@@ -72,118 +176,115 @@ export default function OnboardingScreen({ navigation }) {
           pagingEnabled
           bounces={false}
           keyExtractor={(item) => item.id}
-          onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], {
-            useNativeDriver: false,
-          })}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+            { useNativeDriver: false }
+          )}
           onViewableItemsChanged={viewableItemsChanged}
           viewabilityConfig={viewConfig}
           ref={slidesRef}
         />
       </View>
 
+      {/* Footer */}
       <View style={styles.footer}>
         <View style={styles.indicatorContainer}>
           {SLIDES.map((_, i) => {
-            const opacity = scrollX.interpolate({
-              inputRange: [(i - 1) * width, i * width, (i + 1) * width],
-              outputRange: [0.3, 1, 0.3],
-              extrapolate: 'clamp',
+            const inputRange = [(i - 1) * width, i * width, (i + 1) * width];
+            const dotWidth = scrollX.interpolate({
+              inputRange, outputRange: [8, 24, 8], extrapolate: 'clamp',
             });
-            return <Animated.View style={[styles.dot, { opacity }]} key={i.toString()} />;
+            const opacity = scrollX.interpolate({
+              inputRange, outputRange: [0.3, 1, 0.3], extrapolate: 'clamp',
+            });
+            return <Animated.View style={[styles.dot, { width: dotWidth, opacity }]} key={i.toString()} />;
           })}
         </View>
-
-        <View style={styles.actions}>
-          {currentIndex === SLIDES.length - 1 ? (
-            <GoldButton 
-              title="Commencer" 
-              onPress={() => navigation.navigate('RoleSelect')} 
-              style={{ width: '100%' }} 
-            />
-          ) : (
-            <GoldButton 
-              title="Suivant" 
-              onPress={scrollToNext} 
-              style={{ width: '100%' }} 
-            />
-          )}
-        </View>
+        <GoldButton
+          title={currentIndex === SLIDES.length - 1 ? 'Commencer' : 'Suivant'}
+          onPress={scrollToNext}
+          style={styles.btn}
+        />
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.surface,
-  },
+  container: { flex: 1, backgroundColor: colors.surface },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.xl,
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.sm,
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    paddingHorizontal: spacing.xl, paddingTop: spacing.md, paddingBottom: spacing.sm,
   },
-  brand: {
-    fontFamily: fonts.display,
-    fontSize: 20,
-    color: colors.primary,
-  },
-  skip: {
-    fontFamily: fonts.title,
-    fontSize: 14,
-    color: colors.onSurfaceVariant,
-  },
+  brand: { fontFamily: fonts.display, fontSize: 20, color: colors.primary },
+  skip: { fontFamily: fonts.title, fontSize: 14, color: colors.onSurfaceVariant, paddingVertical: spacing.xs },
+  slidesWrapper: { flex: 1 },
   slide: {
-    width,
-    alignItems: 'center',
-    justifyContent: 'center',
+    width, flex: 1, alignItems: 'center', justifyContent: 'center',
     paddingHorizontal: spacing.xl,
   },
-  illustrationPlaceholder: {
-    width: width * 0.8,
-    height: height * 0.4,
-    backgroundColor: colors.surfaceContainerLow,
-    borderRadius: radius.md,
-    marginBottom: spacing.xxl,
-  },
-  textContainer: {
+  illustrationLayer: {
     width: '100%',
+    height: isSmall ? height * 0.28 : height * 0.32,
+    alignItems: 'center', justifyContent: 'center',
+    marginBottom: isSmall ? spacing.lg : spacing.xxl,
   },
+  textContainer: { width: '100%', paddingBottom: spacing.md },
   title: {
     fontFamily: fonts.display,
-    fontSize: 36,
+    fontSize: isSmall ? 28 : 34,
     color: colors.onSurface,
-    lineHeight: 44,
+    lineHeight: isSmall ? 36 : 44,
     letterSpacing: -0.02,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
+    flexShrink: 1,
   },
   description: {
     fontFamily: fonts.body,
-    fontSize: 16,
+    fontSize: isSmall ? 14 : 16,
     color: colors.onSurfaceVariant,
-    lineHeight: 24,
+    lineHeight: isSmall ? 22 : 26,
+    flexShrink: 1,
   },
   footer: {
-    flex: 1,
-    justifyContent: 'flex-end',
     paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.xxl,
+    paddingBottom: isSmall ? spacing.lg : spacing.xxl,
+    paddingTop: spacing.md,
   },
   indicatorContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: spacing.xxl,
+    flexDirection: 'row', justifyContent: 'center', alignItems: 'center',
+    marginBottom: spacing.xl, gap: 6,
   },
-  dot: {
-    height: 8,
-    width: 8,
-    borderRadius: 4,
-    backgroundColor: colors.primary,
-    marginHorizontal: 4,
+  dot: { height: 8, borderRadius: 4, backgroundColor: colors.primary },
+  btn: { width: '100%' },
+
+  // FeeIllustration
+  feeBadge: {
+    marginTop: spacing.md,
+    backgroundColor: 'rgba(117,91,0,0.1)',
+    paddingHorizontal: spacing.md, paddingVertical: 6,
+    borderRadius: radius.round,
   },
-  actions: {
-    width: '100%',
+  feeBadgeText: { fontFamily: fonts.label, fontSize: 13, color: colors.primary },
+
+  // SecurityIllustration — STATIQUE
+  shieldOuter: {
+    borderRadius: 999,
+    backgroundColor: 'rgba(117,91,0,0.1)',
+    alignItems: 'center', justifyContent: 'center',
+    marginBottom: spacing.xl,
   },
+  shieldInner: {
+    borderRadius: 999,
+    backgroundColor: 'rgba(117,91,0,0.15)',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  securityPills: { gap: spacing.sm, alignItems: 'center' },
+  securityPill: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    backgroundColor: colors.surfaceContainerLow,
+    paddingHorizontal: spacing.md, paddingVertical: 7,
+    borderRadius: radius.round,
+  },
+  securityPillText: { fontFamily: fonts.label, fontSize: 13, color: colors.onSurface },
 });

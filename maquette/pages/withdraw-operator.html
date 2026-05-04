@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Retrait</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="../assets/js/nav.js"></script>
+    <style>
+        .wo-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-sm);
+        }
+        .wo-back { font-size: 24px; color: var(--primary); text-decoration: none; }
+        .wo-title { font-family: var(--font-title); font-size: 16px; color: var(--on-surface); }
+
+        .wo-scroll { padding: var(--spacing-lg) var(--spacing-xl); padding-bottom: 100px; }
+
+        .wo-instruction {
+            font-family: var(--font-headline); font-size: 22px; color: var(--on-surface);
+            margin-bottom: var(--spacing-xl); line-height: 30px;
+        }
+
+        /* Operator row — 2 cards côte à côte */
+        .operator-row { display: flex; gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+        .operator-card {
+            flex: 1; background: var(--surface-lowest);
+            padding: var(--spacing-lg); border-radius: var(--radius-md);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border: 1.5px solid transparent;
+            box-shadow: var(--shadow-diffuse);
+            position: relative; min-height: 120px;
+            cursor: pointer; transition: border-color 0.2s;
+        }
+        .operator-card.active { border-color: var(--primary); }
+
+        .op-check {
+            position: absolute; top: 10px; right: 10px;
+            width: 22px; height: 22px; border-radius: var(--radius-round);
+            background: var(--primary);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 12px; font-family: var(--font-title);
+        }
+
+        .op-logo {
+            width: 60px; height: 60px; border-radius: 30px;
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-title); font-size: 14px;
+            margin-bottom: var(--spacing-md);
+        }
+        .op-name {
+            font-family: var(--font-body); font-size: 13px;
+            color: var(--on-surface-variant); text-align: center; line-height: 18px;
+        }
+        .op-name.active { font-family: var(--font-title); color: var(--on-surface); }
+
+        /* Info box */
+        .info-box {
+            background: var(--surface-low); padding: var(--spacing-lg);
+            border-radius: var(--radius-md);
+        }
+        .info-text { font-family: var(--font-body); font-size: 14px; color: var(--on-surface-variant); line-height: 22px; }
+
+        /* Footer */
+        .wo-footer {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 430px;
+            padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl);
+            background: var(--surface);
+            border-top: 1px solid rgba(208,197,178,0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-view">
+        <div id="dc-nav" data-active="receive"></div>
+        <div class="wo-header">
+            <a href="home-receiver.html" class="wo-back">←</a>
+            <span class="wo-title">Retrait</span>
+            <div style="width:40px;"></div>
+        </div>
+
+        <div class="wo-scroll">
+            <div class="wo-instruction">Où souhaitez-vous<br>recevoir les fonds ?</div>
+
+            <div class="operator-row">
+                <!-- MTN -->
+                <div class="operator-card active" id="cardMTN" onclick="selectOp('MTN')">
+                    <div class="op-check" id="checkMTN">✓</div>
+                    <div class="op-logo" style="background:#FFCC00;">
+                        <span style="color:#1B1C1A;">MTN</span>
+                    </div>
+                    <div class="op-name active" id="nameMTN">MTN Money</div>
+                </div>
+
+                <!-- Moov -->
+                <div class="operator-card" id="cardMoov" onclick="selectOp('Moov')">
+                    <div class="op-logo" style="background:#005BBB;">
+                        <span style="color:#fff;">Moov</span>
+                    </div>
+                    <div class="op-name" id="nameMoov">Moov Money</div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-text">Les retraits sont instantanés au Bénin. DiasporaConnect ne prélève aucun frais sur le retrait.</div>
+            </div>
+        </div>
+
+        <div class="wo-footer">
+            <a href="withdraw-confirm.html" class="btn btn-primary">Continuer</a>
+        </div>
+    </div>
+
+    <script>
+        function selectOp(op) {
+            ['MTN','Moov'].forEach(id => {
+                document.getElementById(`card${id}`).classList.remove('active');
+                document.getElementById(`name${id}`).classList.remove('active');
+                const chk = document.getElementById(`check${id}`);
+                if (chk) chk.remove();
+            });
+            const card = document.getElementById(`card${op}`);
+            card.classList.add('active');
+            document.getElementById(`name${op}`).classList.add('active');
+            const badge = document.createElement('div');
+            badge.className = 'op-check'; badge.id = `check${op}`; badge.textContent = '✓';
+            card.insertBefore(badge, card.firstChild);
+        }
+    </script>
+</body>
+</html>

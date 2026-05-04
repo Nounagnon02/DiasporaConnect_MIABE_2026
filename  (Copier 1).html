@@ -1,0 +1,3296 @@
+==============================
+SOMMAIRE :
+
+- Splash Screen
+- Onboarding
+- Choix du Rôle
+- Authentification Émetteur
+- Accueil Émetteur
+- Calculateur de Transfert
+- Envoi - Étape 1 (Bénéficiaire)
+- Envoi - Étape 2 (Impact)
+- Envoi - Étape 3 (Résumé)
+- Envoi - Étape 4 (Succès)
+- Authentification Bénéficiaire
+- Accueil Bénéficiaire
+- Retrait - Étape 1 (Opérateur)
+- Retrait - Étape 2 (Confirmation)
+- Retrait - Étape 3 (Succès)
+- Historique des Transactions
+- Détails de la Transaction
+- Mon Impact Écologique
+- Mon Profil
+- Support & Contact
+
+==============================
+
+<style>
+        .dc-topnav{width:100%;max-width:430px;background:rgba(250,249,245,0.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(208,197,178,0.35);display:flex;align-items:center;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;padding:0 4px;gap:0;z-index:200;flex-shrink:0;position:sticky;top:0;}
+        .dc-topnav::-webkit-scrollbar{display:none;}
+        .dc-tnav-item{display:flex;align-items:center;justify-content:center;white-space:nowrap;padding:10px 14px;font-family:"Public Sans",sans-serif;font-size:12px;font-weight:500;color:#4A4A48;text-decoration:none;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;flex-shrink:0;}
+        .dc-tnav-item:hover{color:#755B00;}
+        .dc-tnav-item.active{color:#755B00;border-bottom-color:#755B00;font-weight:600;}
+</style>
+
+==============================
+Page : Splash Screen
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Splash</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .splash-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            background: linear-gradient(180deg, #6B4F00 0%, #8B6800 30%, #C9A020 70%, #E8B800 100%);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .bg-circle-1 {
+            position: absolute;
+            width: 120vw; height: 120vw;
+            max-width: 516px; max-height: 516px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.04);
+            top: -40vw;
+        }
+        .bg-circle-2 {
+            position: absolute;
+            width: 80vw; height: 80vw;
+            max-width: 344px; max-height: 344px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.04);
+            bottom: -20vw;
+        }
+        .logo-card {
+            width: 160px; height: 160px;
+            border-radius: 28px;
+            background: #FFFFFF;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+            margin-bottom: 32px;
+            animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.2s both;
+        }
+        .logo-card-text {
+            font-family: var(--font-display);
+            font-size: 48px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+        .splash-title {
+            font-family: var(--font-display);
+            font-size: 30px;
+            color: #FFFFFF;
+            letter-spacing: -0.3px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            animation: fadeUp 0.4s ease 0.7s both;
+        }
+        .splash-tagline {
+            font-family: var(--font-label);
+            font-size: 13px;
+            color: rgba(255,255,255,0.7);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 48px;
+            animation: fadeUp 0.4s ease 1.1s both;
+        }
+        .loading-dots {
+            display: flex;
+            gap: 6px;
+            margin-top: 32px;
+            animation: fadeUp 0.4s ease 1.1s both;
+        }
+        .dot {
+            width: 6px; height: 6px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.5);
+        }
+        .dot.mid { background: rgba(255,255,255,0.9); }
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.85); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-view">
+        <div class="splash-container">
+    <nav class="dc-topnav"><a href="splash.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg><span>Accueil</span></a><a href="onboarding.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Onboarding</span></a><a href="calculator.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>Envoi</span></a><a href="send-step3.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Confirmation</span></a><a href="home-receiver.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Réception</span></a><a href="home-sender.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span></a></nav>
+            <div class="bg-circle-1"></div>
+            <div class="bg-circle-2"></div>
+            <div class="logo-card">
+                <span class="logo-card-text">DC</span>
+            </div>
+            <div class="splash-title">DiasporaConnect</div>
+            <div class="splash-tagline">The Private Ledger</div>
+            <div class="loading-dots">
+                <div class="dot"></div>
+                <div class="dot mid"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        setTimeout(() => { window.location.href = 'onboarding.html'; }, 3000);
+    </script>
+</body>
+</html>
+
+
+==============================
+Page : Onboarding
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Onboarding</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        /* background déjà défini dans style.css */
+        .ob-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: var(--spacing-md) var(--spacing-xl) var(--spacing-sm);
+        }
+        .ob-brand {
+            font-family: var(--font-display); font-size: 20px;
+            color: var(--primary); font-weight: 700;
+        }
+        .ob-skip {
+            font-family: var(--font-title); font-size: 14px;
+            color: var(--on-surface-variant); text-decoration: none;
+            padding: var(--spacing-xs) 0;
+        }
+        .slides-wrapper { flex: 1; overflow: hidden; height: 0; }
+        .slide {
+            display: none; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 0 var(--spacing-xl);
+            animation: fadeIn 0.4s ease;
+        }
+        .slide.active { display: flex; }
+        .illustration-layer {
+            width: 100%; height: 220px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: var(--spacing-xxl);
+        }
+
+        /* Slide 1 — Connection Anim */
+        .conn-anim {
+            display: flex; align-items: center; gap: 12px;
+        }
+        .conn-node {
+            width: 56px; height: 56px; border-radius: 50%;
+            background: rgba(117,91,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px;
+        }
+        .conn-line {
+            flex: 1; height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-container));
+            position: relative; max-width: 80px;
+        }
+        .conn-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: var(--primary);
+            position: absolute; top: -4px; left: 0;
+            animation: slideDot 1.8s ease-in-out infinite;
+        }
+        @keyframes slideDot {
+            0%   { left: 0; opacity: 1; }
+            80%  { left: calc(100% - 10px); opacity: 1; }
+            100% { left: calc(100% - 10px); opacity: 0; }
+        }
+
+        /* Slide 2 — Fee bars */
+        .fee-chart {
+            display: flex; align-items: flex-end;
+            gap: var(--spacing-md); height: 130px;
+        }
+        .fee-bar-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .fee-bar {
+            width: 44px; border-radius: 4px;
+            transition: height 0.9s ease;
+        }
+        .fee-bar-label {
+            font-family: var(--font-label); font-size: 11px;
+            color: var(--on-surface-variant);
+        }
+        .fee-bar-label.dc { color: var(--primary); font-weight: 700; }
+        .fee-badge {
+            margin-top: var(--spacing-md);
+            background: rgba(117,91,0,0.1);
+            padding: 6px var(--spacing-md);
+            border-radius: var(--radius-round);
+            font-family: var(--font-label); font-size: 13px;
+            color: var(--primary);
+        }
+
+        /* Slide 3 — Security */
+        .shield-outer {
+            width: 120px; height: 120px; border-radius: 50%;
+            background: rgba(117,91,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: var(--spacing-xl);
+        }
+        .shield-inner {
+            width: 78px; height: 78px; border-radius: 50%;
+            background: rgba(117,91,0,0.15);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 36px;
+        }
+        .security-pills {
+            display: flex; flex-direction: column;
+            align-items: center; gap: var(--spacing-sm);
+        }
+        .sec-pill {
+            display: flex; align-items: center; gap: 6px;
+            background: var(--surface-low);
+            padding: 7px var(--spacing-md);
+            border-radius: var(--radius-round);
+            font-family: var(--font-label); font-size: 13px;
+            color: var(--on-surface);
+        }
+        .sec-pill-icon { font-size: 14px; }
+
+        /* Text */
+        .slide-title {
+            font-family: var(--font-display); font-size: 34px;
+            color: var(--on-surface); line-height: 44px;
+            letter-spacing: -0.02em; margin-bottom: var(--spacing-md);
+            width: 100%;
+        }
+        .slide-desc {
+            font-family: var(--font-body); font-size: 16px;
+            color: var(--on-surface-variant); line-height: 26px;
+            width: 100%;
+        }
+
+        /* Footer */
+        .ob-footer {
+            padding: var(--spacing-md) var(--spacing-xl) var(--spacing-xxl);
+        }
+        .ob-dots {
+            display: flex; justify-content: center; align-items: center;
+            gap: 6px; margin-bottom: var(--spacing-xl);
+        }
+        .ob-dot {
+            height: 8px; border-radius: 4px;
+            background: var(--primary); opacity: 0.3;
+            width: 8px; transition: width 0.3s, opacity 0.3s;
+        }
+        .ob-dot.active { width: 24px; opacity: 1; }
+    </style>
+</head>
+<body>
+    <div class="mobile-view" style="display:flex;flex-direction:column;">
+    <nav class="dc-topnav"><a href="splash.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg><span>Accueil</span></a><a href="onboarding.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Onboarding</span></a><a href="calculator.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>Envoi</span></a><a href="send-step3.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Confirmation</span></a><a href="home-receiver.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Réception</span></a><a href="home-sender.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span></a></nav>
+                <!-- Header -->
+        <div class="ob-header">
+            <span class="ob-brand">DiasporaConnect</span>
+            <a href="role-selection.html" class="ob-skip">Passer</a>
+        </div>
+
+        <!-- Slides -->
+        <div class="slides-wrapper" style="flex:1;">
+            <!-- Slide 1 -->
+            <div class="slide active" id="slide1" style="height:100%;">
+                <div class="illustration-layer">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:var(--spacing-xl);">
+                        <div class="conn-anim">
+                            <div class="conn-node">🌍</div>
+                            <div class="conn-line"><div class="conn-dot"></div></div>
+                            <div class="conn-node" style="background:rgba(117,91,0,0.15);">🇧🇯</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slide-title">Une technologie<br>qui vous rapproche.</div>
+                <div class="slide-desc">DiasporaConnect lie la diaspora béninoise à ses familles grâce à la blockchain Celo.</div>
+            </div>
+
+            <!-- Slide 2 -->
+            <div class="slide" id="slide2" style="height:100%;">
+                <div class="illustration-layer">
+                    <div style="display:flex;flex-direction:column;align-items:center;">
+                        <div class="fee-chart" id="feeChart">
+                            <div class="fee-bar-wrap">
+                                <div class="fee-bar" style="height:110px;background:#C0392B;opacity:0.55;"></div>
+                                <span class="fee-bar-label">WU</span>
+                            </div>
+                            <div class="fee-bar-wrap">
+                                <div class="fee-bar" style="height:86px;background:#E67E22;opacity:0.55;"></div>
+                                <span class="fee-bar-label">MG</span>
+                            </div>
+                            <div class="fee-bar-wrap">
+                                <div class="fee-bar" style="height:55px;background:#F39C12;opacity:0.55;"></div>
+                                <span class="fee-bar-label">WR</span>
+                            </div>
+                            <div class="fee-bar-wrap">
+                                <div class="fee-bar" style="height:6px;background:var(--primary);"></div>
+                                <span class="fee-bar-label dc">DC</span>
+                            </div>
+                        </div>
+                        <div class="fee-badge">&lt; 1 % de frais</div>
+                    </div>
+                </div>
+                <div class="slide-title">Moins de frais.<br>Plus pour eux.</div>
+                <div class="slide-desc">Les frais d'envoi internationaux sont de 7 à 15 %. Avec le Private Ledger, ils passent sous 1 %.</div>
+            </div>
+
+            <!-- Slide 3 -->
+            <div class="slide" id="slide3" style="height:100%;">
+                <div class="illustration-layer">
+                    <div style="display:flex;flex-direction:column;align-items:center;">
+                        <div class="shield-outer">
+                            <div class="shield-inner">🔒</div>
+                        </div>
+                        <div class="security-pills">
+                            <div class="sec-pill"><span class="sec-pill-icon">🛡️</span> Blockchain Celo</div>
+                            <div class="sec-pill"><span class="sec-pill-icon">🔐</span> Chiffrement E2E</div>
+                            <div class="sec-pill"><span class="sec-pill-icon">👥</span> Zéro intermédiaire</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slide-title">Entrez dans le<br>Private Ledger.</div>
+                <div class="slide-desc">Une plateforme humaine, sécurisée de bout en bout, et enracinée dans notre culture.</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="ob-footer">
+            <div class="ob-dots">
+                <div class="ob-dot active" id="dot0"></div>
+                <div class="ob-dot" id="dot1"></div>
+                <div class="ob-dot" id="dot2"></div>
+            </div>
+            <button class="btn btn-primary" id="nextBtn">Suivant</button>
+        </div>
+    </div>
+
+    <script>
+        let current = 0;
+        const total = 3;
+        const nextBtn = document.getElementById('nextBtn');
+
+        nextBtn.addEventListener('click', () => {
+            if (current < total - 1) {
+                document.getElementById(`slide${current+1}`).classList.remove('active');
+                document.getElementById(`dot${current}`).classList.remove('active');
+                current++;
+                document.getElementById(`slide${current+1}`).classList.add('active');
+                document.getElementById(`dot${current}`).classList.add('active');
+                nextBtn.textContent = current === total - 1 ? 'Commencer' : 'Suivant';
+            } else {
+                window.location.href = 'role-selection.html';
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+==============================
+Page : Choix du Rôle
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Choisir un rôle</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .rs-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: var(--spacing-md) var(--spacing-xl) var(--spacing-sm);
+        }
+        .rs-brand { font-family: var(--font-display); font-size: 17px; color: var(--primary); }
+        .rs-back {
+            width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+            color: var(--primary); font-size: 22px; text-decoration: none;
+        }
+        .rs-placeholder { width: 36px; }
+
+        .hero-bg {
+            margin: 0 var(--spacing-xl) var(--spacing-xl);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg) var(--spacing-xl);
+            background: linear-gradient(135deg, rgba(117,91,0,0.07) 0%, rgba(201,168,76,0.11) 100%);
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .hero-icons-row {
+            display: flex; align-items: center; width: 100%; margin-bottom: var(--spacing-md);
+        }
+        .hero-node { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .hero-emoji { font-size: 36px; }
+        .hero-node-label {
+            font-family: var(--font-label); font-size: 11px; color: var(--on-surface-variant);
+        }
+        .hero-arrow-track {
+            flex: 1; display: flex; align-items: center; margin: 0 var(--spacing-md);
+        }
+        .hero-arrow-line { flex: 1; height: 2px; background: var(--primary-container); opacity: 0.6; }
+        .hero-arrow-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: var(--primary); margin: 0 4px;
+        }
+        .hero-caption {
+            font-family: var(--font-label); font-size: 13px; color: var(--primary);
+            letter-spacing: 0.2px; text-align: center;
+        }
+
+        .rs-scroll { padding: 0 var(--spacing-xl) var(--spacing-xxl); }
+        .rs-title {
+            font-family: var(--font-display); font-size: 32px; color: var(--on-surface);
+            margin-bottom: var(--spacing-sm); letter-spacing: -0.5px; line-height: 40px;
+        }
+        .rs-subtitle {
+            font-family: var(--font-body); font-size: 15px; color: var(--on-surface-variant);
+            margin-bottom: var(--spacing-xl); line-height: 24px;
+        }
+
+        .role-card {
+            display: flex; align-items: center;
+            background: var(--surface-lowest);
+            border-radius: var(--radius-md); padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            border: 1px solid rgba(117,91,0,0.15);
+            box-shadow: var(--shadow-diffuse);
+            text-decoration: none; color: inherit; cursor: pointer;
+        }
+        .role-card-secondary {
+            background: var(--surface-low);
+            border: 1px solid rgba(208,197,178,0.3);
+            box-shadow: none;
+        }
+        .role-icon-wrap {
+            width: 52px; height: 52px; border-radius: 26px;
+            background: rgba(117,91,0,0.06);
+            display: flex; align-items: center; justify-content: center;
+            margin-right: var(--spacing-md); flex-shrink: 0;
+            font-size: 28px;
+        }
+        .role-text { flex: 1; margin-right: var(--spacing-md); }
+        .role-title {
+            font-family: var(--font-title); font-size: 16px;
+            color: var(--on-surface); margin-bottom: 4px;
+        }
+        .role-desc {
+            font-family: var(--font-body); font-size: 13px;
+            color: var(--on-surface-variant); line-height: 20px;
+        }
+        .role-arrow { color: var(--primary); font-size: 20px; flex-shrink: 0; }
+
+        .foot-note {
+            display: flex; align-items: center; justify-content: center;
+            gap: 5px; margin-top: var(--spacing-lg);
+        }
+        .foot-note-text {
+            font-family: var(--font-body); font-size: 12px; color: var(--on-surface-variant);
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-view">
+    <nav class="dc-topnav"><a href="splash.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg><span>Accueil</span></a><a href="onboarding.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Onboarding</span></a><a href="calculator.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>Envoi</span></a><a href="send-step3.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Confirmation</span></a><a href="home-receiver.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Réception</span></a><a href="home-sender.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span></a></nav>
+                <!-- Header -->
+                <div class="rs-header">
+            <a href="onboarding.html" class="rs-back">←</a>
+            <span class="rs-brand">DiasporaConnect</span>
+            <div class="rs-placeholder"></div>
+        </div>
+
+        <!-- Hero -->
+        <div class="hero-bg">
+            <div class="hero-icons-row">
+                <div class="hero-node">
+                    <span class="hero-emoji">🌍</span>
+                    <span class="hero-node-label">Diaspora</span>
+                </div>
+                <div class="hero-arrow-track">
+                    <div class="hero-arrow-line"></div>
+                    <div class="hero-arrow-dot"></div>
+                    <div class="hero-arrow-line"></div>
+                </div>
+                <div class="hero-node">
+                    <span class="hero-emoji">🇧🇯</span>
+                    <span class="hero-node-label">Bénin</span>
+                </div>
+            </div>
+            <div class="hero-caption">Transferts instantanés · Frais &lt; 1 %</div>
+        </div>
+
+        <!-- Content -->
+        <div class="rs-scroll">
+            <div class="rs-title">Quel est votre<br>rôle ?</div>
+            <div class="rs-subtitle">Sélectionnez votre profil pour continuer l'inscription ou la connexion.</div>
+
+            <a href="auth-sender.html" class="role-card">
+                <div class="role-icon-wrap">🌍</div>
+                <div class="role-text">
+                    <div class="role-title">Expéditeur (Diaspora)</div>
+                    <div class="role-desc">J'envoie de l'argent vers le Bénin depuis l'étranger.</div>
+                </div>
+                <span class="role-arrow">›</span>
+            </a>
+
+            <a href="auth-receiver.html" class="role-card role-card-secondary">
+                <div class="role-icon-wrap">🇧🇯</div>
+                <div class="role-text">
+                    <div class="role-title">Destinataire (Bénin)</div>
+                    <div class="role-desc">Je reçois de l'argent sur mon compte Mobile Money (MTN / Moov).</div>
+                </div>
+                <span class="role-arrow">›</span>
+            </a>
+
+            <div class="foot-note">
+                <span style="font-size:12px;">🔒</span>
+                <span class="foot-note-text">Vos données sont protégées par la blockchain Celo</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+
+==============================
+Page : Authentification Émetteur
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Connexion Expéditeur</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .as-header { padding: var(--spacing-md) var(--spacing-xl) var(--spacing-sm); }
+        .as-back { font-size: 24px; color: var(--primary); text-decoration: none; }
+        .as-scroll { padding: 0 var(--spacing-xl) var(--spacing-xxl); }
+        .as-title {
+            font-family: var(--font-display); font-size: 30px; color: var(--on-surface);
+            margin-bottom: var(--spacing-sm); letter-spacing: -0.02em; line-height: 38px;
+        }
+        .as-subtitle {
+            font-family: var(--font-body); font-size: 15px; color: var(--on-surface-variant);
+            margin-bottom: var(--spacing-xl); line-height: 23px;
+        }
+        .section-label {
+            font-family: var(--font-title); font-size: 13px; color: var(--on-surface-variant);
+            margin-bottom: var(--spacing-md); text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .chain-card {
+            display: flex; align-items: center;
+            background: var(--surface-lowest);
+            border-radius: var(--radius-md); padding: var(--spacing-md);
+            margin-bottom: var(--spacing-sm);
+            border: 1px solid transparent;
+            box-shadow: var(--shadow-glass);
+            cursor: pointer; transition: border-color 0.2s, background 0.2s;
+        }
+        .chain-card.active {
+            border-color: var(--primary);
+            background: rgba(117,91,0,0.04);
+        }
+        .chain-emoji { font-size: 26px; margin-right: var(--spacing-md); flex-shrink: 0; }
+        .chain-info { flex: 1; margin-right: var(--spacing-sm); }
+        .chain-name {
+            font-family: var(--font-title); font-size: 15px; color: var(--on-surface); margin-bottom: 2px;
+        }
+        .chain-name.active { color: var(--primary); }
+        .chain-desc { font-family: var(--font-body); font-size: 12px; color: var(--on-surface-variant); line-height: 17px; }
+        .check-badge {
+            width: 24px; height: 24px; border-radius: 12px;
+            background: var(--primary);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 13px; font-family: var(--font-title);
+            flex-shrink: 0;
+        }
+
+        .divider {
+            display: flex; align-items: center; gap: 10px;
+            margin: var(--spacing-xl) 0;
+        }
+        .divider-line { flex: 1; height: 1px; background: rgba(208,197,178,0.3); }
+        .divider-text { font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant); }
+
+        .ledger-input-wrap { margin-bottom: var(--spacing-md); }
+        .ledger-label {
+            font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant);
+            margin-bottom: 6px; display: block;
+        }
+        .ledger-input {
+            width: 100%; padding: var(--spacing-md);
+            border: none; border-bottom: 2px solid rgba(208,197,178,0.4);
+            background: transparent;
+            font-family: var(--font-label); font-size: 15px;
+            color: var(--on-surface);
+        }
+        .ledger-input:focus { outline: none; border-color: var(--primary); }
+
+        .actions-block { margin-top: var(--spacing-xl); display: flex; flex-direction: column; gap: var(--spacing-md); }
+        .btn-demo {
+            height: 52px; display: flex; align-items: center; justify-content: center;
+            background: var(--surface-low); border-radius: var(--radius-md);
+            font-family: var(--font-title); font-size: 15px; color: var(--on-surface);
+            text-decoration: none; border: none; cursor: pointer;
+        }
+        .secure-note {
+            display: flex; align-items: center; justify-content: center;
+            padding: var(--spacing-sm) 0;
+            font-family: var(--font-body); font-size: 12px; color: var(--on-surface-variant);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-view">
+    <nav class="dc-topnav"><a href="splash.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg><span>Accueil</span></a><a href="onboarding.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Onboarding</span></a><a href="calculator.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>Envoi</span></a><a href="send-step3.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Confirmation</span></a><a href="home-receiver.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Réception</span></a><a href="home-sender.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span></a></nav>
+                <div class="as-header">
+            <a href="role-selection.html" class="as-back">←</a>
+        </div>
+
+        <div class="as-scroll">
+            <div class="as-title">Connecter votre<br>portefeuille</div>
+            <div class="as-subtitle">DiasporaConnect utilise la blockchain Celo pour des transferts sécurisés et transparents.</div>
+
+            <div class="section-label">Choisir le réseau</div>
+
+            <div class="chain-card active" onclick="selectChain(this, 'celo')">
+                <span class="chain-emoji">🟡</span>
+                <div class="chain-info">
+                    <div class="chain-name active">Celo</div>
+                    <div class="chain-desc">Réseau principal DiasporaConnect</div>
+                </div>
+                <div class="check-badge">✓</div>
+            </div>
+
+            <div class="chain-card" onclick="selectChain(this, 'ethereum')">
+                <span class="chain-emoji">🔷</span>
+                <div class="chain-info">
+                    <div class="chain-name">Ethereum</div>
+                    <div class="chain-desc">Compatible EVM</div>
+                </div>
+            </div>
+
+            <div class="chain-card" onclick="selectChain(this, 'polygon')">
+                <span class="chain-emoji">🟣</span>
+                <div class="chain-info">
+                    <div class="chain-name">Polygon</div>
+                    <div class="chain-desc">Frais réduits</div>
+                </div>
+            </div>
+
+            <div class="divider">
+                <div class="divider-line"></div>
+                <span class="divider-text">ou saisir manuellement</span>
+                <div class="divider-line"></div>
+            </div>
+
+            <div class="ledger-input-wrap">
+                <label class="ledger-label">Adresse du portefeuille (0x...)</label>
+                <input class="ledger-input" type="text" placeholder="0x1a3b5c..." autocapitalize="none">
+            </div>
+
+            <div class="actions-block">
+                <a href="home-sender.html" class="btn btn-primary">Connecter le portefeuille</a>
+                <a href="home-sender.html" class="btn-demo">🚀 Continuer en mode démo</a>
+                <div class="secure-note">🔒 Connexion chiffrée de bout en bout</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function selectChain(el, id) {
+            document.querySelectorAll('.chain-card').forEach(c => {
+                c.classList.remove('active');
+                c.querySelector('.chain-name').classList.remove('active');
+                const badge = c.querySelector('.check-badge');
+                if (badge) badge.remove();
+            });
+            el.classList.add('active');
+            el.querySelector('.chain-name').classList.add('active');
+            const badge = document.createElement('div');
+            badge.className = 'check-badge';
+            badge.textContent = '✓';
+            el.appendChild(badge);
+        }
+    </script>
+</body>
+</html>
+
+
+==============================
+Page : Accueil Émetteur
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Accueil Expéditeur</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .dc-tabs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;display:flex;justify-content:space-around;padding:8px 0 max(12px,env(safe-area-inset-bottom,8px));background:rgba(250,249,245,0.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(208,197,178,0.4);z-index:100;}
+        .dc-tab{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#4A4A48;font-size:11px;gap:3px;padding:0 12px;font-family:'Public Sans',sans-serif;}
+        .dc-tab .dc-tab-icon{font-size:20px;line-height:1;}
+        .dc-tab.active{color:#755B00;}
+        .hs-scroll { padding: var(--spacing-lg) var(--spacing-xl) 120px; }
+
+        /* Header */
+        .hs-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: var(--spacing-xl);
+        }
+        .hs-greeting-small { font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant); }
+        .hs-greeting { font-family: var(--font-title); font-size: 20px; color: var(--on-surface); }
+        .profile-badge {
+            width: 44px; height: 44px; border-radius: var(--radius-round);
+            background: var(--surface-lowest);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: var(--shadow-diffuse); flex-shrink: 0;
+            text-decoration: none;
+        }
+        .profile-initials { font-family: var(--font-title); font-size: 16px; color: var(--primary); }
+
+        /* Hero balance */
+        .hero-section { margin-bottom: var(--spacing-xl); }
+        .balance-label { font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant); margin-bottom: var(--spacing-xs); }
+        .balance-usd {
+            font-family: var(--font-display); font-size: 40px; color: var(--on-surface);
+            letter-spacing: -0.02em; margin-bottom: var(--spacing-xs);
+        }
+        .balance-fcfa { font-family: var(--font-label); font-size: 15px; color: var(--on-surface-variant); }
+
+        /* CTA */
+        .cta-wrapper {
+            margin-bottom: var(--spacing-xl); border-radius: var(--radius-md);
+            box-shadow: var(--shadow-diffuse); text-decoration: none;
+        }
+        .cta-card {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: var(--spacing-lg); border-radius: var(--radius-md);
+            background: linear-gradient(90deg, #755B00 0%, #C9A84C 100%);
+        }
+        .cta-text { flex: 1; margin-right: var(--spacing-md); }
+        .cta-title { font-family: var(--font-title); font-size: clamp(17px, 4.5vw, 20px); color: #fff; margin-bottom: 2px; }
+        .cta-sub { font-family: var(--font-body); font-size: 13px; color: rgba(255,255,255,0.8); }
+        .cta-arrow-circle {
+            width: 48px; height: 48px; border-radius: 24px;
+            background: rgba(255,255,255,0.2);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; font-size: 20px; color: #fff;
+        }
+
+        /* Glass savings card */
+        .savings-card {
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(208,197,178,0.15);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-glass);
+            margin-bottom: var(--spacing-xl);
+        }
+        .savings-label { font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant); margin-bottom: var(--spacing-xs); }
+        .savings-amount { font-family: var(--font-label); font-size: 24px; color: var(--primary); letter-spacing: -0.02em; margin-bottom: 2px; }
+        .savings-sub { font-family: var(--font-label); font-size: 12px; color: var(--on-surface-variant); line-height: 17px; }
+
+        /* Transactions */
+        .section-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: var(--spacing-md);
+        }
+        .section-title { font-family: var(--font-title); font-size: 17px; color: var(--on-surface); }
+        .see-all { font-family: var(--font-label); font-size: 13px; color: var(--primary); text-decoration: none; }
+
+        .tx-item {
+            display: flex; align-items: center;
+            padding: var(--spacing-md) 0;
+            border-bottom: 1px solid rgba(208,197,178,0.15);
+            gap: var(--spacing-md); cursor: pointer;
+        }
+        .tx-avatar {
+            width: 40px; height: 40px; border-radius: var(--radius-sm);
+            background: var(--surface-low);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-title); font-size: 14px; color: var(--primary);
+            flex-shrink: 0;
+        }
+        .tx-info { flex: 1; }
+        .tx-name { font-family: var(--font-body); font-size: 15px; color: var(--on-surface); margin-bottom: 2px; }
+        .tx-date { font-family: var(--font-label); font-size: 12px; color: var(--on-surface-variant); }
+        .tx-amount { font-family: var(--font-label); font-size: 14px; color: var(--on-surface); text-align: right; }
+        .tx-status { font-family: var(--font-label); font-size: 11px; color: var(--primary); text-align: right; }
+    </style>
+</head>
+<body>
+    <div class="mobile-view">
+    <nav class="dc-topnav"><a href="splash.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg><span>Accueil</span></a><a href="onboarding.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Onboarding</span></a><a href="calculator.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>Envoi</span></a><a href="send-step3.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Confirmation</span></a><a href="home-receiver.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Réception</span></a><a href="home-sender.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span></a></nav>
+                <div class="hs-scroll">
+            <!-- Header -->
+            <div class="hs-header">
+                <div style="flex:1;margin-right:var(--spacing-md);">
+                    <div class="hs-greeting-small">Bonjour,</div>
+                    <div class="hs-greeting">Kossi</div>
+                </div>
+                <a href="profile.html" class="profile-badge">
+                    <span class="profile-initials">K</span>
+                </a>
+            </div>
+
+            <!-- Hero Balance -->
+            <div class="hero-section">
+                <div class="balance-label">Votre solde</div>
+                <div class="balance-usd">1 242,80 USD</div>
+                <div class="balance-fcfa">≈ 761 465 FCFA</div>
+            </div>
+
+            <!-- CTA Transfert -->
+            <a href="calculator.html" class="cta-wrapper" style="display:block;">
+                <div class="cta-card">
+                    <div class="cta-text">
+                        <div class="cta-title">Faire un transfert</div>
+                        <div class="cta-sub">Frais &lt; 1 % · Actif sur Celo</div>
+                    </div>
+                    <div class="cta-arrow-circle">›</div>
+                </div>
+            </a>
+
+            <!-- Savings GlassCard -->
+            <div class="savings-card">
+                <div class="savings-label">Économies réalisées ce mois-ci</div>
+                <div class="savings-amount">41.30 USD</div>
+                <div class="savings-sub">Soit environ 25 296 FCFA économisés</div>
+            </div>
+
+            <!-- Transactions récentes -->
+            <div class="section-header">
+                <span class="section-title">Transferts récents</span>
+                <a href="history.html" class="see-all">Voir tout</a>
+            </div>
+
+            <div onclick="window.location.href='transaction-detail.html'" class="tx-item">
+                <div class="tx-avatar">FA</div>
+                <div class="tx-info">
+                    <div class="tx-name">Fatou Amoussou</div>
+                    <div class="tx-date">03/05/2026 · MTN</div>
+                </div>
+                <div>
+                    <div class="tx-amount">- 200.00 USD</div>
+                    <div class="tx-status">Confirmé</div>
+                </div>
+            </div>
+
+            <div onclick="window.location.href='transaction-detail.html'" class="tx-item">
+                <div class="tx-avatar">KD</div>
+                <div class="tx-info">
+                    <div class="tx-name">Kofi Dossou</div>
+                    <div class="tx-date">28/04/2026 · Moov</div>
+                </div>
+                <div>
+                    <div class="tx-amount">- 150.00 USD</div>
+                    <div class="tx-status">Confirmé</div>
+                </div>
+            </div>
+
+            <div onclick="window.location.href='transaction-detail.html'" class="tx-item">
+                <div class="tx-avatar">SA</div>
+                <div class="tx-info">
+                    <div class="tx-name">Séraphin Adjovi</div>
+                    <div class="tx-date">15/04/2026 · MTN</div>
+                </div>
+                <div>
+                    <div class="tx-amount">- 500.00 USD</div>
+                    <div class="tx-status">Confirmé</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+
+==============================
+Page : Calculateur de Transfert
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Estimer un transfert</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .dc-tabs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;display:flex;justify-content:space-around;padding:8px 0 max(12px,env(safe-area-inset-bottom,8px));background:rgba(250,249,245,0.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(208,197,178,0.4);z-index:100;}
+        .dc-tab{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#4A4A48;font-size:11px;gap:3px;padding:0 12px;font-family:'Public Sans',sans-serif;}
+        .dc-tab .dc-tab-icon{font-size:20px;line-height:1;}
+        .dc-tab.active{color:#755B00;}
+        .calc-header { padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-md); }
+        .calc-title { font-family: var(--font-display); font-size: 28px; color: var(--on-surface); letter-spacing: -0.02em; }
+        .calc-scroll { padding: 0 var(--spacing-xl); padding-bottom: 120px; }
+
+        /* Input card */
+        .input-card {
+            background: var(--surface-lowest); border-radius: var(--radius-md);
+            padding: var(--spacing-lg); margin-bottom: var(--spacing-xl);
+            box-shadow: var(--shadow-diffuse);
+        }
+
+        /* Toggle devise */
+        .currency-toggle {
+            display: flex; margin-bottom: var(--spacing-lg);
+            background: var(--surface-low); border-radius: var(--radius-sm); padding: 4px;
+        }
+        .toggle-btn {
+            flex: 1; padding: 8px; text-align: center; border-radius: 2px;
+            font-family: var(--font-title); font-size: 14px; color: var(--on-surface-variant);
+            cursor: pointer; border: none; background: transparent; transition: all 0.2s;
+        }
+        .toggle-btn.active {
+            background: var(--surface-lowest); color: var(--primary);
+            box-shadow: var(--shadow-glass);
+        }
+
+        /* LedgerInput */
+        .ledger-label { font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant); margin-bottom: 6px; display: block; }
+        .ledger-input {
+            width: 100%; padding: var(--spacing-md);
+            border: none; border-bottom: 2px solid rgba(208,197,178,0.4);
+            background: transparent;
+            font-family: var(--font-label); font-size: 20px; color: var(--on-surface);
+        }
+        .ledger-input:focus { outline: none; border-bottom-color: var(--primary); }
+
+        /* Result */
+        .result-container {
+            margin-top: var(--spacing-md); padding-top: var(--spacing-md);
+            border-top: 1px solid rgba(208,197,178,0.2);
+        }
+        .result-label { font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant); margin-bottom: 4px; }
+        .result-amount {
+            font-family: var(--font-label); font-size: clamp(20px, 7vw, 32px);
+            color: var(--on-surface); letter-spacing: -0.64px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        /* Fee comparator */
+        .fee-comp {
+            background: var(--surface-lowest); border-radius: var(--radius-md);
+            padding: var(--spacing-lg); margin-bottom: var(--spacing-xl);
+            box-shadow: var(--shadow-diffuse);
+        }
+        .fee-comp-title { font-family: var(--font-label); font-size: 11px; color: var(--on-surface-variant); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: var(--spacing-md); }
+        .fee-row { display: flex; align-items: center; margin-bottom: var(--spacing-sm); gap: var(--spacing-sm); }
+        .fee-row-label { font-family: var(--font-label); font-size: 12px; color: var(--on-surface-variant); width: 32px; flex-shrink: 0; }
+        .fee-bar-track { flex: 1; height: 8px; background: var(--surface-low); border-radius: 4px; overflow: hidden; }
+        .fee-bar-fill { height: 100%; border-radius: 4px; }
+        .fee-row-pct { font-family: var(--font-label); font-size: 12px; color: var(--on-surface-variant); width: 36px; text-align: right; flex-shrink: 0; }
+        .fee-row-pct.gold { color: var(--primary); font-weight: 700; }
+
+        /* Savings banner */
+        .savings-banner {
+            display: flex; align-items: flex-start;
+            background: var(--surface-low); padding: var(--spacing-lg);
+            border-radius: var(--radius-md); gap: var(--spacing-md);
+            margin-bottom: var(--spacing-xl);
+        }
+        .savings-icon { font-size: 22px; flex-shrink: 0; }
+        .savings-text { flex: 1; font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant); line-height: 20px; }
+        .savings-bold { font-family: var(--font-title); color: var(--primary); }
+
+        /* CTA flottant */
+        .bottom-cta {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 430px;
+            padding: var(--spacing-lg) var(--spacing-xl);
+            padding-bottom: max(40px, env(safe-area-inset-bottom, 16px));
+            background: rgba(250,249,245,0.95);
+            border-top: 1px solid rgba(208,197,178,0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-view">
+    <nav class="dc-topnav"><a href="splash.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg><span>Accueil</span></a><a href="onboarding.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Onboarding</span></a><a href="calculator.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>Envoi</span></a><a href="send-step3.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Confirmation</span></a><a href="home-receiver.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Réception</span></a><a href="home-sender.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span></a></nav>
+                <div class="calc-header">
+            <div class="calc-title">Estimer un transfert</div>
+        </div>
+
+        <div class="calc-scroll">
+            <!-- Input Card -->
+            <div class="input-card">
+                <div class="currency-toggle">
+                    <button class="toggle-btn active" id="btnEUR" onclick="setCurrency('EUR')">EUR</button>
+                    <button class="toggle-btn" id="btnUSD" onclick="setCurrency('USD')">USD</button>
+                </div>
+
+                <label class="ledger-label">Montant de l'expédition</label>
+                <input class="ledger-input" type="number" id="amountInput" value="200" oninput="calculate()">
+
+                <div class="result-container">
+                    <div class="result-label">Le bénéficiaire reçoit environ</div>
+                    <div class="result-amount" id="resultFCFA">121 975 FCFA</div>
+                </div>
+            </div>
+
+            <!-- Fee Comparator -->
+            <div class="fee-comp" id="feeComp">
+                <div class="fee-comp-title">Comparaison des frais</div>
+                <div class="fee-row">
+                    <span class="fee-row-label">WU</span>
+                    <div class="fee-bar-track"><div class="fee-bar-fill" style="width:100%;background:#C0392B;opacity:0.55;"></div></div>
+                    <span class="fee-row-pct">14 %</span>
+                </div>
+                <div class="fee-row">
+                    <span class="fee-row-label">MG</span>
+                    <div class="fee-bar-track"><div class="fee-bar-fill" style="width:78%;background:#E67E22;opacity:0.55;"></div></div>
+                    <span class="fee-row-pct">11 %</span>
+                </div>
+                <div class="fee-row">
+                    <span class="fee-row-label">WR</span>
+                    <div class="fee-bar-track"><div class="fee-bar-fill" style="width:50%;background:#F39C12;opacity:0.55;"></div></div>
+                    <span class="fee-row-pct">7 %</span>
+                </div>
+                <div class="fee-row">
+                    <span class="fee-row-label" style="color:var(--primary);font-weight:700;">DC</span>
+                    <div class="fee-bar-track"><div class="fee-bar-fill" style="width:6%;background:var(--primary);"></div></div>
+                    <span class="fee-row-pct gold">&lt; 1 %</span>
+                </div>
+            </div>
+
+            <!-- Savings Banner -->
+            <div class="savings-banner" id="savingsBanner">
+                <span class="savings-icon">✨</span>
+                <span class="savings-text">
+                    En envoyant avec DiasporaConnect, vous conservez
+                    <span class="savings-bold" id="savingsAmt">26.20 USD</span>
+                    dans la famille vs. le marché.
+                </span>
+            </div>
+        </div>
+
+        <!-- CTA flottant -->
+        <div class="bottom-cta">
+            <a href="send-step2.html" class="btn btn-primary">Continuer le transfert</a>
+        </div>
+    </div>
+
+    <script>
+        let currency = 'EUR';
+        const EUR_TO_USD = 1.09;
+        const USD_TO_FCFA = 612.5;
+        const DC_FEE_PCT = 0.008;
+        const WU_FEE_PCT = 0.14;
+
+        function setCurrency(cur) {
+            currency = cur;
+            document.getElementById('btnEUR').classList.toggle('active', cur === 'EUR');
+            document.getElementById('btnUSD').classList.toggle('active', cur === 'USD');
+            calculate();
+        }
+
+        function calculate() {
+            const raw = parseFloat(document.getElementById('amountInput').value) || 0;
+            const amountUSD = currency === 'EUR' ? raw * EUR_TO_USD : raw;
+            const fee = amountUSD * DC_FEE_PCT;
+            const recipientUSD = amountUSD - fee;
+            const recipientFCFA = Math.round(recipientUSD * USD_TO_FCFA);
+            const savings = amountUSD * WU_FEE_PCT - fee;
+
+            document.getElementById('resultFCFA').textContent =
+                new Intl.NumberFormat('fr-FR').format(recipientFCFA) + ' FCFA';
+            document.getElementById('savingsAmt').textContent =
+                savings.toFixed(2) + ' USD';
+        }
+
+        calculate();
+    </script>
+</body>
+</html>
+
+
+==============================
+Page : Envoi - Étape 1 (Bénéficiaire)
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Initialisation</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .s1-header {
+            padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-sm);
+            display: flex; justify-content: center;
+        }
+        .s1-header-title { font-family: var(--font-title); font-size: 16px; color: var(--on-surface); }
+
+        .step-indicator {
+            display: flex; align-items: center;
+            padding: 0 var(--spacing-xl) var(--spacing-md);
+        }
+        .step-item { display: flex; flex-direction: column; align-items: center; flex: 1; }
+        .step-dot {
+            width: 24px; height: 24px; border-radius: 50%;
+            background: var(--surface-low); border: 2px solid rgba(208,197,178,0.4);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-label); font-size: 11px; color: var(--on-surface-variant);
+            margin-bottom: 4px;
+        }
+        .step-dot.active { border-color: var(--primary); color: var(--primary); background: rgba(117,91,0,0.08); }
+        .step-label { font-family: var(--font-label); font-size: 10px; color: var(--on-surface-variant); text-align: center; }
+        .step-label.active { color: var(--primary); }
+        .step-line { flex: 1; height: 2px; background: rgba(208,197,178,0.3); margin-bottom: 18px; }
+
+        .s1-body {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: var(--spacing-md);
+        }
+        /* Spinner */
+        .spinner {
+            width: 40px; height: 40px; border-radius: 50%;
+            border: 3px solid rgba(117,91,0,0.15);
+            border-top-color: var(--primary);
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .s1-text { font-family: var(--font-body); color: var(--on-surface-variant); }
+    </style>
+</head>
+<body>
+    <div class="mobile-view" style="display:flex;flex-direction:column;height:100vh;overflow:hidden;">
+    <nav class="dc-topnav"><a href="splash.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg><span>Accueil</span></a><a href="onboarding.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Onboarding</span></a><a href="calculator.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>Envoi</span></a><a href="send-step3.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Confirmation</span></a><a href="home-receiver.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Réception</span></a><a href="home-sender.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span></a></nav>
+                <div class="s1-header">
+            <span class="s1-header-title">Initialisation</span>
+        </div>
+
+        <div class="step-indicator">
+            <div class="step-item">
+                <div class="step-dot active">1</div>
+                <span class="step-label active">Montant</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item">
+                <div class="step-dot">2</div>
+                <span class="step-label">Destinataire</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item">
+                <div class="step-dot">3</div>
+                <span class="step-label">Confirmation</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item">
+                <div class="step-dot">4</div>
+                <span class="step-label">Succès</span>
+            </div>
+        </div>
+
+        <div class="s1-body">
+            <div class="spinner"></div>
+            <span class="s1-text">Préparation de l'envoi...</span>
+        </div>
+    </div>
+
+    <script>
+        setTimeout(() => { window.location.href = 'send-step2.html'; }, 1000);
+    </script>
+</body>
+</html>
+
+
+==============================
+Page : Envoi - Étape 2 (Impact)
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Destinataire</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .step-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-sm);
+        }
+        .step-back { font-size: 24px; color: var(--primary); text-decoration: none; }
+        .step-title { font-family: var(--font-title); font-size: 16px; color: var(--on-surface); }
+
+        /* Step Indicator */
+        .step-indicator {
+            display: flex; align-items: center;
+            padding: 0 var(--spacing-xl) var(--spacing-md);
+            gap: 0;
+        }
+        .step-item { display: flex; flex-direction: column; align-items: center; flex: 1; }
+        .step-dot {
+            width: 24px; height: 24px; border-radius: 50%;
+            background: var(--surface-low); border: 2px solid rgba(208,197,178,0.4);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-label); font-size: 11px; color: var(--on-surface-variant);
+            margin-bottom: 4px;
+        }
+        .step-dot.done { background: var(--primary); border-color: var(--primary); color: #fff; }
+        .step-dot.active { border-color: var(--primary); color: var(--primary); background: rgba(117,91,0,0.08); }
+        .step-label { font-family: var(--font-label); font-size: 10px; color: var(--on-surface-variant); text-align: center; }
+        .step-label.active { color: var(--primary); }
+        .step-line { flex: 1; height: 2px; background: rgba(208,197,178,0.3); margin-bottom: 18px; }
+        .step-line.done { background: var(--primary); opacity: 0.4; }
+
+        .step-scroll { padding: var(--spacing-lg) var(--spacing-xl); padding-bottom: 120px; }
+
+        /* Input card */
+        .input-card {
+            background: var(--surface-lowest); padding: var(--spacing-lg);
+            border-radius: var(--radius-md); margin-bottom: var(--spacing-xl);
+            box-shadow: var(--shadow-diffuse);
+        }
+        .ledger-label { font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant); margin-bottom: 6px; display: block; }
+        .ledger-input {
+            width: 100%; padding: var(--spacing-md);
+            border: none; border-bottom: 2px solid rgba(208,197,178,0.4);
+            background: transparent;
+            font-family: var(--font-label); font-size: 16px; color: var(--on-surface);
+        }
+        .ledger-input:focus { outline: none; border-bottom-color: var(--primary); }
+        .btn-secondary {
+            display: flex; align-items: center; justify-content: center;
+            margin-top: var(--spacing-md); padding: var(--spacing-sm) var(--spacing-md);
+            border: 1px solid rgba(208,197,178,0.4); border-radius: var(--radius-md);
+            background: transparent; font-family: var(--font-title); font-size: 14px;
+            color: var(--primary); cursor: pointer; width: 100%;
+        }
+
+        /* Section label */
+        .section-label { font-family: var(--font-title); font-size: 16px; color: var(--on-surface); margin-bottom: var(--spacing-md); }
+
+        /* Contact cards */
+        .contact-card {
+            display: flex; align-items: center;
+            background: var(--surface-low); padding: var(--spacing-md);
+            border-radius: var(--radius-md); margin-bottom: var(--spacing-sm);
+            border: 1.5px solid transparent; cursor: pointer; transition: all 0.2s;
+        }
+        .contact-card.selected {
+            border-color: rgba(117,91,0,0.3); background: var(--surface-lowest);
+        }
+        .contact-avatar {
+            width: 44px; height: 44px; border-radius: var(--radius-round);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-title); font-size: 15px;
+            margin-right: var(--spacing-md); flex-shrink: 0;
+        }
+        .contact-info { flex: 1; margin-right: var(--spacing-sm); }
+        .contact-name { font-family: var(--font-body); font-size: 15px; color: var(--on-surface); margin-bottom: 2px; }
+        .contact-phone { font-family: var(--font-label); font-size: 12px; color: var(--on-surface-variant); }
+        .selected-badge {
+            width: 24px; height: 24px; border-radius: var(--radius-round);
+            background: var(--primary); display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 13px; flex-shrink: 0;
+        }
+
+        /* Footer */
+        .step-footer {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 430px;
+            padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl);
+            background: var(--surface);
+            border-top: 1px solid rgba(208,197,178,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-view">
+    <nav class="dc-topnav"><a href="splash.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg><span>Accueil</span></a><a href="onboarding.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Onboarding</span></a><a href="calculator.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>Envoi</span></a><a href="send-step3.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Confirmation</span></a><a href="home-receiver.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Réception</span></a><a href="home-sender.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span></a></nav>
+                <!-- Header -->
+                <div class="step-header">
+                    <a href="calculator.html" class="step-back">←</a>
+            <span class="step-title">Destinataire</span>
+            <div style="width:40px;"></div>
+        </div>
+
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+            <div class="step-item">
+                <div class="step-dot done">✓</div>
+                <span class="step-label">Montant</span>
+            </div>
+            <div class="step-line done"></div>
+            <div class="step-item">
+                <div class="step-dot active">2</div>
+                <span class="step-label active">Destinataire</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item">
+                <div class="step-dot">3</div>
+                <span class="step-label">Confirmation</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item">
+                <div class="step-dot">4</div>
+                <span class="step-label">Succès</span>
+            </div>
+        </div>
+
+        <div class="step-scroll">
+            <!-- Input -->
+            <div class="input-card">
+                <label class="ledger-label">Numéro Mobile Money (+229)</label>
+                <input class="ledger-input" type="tel" id="phoneInput" placeholder="97 00 00 00">
+                <button class="btn-secondary">Scanner QR Code</button>
+            </div>
+
+            <!-- Contacts récents -->
+            <div class="section-label">Destinataires récents</div>
+
+            <div class="contact-card selected" onclick="selectContact(this, '+229 97 12 34 56')">
+                <div class="contact-avatar" style="background:rgba(117,91,0,0.12);color:#755B00;">FA</div>
+                <div class="contact-info">
+                    <div class="contact-name">Fatou Amoussou</div>
+                    <div class="contact-phone">+229 97 12 34 56 · MTN</div>
+                </div>
+                <div class="selected-badge">✓</div>
+            </div>
+
+            <div class="contact-card" onclick="selectContact(this, '+229 96 78 90 12')">
+                <div class="contact-avatar" style="background:rgba(0,91,187,0.1);color:#005BBB;">KD</div>
+                <div class="contact-info">
+                    <div class="contact-name">Kofi Dossou</div>
+                    <div class="contact-phone">+229 96 78 90 12 · Moov</div>
+                </div>
+            </div>
+
+            <div class="contact-card" onclick="selectContact(this, '+229 97 55 66 77')">
+                <div class="contact-avatar" style="background:rgba(117,91,0,0.08);color:#755B00;">SA</div>
+                <div class="contact-info">
+                    <div class="contact-name">Séraphin Adjovi</div>
+                    <div class="contact-phone">+229 97 55 66 77 · MTN</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="step-footer">
+            <a href="send-step3.html" class="btn btn-primary">Continuer</a>
+        </div>
+    </div>
+
+    <script>
+        function selectContact(el, phone) {
+            document.querySelectorAll('.contact-card').forEach(c => {
+                c.classList.remove('selected');
+                const badge = c.querySelector('.selected-badge');
+                if (badge) badge.remove();
+            });
+            el.classList.add('selected');
+            const badge = document.createElement('div');
+            badge.className = 'selected-badge';
+            badge.textContent = '✓';
+            el.appendChild(badge);
+            document.getElementById('phoneInput').value = phone;
+        }
+    </script>
+</body>
+</html>
+
+
+==============================
+Page : Envoi - Étape 3 (Résumé)
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Confirmation</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .step-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-sm);
+        }
+        .step-back { font-size: 24px; color: var(--primary); text-decoration: none; }
+        .step-title { font-family: var(--font-title); font-size: 16px; color: var(--on-surface); }
+
+        .step-indicator {
+            display: flex; align-items: center;
+            padding: 0 var(--spacing-xl) var(--spacing-md);
+        }
+        .step-item { display: flex; flex-direction: column; align-items: center; flex: 1; }
+        .step-dot {
+            width: 24px; height: 24px; border-radius: 50%;
+            background: var(--surface-low); border: 2px solid rgba(208,197,178,0.4);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-label); font-size: 11px; color: var(--on-surface-variant);
+            margin-bottom: 4px;
+        }
+        .step-dot.done { background: var(--primary); border-color: var(--primary); color: #fff; }
+        .step-dot.active { border-color: var(--primary); color: var(--primary); background: rgba(117,91,0,0.08); }
+        .step-label { font-family: var(--font-label); font-size: 10px; color: var(--on-surface-variant); text-align: center; }
+        .step-label.active { color: var(--primary); }
+        .step-line { flex: 1; height: 2px; background: rgba(208,197,178,0.3); margin-bottom: 18px; }
+        .step-line.done { background: var(--primary); opacity: 0.4; }
+
+        .step-scroll { padding: var(--spacing-lg) var(--spacing-xl); padding-bottom: 120px; }
+
+        /* Recap card */
+        .recap-card {
+            background: var(--surface-lowest); padding: var(--spacing-lg);
+            border-radius: var(--radius-md); margin-bottom: var(--spacing-lg);
+            box-shadow: var(--shadow-diffuse);
+        }
+        .recap-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: var(--spacing-sm) 0; gap: var(--spacing-sm);
+        }
+        .recap-row-amount { padding: var(--spacing-sm) 0; }
+        .recap-splitter { height: 1px; background: rgba(208,197,178,0.2); margin: var(--spacing-sm) 0; }
+        .recap-label { font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant); flex-shrink: 1; }
+        .recap-label-bold { font-family: var(--font-title); font-size: 15px; color: var(--on-surface); }
+        .recap-value { font-family: var(--font-label); font-size: 13px; color: var(--on-surface); flex-shrink: 0; }
+        .recap-value-gold { font-family: var(--font-label); font-size: 15px; color: var(--primary); flex-shrink: 0; }
+        .recap-value-hero { font-family: var(--font-display); font-size: 26px; color: var(--on-surface); letter-spacing: -0.52px; }
+        .recap-value-sub { font-family: var(--font-label); font-size: 13px; color: var(--on-surface); }
+
+        /* Recipient card */
+        .recipient-card {
+            background: var(--surface-low); padding: var(--spacing-lg);
+            border-radius: var(--radius-md); margin-bottom: var(--spacing-lg);
+        }
+        .recipient-label { font-family: var(--font-body); font-size: 12px; color: var(--on-surface-variant); margin-bottom: 4px; }
+        .recipient-name { font-family: var(--font-title); font-size: 16px; color: var(--on-surface); margin-bottom: 2px; }
+        .recipient-phone { font-family: var(--font-label); font-size: 13px; color: var(--on-surface-variant); }
+
+        /* Info box */
+        .info-box {
+            background: rgba(117,91,0,0.05); padding: var(--spacing-md);
+            border-radius: var(--radius-md); border-left: 3px solid var(--primary);
+        }
+        .info-text { font-family: var(--font-body); font-size: 12px; color: var(--on-surface-variant); line-height: 19px; }
+
+        /* Footer */
+        .step-footer {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 430px;
+            padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl);
+            background: var(--surface);
+            border-top: 1px solid rgba(208,197,178,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-view">
+    <nav class="dc-topnav"><a href="splash.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg><span>Accueil</span></a><a href="onboarding.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Onboarding</span></a><a href="calculator.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>Envoi</span></a><a href="send-step3.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Confirmation</span></a><a href="home-receiver.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Réception</span></a><a href="home-sender.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span></a></nav>
+                <div class="step-header">
+                    <a href="send-step2.html" class="step-back">←</a>
+            <span class="step-title">Confirmation</span>
+            <div style="width:40px;"></div>
+        </div>
+
+        <div class="step-indicator">
+            <div class="step-item">
+                <div class="step-dot done">✓</div>
+                <span class="step-label">Montant</span>
+            </div>
+            <div class="step-line done"></div>
+            <div class="step-item">
+                <div class="step-dot done">✓</div>
+                <span class="step-label">Destinataire</span>
+            </div>
+            <div class="step-line done"></div>
+            <div class="step-item">
+                <div class="step-dot active">3</div>
+                <span class="step-label active">Confirmation</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item">
+                <div class="step-dot">4</div>
+                <span class="step-label">Succès</span>
+            </div>
+        </div>
+
+        <div class="step-scroll">
+            <!-- Récapitulatif -->
+            <div class="recap-card">
+                <div class="recap-row">
+                    <span class="recap-label">Montant envoyé</span>
+                    <span class="recap-value">200.00 USD</span>
+                </div>
+                <div class="recap-splitter"></div>
+                <div class="recap-row">
+                    <span class="recap-label">Frais Celo (estimés)</span>
+                    <span class="recap-value">0.002 CELO</span>
+                </div>
+                <div class="recap-row">
+                    <span class="recap-label">Frais DiasporaConnect</span>
+                    <span class="recap-value-gold">$1.60</span>
+                </div>
+                <div class="recap-splitter"></div>
+                <div class="recap-row-amount">
+                    <div class="recap-label-bold">Le bénéficiaire recevra</div>
+                    <div class="recap-value-hero">121 975 FCFA</div>
+                    <div class="recap-value-sub">= $198.40</div>
+                </div>
+            </div>
+
+            <!-- Bénéficiaire -->
+            <div class="recipient-card">
+                <div class="recipient-label">Bénéficiaire</div>
+                <div class="recipient-name">Fatou Amoussou</div>
+                <div class="recipient-phone">+229 97 12 34 56 · MTN</div>
+            </div>
+
+            <!-- Info légale -->
+            <div class="info-box">
+                <div class="info-text">En confirmant, vous autorisez le transfert via The Private Ledger sur Celo Alfajores. L'argent sera instantanément disponible pour le retrait au Bénin.</div>
+            </div>
+        </div>
+
+        <div class="step-footer">
+            <a href="send-step4.html" class="btn btn-primary">Confirmer et Envoyer</a>
+        </div>
+    </div>
+</body>
+</html>
+
+
+==============================
+Page : Envoi - Étape 4 (Succès)
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Transfert envoyé</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .s4-scroll {
+            padding: var(--spacing-xxl) var(--spacing-xl) 160px;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        /* Check carré */
+        .check-wrapper {
+            width: 80px; height: 80px; border-radius: 8px;
+            background: var(--primary);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: var(--spacing-xl);
+            box-shadow: var(--shadow-diffuse);
+            animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+        }
+        .check-text { font-family: var(--font-title); font-size: 40px; color: #fff; }
+
+        @keyframes popIn {
+            from { transform: scale(0); opacity: 0; }
+            to   { transform: scale(1); opacity: 1; }
+        }
+
+        .s4-title {
+            font-family: var(--font-display); font-size: 30px; color: var(--on-surface);
+            letter-spacing: -0.6px; text-align: center; margin-bottom: var(--spacing-sm);
+        }
+        .s4-subtitle {
+            font-family: var(--font-body); font-size: 15px; color: var(--on-surface-variant);
+            text-align: center; margin-bottom: var(--spacing-xl); line-height: 23px;
+            padding: 0 var(--spacing-sm);
+        }
+        .s4-recipient { font-family: var(--font-title); color: var(--on-surface); }
+        .s4-amount-inline { font-family: var(--font-label); color: var(--primary); }
+
+        /* TX Card */
+        .tx-card {
+            width: 100%; background: var(--surface-lowest);
+            border-radius: var(--radius-md); padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg); box-shadow: var(--shadow-diffuse);
+        }
+        .tx-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: var(--spacing-sm) 0; gap: var(--spacing-sm);
+        }
+        .tx-sep { height: 1px; background: rgba(208,197,178,0.15); }
+        .tx-label { font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant); flex-shrink: 0; }
+        .tx-value { font-family: var(--font-label); font-size: 13px; color: var(--on-surface); flex-shrink: 1; text-align: right; }
+        .tx-hash-row { display: flex; align-items: center; gap: 8px; flex: 1; justify-content: flex-end; }
+        .tx-hash-text { font-family: var(--font-label); font-size: 12px; color: var(--on-surface); flex-shrink: 1; }
+        .copy-btn {
+            padding: 3px 8px; background: rgba(117,91,0,0.1); border-radius: 4px;
+            font-family: var(--font-label); font-size: 11px; color: var(--primary);
+            border: none; cursor: pointer; flex-shrink: 0;
+        }
+        .status-row { display: flex; align-items: center; gap: 6px; }
+        .status-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--primary);
+            animation: blink 1.2s ease-in-out infinite;
+        }
+        @keyframes blink {
+            0%,100% { opacity: 1; } 50% { opacity: 0.3; }
+        }
+        .status-text { font-family: var(--font-label); font-size: 13px; color: var(--primary); }
+
+        /* Progress */
+        .progress-section { width: 100%; margin-bottom: var(--spacing-lg); }
+        .progress-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .progress-label { font-family: var(--font-label); font-size: 13px; color: var(--on-surface); }
+        .progress-sub { font-family: var(--font-label); font-size: 12px; color: var(--on-surface-variant); }
+        .progress-track { height: 4px; background: var(--surface-low); border-radius: 2px; overflow: hidden; }
+        .progress-fill {
+            height: 100%; background: var(--primary); border-radius: 2px;
+            width: 0%; animation: fillBar 60s linear forwards;
+        }
+        @keyframes fillBar { to { width: 100%; } }
+
+        /* Savings box */
+        .savings-box {
+            width: 100%; background: rgba(117,91,0,0.06);
+            border-radius: var(--radius-md); padding: var(--spacing-lg);
+            border-left: 3px solid var(--primary);
+        }
+        .savings-text { font-family: var(--font-body); font-size: 14px; color: var(--on-surface-variant); text-align: center; line-height: 22px; }
+        .savings-amount { font-family: var(--font-label); color: var(--primary); }
+
+        /* Footer */
+        .s4-footer {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 430px;
+            padding: var(--spacing-lg) var(--spacing-xl);
+            padding-bottom: max(40px, env(safe-area-inset-bottom, 16px));
+            background: var(--surface);
+        }
+        .btn-secondary-outline {
+            display: flex; align-items: center; justify-content: center;
+            padding: var(--spacing-md); border-radius: var(--radius-md);
+            border: 1px solid rgba(208,197,178,0.4); background: transparent;
+            font-family: var(--font-title); font-size: 15px; color: var(--on-surface);
+            text-decoration: none; margin-top: var(--spacing-md);
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-view" style="overflow-y:auto;">
+    <nav class="dc-topnav"><a href="splash.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg><span>Accueil</span></a><a href="onboarding.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Onboarding</span></a><a href="calculator.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>Envoi</span></a><a href="send-step3.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Confirmation</span></a><a href="home-receiver.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Réception</span></a><a href="home-sender.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span></a></nav>
+                <div class="s4-scroll">
+            <!-- Check carré -->
+            <div class="check-wrapper">
+                <span class="check-text">✓</span>
+            </div>
+
+            <div class="s4-title">Transfert envoyé !</div>
+            <div class="s4-subtitle">
+                <span class="s4-recipient">Fatou Amoussou</span>
+                recevra
+                <span class="s4-amount-inline">198.40 USD</span>
+            </div>
+
+            <!-- Card TX -->
+            <div class="tx-card">
+                <div class="tx-row">
+                    <span class="tx-label">Réf. transaction</span>
+                    <span class="tx-value">TX-2026-05-001</span>
+                </div>
+                <div class="tx-sep"></div>
+                <div class="tx-row">
+                    <span class="tx-label">Hash Celo</span>
+                    <div class="tx-hash-row">
+                        <span class="tx-hash-text">0x3f4a8b2c...e6f8a0b</span>
+                        <button class="copy-btn" onclick="this.textContent='✓';setTimeout(()=>this.textContent='Copier',2000)">Copier</button>
+                    </div>
+                </div>
+                <div class="tx-sep"></div>
+                <div class="tx-row">
+                    <span class="tx-label">Statut</span>
+                    <div class="status-row">
+                        <div class="status-dot"></div>
+                        <span class="status-text">En confirmation</span>
+                    </div>
+                </div>
+                <div class="tx-sep"></div>
+                <div class="tx-row">
+                    <span class="tx-label">Réseau</span>
+                    <span class="tx-value">Celo Alfajores</span>
+                </div>
+            </div>
+
+            <!-- Barre progression -->
+            <div class="progress-section">
+                <div class="progress-header">
+                    <span class="progress-label">Confirmation Celo</span>
+                    <span class="progress-sub">~60 secondes</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill"></div>
+                </div>
+            </div>
+
+            <!-- Économies -->
+            <div class="savings-box">
+                <div class="savings-text">
+                    Vous avez économisé
+                    <span class="savings-amount">26.20 USD</span>
+                    vs. Western Union
+                </div>
+            </div>
+        </div>
+
+        <div class="s4-footer">
+            <a href="calculator.html" class="btn btn-primary">Nouveau transfert</a>
+            <a href="history.html" class="btn-secondary-outline">Voir l'historique</a>
+        </div>
+    </div>
+</body>
+</html>
+
+
+==============================
+Page : Authentification Bénéficiaire
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Connexion Destinataire</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .ar-header { padding: var(--spacing-md) var(--spacing-xl) var(--spacing-sm); }
+        .ar-back { font-size: 24px; color: var(--primary); text-decoration: none; cursor: pointer; }
+        .ar-scroll { padding: 0 var(--spacing-xl) var(--spacing-xxl); }
+        .ar-title {
+            font-family: var(--font-display); font-size: 30px; color: var(--on-surface);
+            letter-spacing: -0.5px; margin-bottom: var(--spacing-sm); line-height: 38px;
+        }
+        .ar-subtitle {
+            font-family: var(--font-body); font-size: 15px; color: var(--on-surface-variant);
+            margin-bottom: var(--spacing-xl); line-height: 23px;
+        }
+        .hint { font-family: var(--font-label); color: var(--primary); }
+
+        .ledger-label {
+            font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant);
+            margin-bottom: 6px; display: block;
+        }
+        .ledger-input {
+            width: 100%; padding: var(--spacing-md);
+            border: none; border-bottom: 2px solid rgba(208,197,178,0.4);
+            background: transparent;
+            font-family: var(--font-label); font-size: 15px; color: var(--on-surface);
+        }
+        .ledger-input:focus { outline: none; border-color: var(--primary); }
+
+        /* OTP */
+        .otp-row {
+            display: flex; gap: var(--spacing-md);
+            margin: var(--spacing-xl) 0;
+        }
+        .otp-box {
+            flex: 1; height: 64px;
+            background: var(--surface-low);
+            border-radius: 0;
+            border: none; border-bottom: 2px solid rgba(208,197,178,0.4);
+            font-family: var(--font-label); font-size: 28px;
+            color: var(--on-surface); text-align: center;
+            box-shadow: var(--shadow-glass);
+        }
+        .otp-box:focus { outline: none; border-bottom-color: var(--primary); background: rgba(117,91,0,0.04); }
+
+        .actions-block { margin-top: var(--spacing-xl); display: flex; flex-direction: column; gap: var(--spacing-md); }
+        .btn-demo {
+            height: 52px; display: flex; align-items: center; justify-content: center;
+            background: var(--surface-low); border-radius: var(--radius-md);
+            font-family: var(--font-title); font-size: 15px; color: var(--on-surface);
+            text-decoration: none; border: none; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-view">
+    <nav class="dc-topnav"><a href="splash.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg><span>Accueil</span></a><a href="onboarding.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Onboarding</span></a><a href="calculator.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>Envoi</span></a><a href="send-step3.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Confirmation</span></a><a href="home-receiver.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Réception</span></a><a href="home-sender.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span></a></nav>
+                <div class="ar-header">
+            <span class="ar-back" id="backBtn" onclick="goBack()">←</span>
+        </div>
+
+        <!-- Step 1 : Téléphone -->
+        <div class="ar-scroll" id="step1">
+            <div class="ar-title">Votre numéro</div>
+            <div class="ar-subtitle">Saisissez votre numéro Mobile Money actif au Bénin.</div>
+
+            <label class="ledger-label">Numéro MTN ou Moov (+229...)</label>
+            <input class="ledger-input" type="tel" id="phoneInput" placeholder="+229 97 00 00 00">
+
+            <div class="actions-block">
+                <button class="btn btn-primary" onclick="goToOTP()">Recevoir mon code SMS</button>
+                <a href="home-receiver.html" class="btn-demo">🚀 Continuer en mode démo</a>
+            </div>
+        </div>
+
+        <!-- Step 2 : OTP -->
+        <div class="ar-scroll" id="step2" style="display:none;">
+            <div class="ar-title">Code de vérification</div>
+            <div class="ar-subtitle" id="otpSubtitle">
+                Code envoyé au <span id="phoneDisplay"></span>.<br>
+                <span class="hint">Code démo : 4242</span>
+            </div>
+
+            <div class="otp-row">
+                <input class="otp-box" type="tel" maxlength="1" id="otp0" oninput="otpNext(0)">
+                <input class="otp-box" type="tel" maxlength="1" id="otp1" oninput="otpNext(1)">
+                <input class="otp-box" type="tel" maxlength="1" id="otp2" oninput="otpNext(2)">
+                <input class="otp-box" type="tel" maxlength="1" id="otp3" oninput="otpNext(3)">
+            </div>
+
+            <div class="actions-block">
+                <a href="home-receiver.html" class="btn btn-primary">Valider et continuer</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+
+        function goToOTP() {
+            const phone = document.getElementById('phoneInput').value;
+            if (phone.length < 8) return;
+            document.getElementById('phoneDisplay').textContent = phone;
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'block';
+            currentStep = 2;
+            setTimeout(() => document.getElementById('otp0').focus(), 100);
+        }
+
+        function goBack() {
+            if (currentStep === 2) {
+                document.getElementById('step2').style.display = 'none';
+                document.getElementById('step1').style.display = 'block';
+                currentStep = 1;
+            } else {
+                window.location.href = 'role-selection.html';
+            }
+        }
+
+        function otpNext(index) {
+            const val = document.getElementById(`otp${index}`).value.replace(/[^0-9]/g, '');
+            document.getElementById(`otp${index}`).value = val.slice(-1);
+            if (val && index < 3) document.getElementById(`otp${index + 1}`).focus();
+        }
+    </script>
+</body>
+</html>
+
+
+==============================
+Page : Accueil Bénéficiaire
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Accueil Destinataire</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .dc-tabs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;display:flex;justify-content:space-around;padding:8px 0 max(12px,env(safe-area-inset-bottom,8px));background:rgba(250,249,245,0.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(208,197,178,0.4);z-index:100;}
+        .dc-tab{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#4A4A48;font-size:11px;gap:3px;padding:0 12px;font-family:'Public Sans',sans-serif;}
+        .dc-tab .dc-tab-icon{font-size:20px;line-height:1;}
+        .dc-tab.active{color:#755B00;}
+        .hr-scroll { padding: var(--spacing-lg) var(--spacing-xl) 120px; }
+
+        .hr-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: var(--spacing-xl);
+        }
+        .hr-greeting-small { font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant); }
+        .hr-username { font-family: var(--font-display); font-size: 24px; color: var(--on-surface); }
+        .profile-badge {
+            width: 48px; height: 48px; border-radius: var(--radius-round);
+            background: var(--surface-lowest);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: var(--shadow-diffuse); flex-shrink: 0; text-decoration: none;
+        }
+        .profile-initials { font-family: var(--font-title); font-size: 18px; color: var(--primary); }
+
+        /* Hero */
+        .hero-section { margin-bottom: var(--spacing-xl); }
+        .balance-label { font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant); margin-bottom: var(--spacing-xs); }
+        .balance-fcfa {
+            font-family: var(--font-display); font-size: clamp(28px, 9vw, 40px);
+            color: var(--on-surface); letter-spacing: -0.02em;
+        }
+
+        /* CTA */
+        .cta-wrapper {
+            margin-bottom: var(--spacing-lg); border-radius: var(--radius-md);
+            box-shadow: var(--shadow-diffuse); text-decoration: none; display: block;
+        }
+        .cta-card {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: var(--spacing-lg); border-radius: var(--radius-md);
+            background: linear-gradient(90deg, #755B00 0%, #C9A84C 100%);
+        }
+        .cta-text { flex: 1; margin-right: var(--spacing-md); }
+        .cta-title { font-family: var(--font-title); font-size: 20px; color: #fff; margin-bottom: 2px; }
+        .cta-sub { font-family: var(--font-body); font-size: 13px; color: rgba(255,255,255,0.8); }
+        .cta-arrow-circle {
+            width: 44px; height: 44px; border-radius: 22px;
+            background: rgba(255,255,255,0.2);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; font-size: 18px; color: #fff;
+        }
+
+        /* Info row */
+        .info-row { display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+        .info-card {
+            flex: 1; background: var(--surface-low);
+            border-radius: var(--radius-md); padding: var(--spacing-md);
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
+        }
+        .info-icon { font-size: 20px; }
+        .info-label { font-family: var(--font-label); font-size: 11px; color: var(--on-surface-variant); text-align: center; }
+
+        /* Transactions */
+        .section-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: var(--spacing-md);
+        }
+        .section-title { font-family: var(--font-title); font-size: 17px; color: var(--on-surface); }
+        .see-all { font-family: var(--font-label); font-size: 12px; color: var(--primary); text-decoration: none; }
+
+        .tx-item {
+            display: flex; align-items: center;
+            padding: var(--spacing-md) 0;
+            border-bottom: 1px solid rgba(208,197,178,0.15);
+            gap: var(--spacing-md);
+        }
+        .tx-avatar {
+            width: 40px; height: 40px; border-radius: var(--radius-sm);
+            background: var(--surface-low);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-title); font-size: 14px; color: var(--primary); flex-shrink: 0;
+        }
+        .tx-info { flex: 1; }
+        .tx-name { font-family: var(--font-body); font-size: 15px; color: var(--on-surface); margin-bottom: 2px; }
+        .tx-date { font-family: var(--font-label); font-size: 12px; color: var(--on-surface-variant); }
+        .tx-amount { font-family: var(--font-label); font-size: 14px; color: var(--primary); text-align: right; }
+        .tx-status { font-family: var(--font-label); font-size: 11px; color: var(--on-surface-variant); text-align: right; }
+    </style>
+</head>
+<body>
+    <div class="mobile-view">
+    <nav class="dc-topnav"><a href="splash.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg><span>Accueil</span></a><a href="onboarding.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Onboarding</span></a><a href="calculator.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>Envoi</span></a><a href="send-step3.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Confirmation</span></a><a href="home-receiver.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Réception</span></a><a href="home-sender.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span></a></nav>
+                <div class="hr-scroll">
+            <!-- Header -->
+            <div class="hr-header">
+                <div style="flex:1;margin-right:var(--spacing-md);">
+                    <div class="hr-greeting-small">Bonjour,</div>
+                    <div class="hr-username">Adjoua</div>
+                </div>
+                <a href="profile.html" class="profile-badge">
+                    <span class="profile-initials">A</span>
+                </a>
+            </div>
+
+            <!-- Hero Balance -->
+            <div class="hero-section">
+                <div class="balance-label">Disponible à retirer</div>
+                <div class="balance-fcfa">131 191 FCFA</div>
+            </div>
+
+            <!-- CTA Retrait -->
+            <a href="withdraw-operator.html" class="cta-wrapper">
+                <div class="cta-card">
+                    <div class="cta-text">
+                        <div class="cta-title">Retirer maintenant</div>
+                        <div class="cta-sub">Vers MTN ou Moov Money</div>
+                    </div>
+                    <div class="cta-arrow-circle">›</div>
+                </div>
+            </a>
+
+            <!-- Info rapide -->
+            <div class="info-row">
+                <div class="info-card">
+                    <span class="info-icon">⚡</span>
+                    <span class="info-label">Instantané</span>
+                </div>
+                <div class="info-card">
+                    <span class="info-icon">🔒</span>
+                    <span class="info-label">Sécurisé</span>
+                </div>
+                <div class="info-card">
+                    <span class="info-icon">💵</span>
+                    <span class="info-label">Sans frais</span>
+                </div>
+            </div>
+
+            <!-- Transferts reçus -->
+            <div class="section-header">
+                <span class="section-title">Transferts reçus</span>
+                <a href="history.html" class="see-all">Voir tout</a>
+            </div>
+
+            <div class="tx-item">
+                <div class="tx-avatar">KD</div>
+                <div class="tx-info">
+                    <div class="tx-name">Kofi Dossou</div>
+                    <div class="tx-date">03/05/2026 · Celo</div>
+                </div>
+                <div>
+                    <div class="tx-amount">+ 131 191 FCFA</div>
+                    <div class="tx-status">En attente</div>
+                </div>
+            </div>
+
+            <div class="tx-item">
+                <div class="tx-avatar">KD</div>
+                <div class="tx-info">
+                    <div class="tx-name">Kofi Dossou</div>
+                    <div class="tx-date">15/04/2026 · Celo</div>
+                </div>
+                <div>
+                    <div class="tx-amount">+ 73 500 FCFA</div>
+                    <div class="tx-status">Retiré</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+
+==============================
+Page : Retrait - Étape 1 (Opérateur)
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Retrait</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .wo-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-sm);
+        }
+        .wo-back { font-size: 24px; color: var(--primary); text-decoration: none; }
+        .wo-title { font-family: var(--font-title); font-size: 16px; color: var(--on-surface); }
+
+        .wo-scroll { padding: var(--spacing-lg) var(--spacing-xl); padding-bottom: 100px; }
+
+        .wo-instruction {
+            font-family: var(--font-headline); font-size: 22px; color: var(--on-surface);
+            margin-bottom: var(--spacing-xl); line-height: 30px;
+        }
+
+        /* Operator row — 2 cards côte à côte */
+        .operator-row { display: flex; gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+        .operator-card {
+            flex: 1; background: var(--surface-lowest);
+            padding: var(--spacing-lg); border-radius: var(--radius-md);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border: 1.5px solid transparent;
+            box-shadow: var(--shadow-diffuse);
+            position: relative; min-height: 120px;
+            cursor: pointer; transition: border-color 0.2s;
+        }
+        .operator-card.active { border-color: var(--primary); }
+
+        .op-check {
+            position: absolute; top: 10px; right: 10px;
+            width: 22px; height: 22px; border-radius: var(--radius-round);
+            background: var(--primary);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 12px; font-family: var(--font-title);
+        }
+
+        .op-logo {
+            width: 60px; height: 60px; border-radius: 30px;
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-title); font-size: 14px;
+            margin-bottom: var(--spacing-md);
+        }
+        .op-name {
+            font-family: var(--font-body); font-size: 13px;
+            color: var(--on-surface-variant); text-align: center; line-height: 18px;
+        }
+        .op-name.active { font-family: var(--font-title); color: var(--on-surface); }
+
+        /* Info box */
+        .info-box {
+            background: var(--surface-low); padding: var(--spacing-lg);
+            border-radius: var(--radius-md);
+        }
+        .info-text { font-family: var(--font-body); font-size: 14px; color: var(--on-surface-variant); line-height: 22px; }
+
+        /* Footer */
+        .wo-footer {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 430px;
+            padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl);
+            background: var(--surface);
+            border-top: 1px solid rgba(208,197,178,0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-view">
+    <nav class="dc-topnav"><a href="splash.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg><span>Accueil</span></a><a href="onboarding.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Onboarding</span></a><a href="calculator.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>Envoi</span></a><a href="send-step3.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Confirmation</span></a><a href="home-receiver.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Réception</span></a><a href="home-sender.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span></a></nav>
+                <div class="wo-header">
+            <a href="home-receiver.html" class="wo-back">←</a>
+            <span class="wo-title">Retrait</span>
+            <div style="width:40px;"></div>
+        </div>
+
+        <div class="wo-scroll">
+            <div class="wo-instruction">Où souhaitez-vous<br>recevoir les fonds ?</div>
+
+            <div class="operator-row">
+                <!-- MTN -->
+                <div class="operator-card active" id="cardMTN" onclick="selectOp('MTN')">
+                    <div class="op-check" id="checkMTN">✓</div>
+                    <div class="op-logo" style="background:#FFCC00;">
+                        <span style="color:#1B1C1A;">MTN</span>
+                    </div>
+                    <div class="op-name active" id="nameMTN">MTN Money</div>
+                </div>
+
+                <!-- Moov -->
+                <div class="operator-card" id="cardMoov" onclick="selectOp('Moov')">
+                    <div class="op-logo" style="background:#005BBB;">
+                        <span style="color:#fff;">Moov</span>
+                    </div>
+                    <div class="op-name" id="nameMoov">Moov Money</div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-text">Les retraits sont instantanés au Bénin. DiasporaConnect ne prélève aucun frais sur le retrait.</div>
+            </div>
+        </div>
+
+        <div class="wo-footer">
+            <a href="withdraw-confirm.html" class="btn btn-primary">Continuer</a>
+        </div>
+    </div>
+
+    <script>
+        function selectOp(op) {
+            ['MTN','Moov'].forEach(id => {
+                document.getElementById(`card${id}`).classList.remove('active');
+                document.getElementById(`name${id}`).classList.remove('active');
+                const chk = document.getElementById(`check${id}`);
+                if (chk) chk.remove();
+            });
+            const card = document.getElementById(`card${op}`);
+            card.classList.add('active');
+            document.getElementById(`name${op}`).classList.add('active');
+            const badge = document.createElement('div');
+            badge.className = 'op-check'; badge.id = `check${op}`; badge.textContent = '✓';
+            card.insertBefore(badge, card.firstChild);
+        }
+    </script>
+</body>
+</html>
+
+
+==============================
+Page : Retrait - Étape 2 (Confirmation)
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Confirmation Retrait</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .wc-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-sm);
+        }
+        .wc-back { font-size: 24px; color: var(--primary); text-decoration: none; }
+        .wc-title {
+            font-family: var(--font-title); font-size: 16px; color: var(--on-surface);
+            flex: 1; text-align: center;
+        }
+
+        .wc-scroll { padding: var(--spacing-lg) var(--spacing-xl); padding-bottom: 120px; }
+
+        /* Confirm card */
+        .confirm-card {
+            background: var(--surface-lowest); padding: var(--spacing-lg);
+            border-radius: var(--radius-md); box-shadow: var(--shadow-diffuse);
+            margin-bottom: var(--spacing-xl);
+        }
+        .cc-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: var(--spacing-sm) 0; gap: var(--spacing-sm);
+        }
+        .cc-row-amount { padding: var(--spacing-md) 0; }
+        .cc-sep { height: 1px; background: rgba(208,197,178,0.15); margin: var(--spacing-xs) 0; }
+        .cc-label { font-family: var(--font-body); font-size: 14px; color: var(--on-surface-variant); flex-shrink: 0; }
+        .cc-label-big { font-family: var(--font-title); font-size: 15px; color: var(--on-surface); }
+        .cc-value { font-family: var(--font-title); font-size: 14px; color: var(--on-surface); flex-shrink: 1; text-align: right; }
+        .cc-value-label { font-family: var(--font-label); font-size: 15px; color: var(--on-surface); flex-shrink: 1; text-align: right; }
+        /* Montant hero — font-display 32px */
+        .cc-value-hero {
+            font-family: var(--font-display); font-size: 32px; color: var(--on-surface);
+            letter-spacing: -0.64px; margin-top: 4px;
+        }
+
+        /* Security box */
+        .security-box {
+            padding: var(--spacing-lg); background: rgba(117,91,0,0.05);
+            border-radius: var(--radius-md); border-left: 3px solid var(--primary);
+        }
+        .security-text { font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant); line-height: 20px; }
+
+        /* Footer */
+        .wc-footer {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 430px;
+            padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl);
+            background: var(--surface);
+            border-top: 1px solid rgba(208,197,178,0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-view">
+    <nav class="dc-topnav"><a href="splash.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg><span>Accueil</span></a><a href="onboarding.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Onboarding</span></a><a href="calculator.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>Envoi</span></a><a href="send-step3.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Confirmation</span></a><a href="home-receiver.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Réception</span></a><a href="home-sender.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span></a></nav>
+                <div class="wc-header">
+            <a href="withdraw-operator.html" class="wc-back">←</a>
+            <span class="wc-title">Confirmation</span>
+            <div style="width:40px;"></div>
+        </div>
+
+        <div class="wc-scroll">
+            <div class="confirm-card">
+                <div class="cc-row">
+                    <span class="cc-label">Opérateur</span>
+                    <span class="cc-value">🟡 MTN Money</span>
+                </div>
+                <div class="cc-sep"></div>
+                <div class="cc-row">
+                    <span class="cc-label">Numéro de retrait</span>
+                    <span class="cc-value-label">+229 97 00 00 00</span>
+                </div>
+                <div class="cc-sep"></div>
+                <div class="cc-row-amount">
+                    <div class="cc-label-big">Montant à recevoir</div>
+                    <div class="cc-value-hero">131 191 FCFA</div>
+                </div>
+            </div>
+
+            <div class="security-box">
+                <div class="security-text">🔒 Transaction sécurisée par The Private Ledger. Le montant sera versé sur votre compte mobile money sous 2 minutes.</div>
+            </div>
+        </div>
+
+        <div class="wc-footer">
+            <a href="withdraw-success.html" class="btn btn-primary">Confirmer le retrait</a>
+        </div>
+    </div>
+</body>
+</html>
+
+
+==============================
+Page : Retrait - Étape 3 (Succès)
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Retrait en cours</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .ws-container {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: var(--spacing-xl);
+        }
+
+        /* Icône succès — cercle var(--primary) */
+        .success-icon-wrap {
+            width: 100px; height: 100px; border-radius: 50%;
+            background: var(--primary);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: var(--spacing-xxl);
+            box-shadow: var(--shadow-diffuse);
+            animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+        }
+        .success-icon-text { font-size: 52px; color: #fff; line-height: 1; }
+
+        @keyframes popIn {
+            from { transform: scale(0); opacity: 0; }
+            to   { transform: scale(1); opacity: 1; }
+        }
+
+        .text-block { width: 100%; display: flex; flex-direction: column; align-items: center; animation: fadeUp 0.6s ease 0.3s both; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .success-title {
+            font-family: var(--font-display); font-size: 32px; color: var(--on-surface);
+            letter-spacing: -0.02em; margin-bottom: var(--spacing-sm); text-align: center;
+        }
+        .success-status {
+            font-family: var(--font-headline); font-size: 17px; color: var(--on-surface-variant);
+            margin-bottom: var(--spacing-xl); text-align: center;
+        }
+
+        /* Box explicatif */
+        .info-box {
+            background: var(--surface); padding: var(--spacing-lg);
+            border-radius: var(--radius-md); width: 100%; margin-bottom: var(--spacing-xl);
+        }
+        .info-box-text {
+            font-family: var(--font-body); font-size: 14px; color: var(--on-surface-variant);
+            text-align: center; line-height: 22px;
+        }
+
+        /* Trust row */
+        .trust-row { display: flex; gap: var(--spacing-lg); justify-content: center; }
+        .trust-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .trust-icon-wrap {
+            width: 40px; height: 40px; border-radius: 20px;
+            background: rgba(117,91,0,0.08);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+        }
+        .trust-label { font-family: var(--font-label); font-size: 11px; color: var(--on-surface-variant); }
+
+        /* Footer */
+        .ws-footer {
+            padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl);
+            background: var(--surface-lowest);
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-view" style="background:var(--surface-lowest);display:flex;flex-direction:column;height:100vh;">
+    <nav class="dc-topnav"><a href="splash.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg><span>Accueil</span></a><a href="onboarding.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Onboarding</span></a><a href="calculator.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>Envoi</span></a><a href="send-step3.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Confirmation</span></a><a href="home-receiver.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Réception</span></a><a href="home-sender.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span></a></nav>
+                <div class="ws-container">
+            <div class="success-icon-wrap">
+                <span class="success-icon-text">✓</span>
+            </div>
+
+            <div class="text-block">
+                <div class="success-title">Retrait en cours</div>
+                <div class="success-status">Délai estimé : moins de 2 minutes</div>
+
+                <div class="info-box">
+                    <div class="info-box-text">Votre compte Mobile Money sera crédité dès que le réseau aura validé la sortie des fonds du Private Ledger.</div>
+                </div>
+
+                <div class="trust-row">
+                    <div class="trust-item">
+                        <div class="trust-icon-wrap">⚡</div>
+                        <span class="trust-label">Instantané</span>
+                    </div>
+                    <div class="trust-item">
+                        <div class="trust-icon-wrap">🔒</div>
+                        <span class="trust-label">Sécurisé</span>
+                    </div>
+                    <div class="trust-item">
+                        <div class="trust-icon-wrap">💵</div>
+                        <span class="trust-label">Sans frais</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ws-footer">
+            <a href="home-receiver.html" class="btn btn-primary">Retour à l'accueil</a>
+        </div>
+    </div>
+</body>
+</html>
+
+
+==============================
+Page : Historique des Transactions
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Historique</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .dc-tabs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;display:flex;justify-content:space-around;padding:8px 0 max(12px,env(safe-area-inset-bottom,8px));background:rgba(250,249,245,0.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(208,197,178,0.4);z-index:100;}
+        .dc-tab{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#4A4A48;font-size:11px;gap:3px;padding:0 12px;font-family:'Public Sans',sans-serif;}
+        .dc-tab .dc-tab-icon{font-size:20px;line-height:1;}
+        .dc-tab.active{color:#755B00;}
+        .hist-header { padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-sm); }
+        .hist-title {
+            font-family: var(--font-display); font-size: 28px; color: var(--on-surface);
+            letter-spacing: -0.56px;
+        }
+
+        /* Filtres */
+        .filters {
+            display: flex; padding: 0 var(--spacing-xl);
+            margin-bottom: var(--spacing-md); gap: var(--spacing-sm);
+        }
+        .pill {
+            padding: 7px var(--spacing-md); border-radius: 6px;
+            background: var(--surface-low); cursor: pointer;
+            font-family: var(--font-label); font-size: 13px; color: var(--on-surface-variant);
+            border: none; transition: all 0.2s;
+        }
+        .pill.active {
+            background: rgba(117,91,0,0.1); color: var(--primary);
+            font-family: var(--font-title);
+        }
+
+        .hist-scroll { padding: 0 var(--spacing-xl); padding-bottom: 120px; }
+
+        /* Group label */
+        .group-label {
+            font-family: var(--font-label); font-size: 11px; color: var(--on-surface-variant);
+            text-transform: uppercase; letter-spacing: 0.5px;
+            margin-top: var(--spacing-lg); margin-bottom: var(--spacing-sm);
+        }
+
+        /* TX item */
+        .tx-item {
+            display: flex; align-items: center;
+            padding: var(--spacing-md) 0;
+            border-bottom: 1px solid rgba(208,197,178,0.15);
+            gap: var(--spacing-md); cursor: pointer;
+        }
+        .tx-avatar {
+            width: 40px; height: 40px; border-radius: var(--radius-sm);
+            background: var(--surface-low);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-title); font-size: 15px; color: var(--primary); flex-shrink: 0;
+        }
+        .tx-info { flex: 1; }
+        .tx-name { font-family: var(--font-body); font-size: 15px; color: var(--on-surface); margin-bottom: 2px; }
+        .tx-date { font-family: var(--font-label); font-size: 12px; color: var(--on-surface-variant); }
+        .tx-right { text-align: right; }
+        .tx-amount { font-family: var(--font-label); font-size: 14px; color: var(--on-surface); }
+        .tx-status { font-family: var(--font-label); font-size: 11px; color: var(--primary); }
+    </style>
+</head>
+<body>
+    <div class="mobile-view">
+    <nav class="dc-topnav"><a href="splash.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg><span>Accueil</span></a><a href="onboarding.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Onboarding</span></a><a href="calculator.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>Envoi</span></a><a href="send-step3.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Confirmation</span></a><a href="home-receiver.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Réception</span></a><a href="home-sender.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span></a></nav>
+                <div class="hist-header">
+            <div class="hist-title">Historique</div>
+        </div>
+
+        <!-- Filtres : 3 pills -->
+        <div class="filters">
+            <button type="button" class="pill active" onclick="setFilter(this,'ALL')">Tous</button>
+            <button type="button" class="pill" onclick="setFilter(this,'SENT')">Envoyés</button>
+            <button type="button" class="pill" onclick="setFilter(this,'RECEIVED')">Reçus</button>
+        </div>
+
+        <div class="hist-scroll" id="histList">
+            <!-- Groupe : Aujourd'hui -->
+            <div class="group-label">Aujourd'hui</div>
+
+            <div class="tx-item" onclick="window.location.href='transaction-detail.html'">
+                <div class="tx-avatar">FA</div>
+                <div class="tx-info">
+                    <div class="tx-name">Fatou Amoussou</div>
+                    <div class="tx-date">Aujourd'hui, 14:20 · MTN</div>
+                </div>
+                <div class="tx-right">
+                    <div class="tx-amount">- 200.00 USD</div>
+                    <div class="tx-status">Confirmé</div>
+                </div>
+            </div>
+
+            <!-- Groupe : Cette semaine -->
+            <div class="group-label">Cette semaine</div>
+
+            <div class="tx-item" onclick="window.location.href='transaction-detail.html'">
+                <div class="tx-avatar">KD</div>
+                <div class="tx-info">
+                    <div class="tx-name">Kofi Dossou</div>
+                    <div class="tx-date">28/04/2026 · Moov</div>
+                </div>
+                <div class="tx-right">
+                    <div class="tx-amount">- 150.00 USD</div>
+                    <div class="tx-status">Confirmé</div>
+                </div>
+            </div>
+
+            <!-- Groupe : Ce mois -->
+            <div class="group-label">Ce mois</div>
+
+            <div class="tx-item" onclick="window.location.href='transaction-detail.html'">
+                <div class="tx-avatar">SA</div>
+                <div class="tx-info">
+                    <div class="tx-name">Séraphin Adjovi</div>
+                    <div class="tx-date">15/04/2026 · MTN</div>
+                </div>
+                <div class="tx-right">
+                    <div class="tx-amount">- 500.00 USD</div>
+                    <div class="tx-status">Confirmé</div>
+                </div>
+            </div>
+
+            <div class="tx-item" onclick="window.location.href='transaction-detail.html'">
+                <div class="tx-avatar">AB</div>
+                <div class="tx-info">
+                    <div class="tx-name">Adjoa Bello</div>
+                    <div class="tx-date">10/04/2026 · MTN</div>
+                </div>
+                <div class="tx-right">
+                    <div class="tx-amount">- 100.00 USD</div>
+                    <div class="tx-status">Confirmé</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function setFilter(el, filter) {
+            document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+            el.classList.add('active');
+        }
+    </script>
+</body>
+</html>
+
+
+==============================
+Page : Détails de la Transaction
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Détails du transfert</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .td-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-sm);
+            background: var(--surface);
+        }
+        .td-back { padding: 4px; width: 40px; color: var(--primary); font-size: 20px; text-decoration: none; }
+        .td-title { font-family: var(--font-title); font-size: 16px; color: var(--on-surface); flex: 1; text-align: center; }
+
+        .td-scroll { padding: var(--spacing-lg) var(--spacing-xl) 40px; }
+
+        /* Amount card */
+        .amount-card {
+            background: var(--surface-lowest); border-radius: var(--radius-md);
+            padding: var(--spacing-xl); display: flex; flex-direction: column;
+            align-items: center; margin-bottom: var(--spacing-lg);
+            box-shadow: var(--shadow-diffuse);
+        }
+        .amount-label { font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant); margin-bottom: 8px; }
+        .amount-fcfa {
+            font-family: var(--font-display); font-size: 34px; color: var(--on-surface);
+            letter-spacing: -0.68px; margin-bottom: 4px; text-align: center; width: 100%;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .amount-usd { font-family: var(--font-label); font-size: 16px; color: var(--on-surface-variant); margin-bottom: var(--spacing-md); }
+        /* Badge statut */
+        .status-badge {
+            padding: 4px 12px; border-radius: var(--radius-round);
+            font-family: var(--font-label); font-size: 12px;
+        }
+        .status-badge.completed { background: rgba(117,91,0,0.1); color: var(--primary); }
+        .status-badge.pending { background: rgba(255,204,0,0.15); color: #8B6800; }
+
+        /* Detail card */
+        .detail-card {
+            background: var(--surface-lowest); border-radius: var(--radius-md);
+            padding: var(--spacing-lg); margin-bottom: var(--spacing-lg);
+            box-shadow: var(--shadow-diffuse);
+        }
+        .block-card {
+            background: var(--surface-low); border-radius: var(--radius-md);
+            padding: var(--spacing-lg); margin-bottom: var(--spacing-lg);
+        }
+        .block-title {
+            font-family: var(--font-label); font-size: 11px; color: var(--on-surface-variant);
+            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: var(--spacing-md);
+        }
+        .d-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: var(--spacing-sm) 0; gap: var(--spacing-sm);
+        }
+        .d-sep { height: 1px; background: rgba(208,197,178,0.15); }
+        .d-label { font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant); flex-shrink: 0; }
+        .d-value { font-family: var(--font-title); font-size: 13px; color: var(--on-surface); flex: 1; text-align: right; }
+        .d-value-label { font-family: var(--font-label); font-size: 13px; color: var(--on-surface); flex-shrink: 1; text-align: right; }
+        .d-value-savings { font-family: var(--font-label); font-size: 14px; color: var(--primary); }
+        .hash-row { display: flex; align-items: center; gap: 8px; flex: 1; justify-content: flex-end; }
+        .hash-text { font-family: var(--font-label); font-size: 12px; color: var(--primary); flex-shrink: 1; }
+        .copy-btn {
+            padding: 3px 8px; background: rgba(117,91,0,0.1); border-radius: 4px;
+            font-family: var(--font-label); font-size: 11px; color: var(--primary);
+            border: none; cursor: pointer; flex-shrink: 0;
+        }
+        .explorer-btn {
+            display: flex; align-items: center; justify-content: center;
+            margin-top: var(--spacing-md); gap: 6px; text-decoration: none;
+        }
+        .explorer-text { font-family: var(--font-title); font-size: 13px; color: var(--primary); }
+
+        /* Timeline */
+        .timeline-card {
+            background: var(--surface-lowest); border-radius: var(--radius-md);
+            padding: var(--spacing-lg); box-shadow: var(--shadow-diffuse);
+        }
+        .timeline-step { display: flex; min-height: 48px; }
+        .timeline-left { display: flex; flex-direction: column; align-items: center; width: 24px; margin-right: var(--spacing-md); }
+        .tl-dot {
+            width: 12px; height: 12px; border-radius: 50%;
+            background: var(--surface-low); border: 2px solid rgba(208,197,178,0.4);
+            margin-top: 4px; flex-shrink: 0;
+        }
+        .tl-dot.done { background: var(--primary); border-color: var(--primary); }
+        .tl-line { flex: 1; width: 2px; background: var(--surface-low); margin-top: 4px; margin-bottom: -4px; }
+        .tl-line.done { background: var(--primary); opacity: 0.4; }
+        .timeline-content { flex: 1; padding-bottom: var(--spacing-md); }
+        .tl-label { font-family: var(--font-body); font-size: 14px; color: var(--on-surface-variant); }
+        .tl-label.done { font-family: var(--font-title); color: var(--on-surface); }
+        .tl-time { font-family: var(--font-label); font-size: 12px; color: var(--on-surface-variant); margin-top: 2px; }
+    </style>
+</head>
+<body>
+    <div class="mobile-view">
+    <nav class="dc-topnav"><a href="splash.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg><span>Accueil</span></a><a href="onboarding.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Onboarding</span></a><a href="calculator.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>Envoi</span></a><a href="send-step3.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Confirmation</span></a><a href="home-receiver.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Réception</span></a><a href="home-sender.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span></a></nav>
+                <div class="td-header">
+            <a href="history.html" class="td-back">←</a>
+            <span class="td-title">Détails du transfert</span>
+            <div style="width:40px;"></div>
+        </div>
+
+        <div class="td-scroll">
+            <!-- Montant hero -->
+            <div class="amount-card">
+                <div class="amount-label">Montant envoyé</div>
+                <div class="amount-fcfa">122 500 FCFA</div>
+                <div class="amount-usd">200.00 USD</div>
+                <span class="status-badge completed">Confirmé</span>
+            </div>
+
+            <!-- Détails -->
+            <div class="detail-card">
+                <div class="d-row">
+                    <span class="d-label">Destinataire</span>
+                    <span class="d-value">Fatou Amoussou</span>
+                </div>
+                <div class="d-sep"></div>
+                <div class="d-row">
+                    <span class="d-label">Opérateur</span>
+                    <span class="d-value-label">MTN</span>
+                </div>
+                <div class="d-sep"></div>
+                <div class="d-row">
+                    <span class="d-label">Date</span>
+                    <span class="d-value-label">03/05/2026, 14:20</span>
+                </div>
+                <div class="d-sep"></div>
+                <div class="d-row">
+                    <span class="d-label">Frais DiasporaConnect</span>
+                    <span class="d-value-label">1.600 USD</span>
+                </div>
+                <div class="d-sep"></div>
+                <div class="d-row">
+                    <span class="d-label">Économie vs WU</span>
+                    <span class="d-value-savings">+26.40 USD</span>
+                </div>
+            </div>
+
+            <!-- Blockchain -->
+            <div class="block-card">
+                <div class="block-title">Blockchain</div>
+                <div class="d-row">
+                    <span class="d-label">Réseau</span>
+                    <span class="d-value-label">Celo Alfajores</span>
+                </div>
+                <div class="d-sep"></div>
+                <div class="d-row">
+                    <span class="d-label">Hash TX</span>
+                    <div class="hash-row">
+                        <span class="hash-text">0x3f4a8b2c9e1d…</span>
+                        <button class="copy-btn" onclick="this.textContent='✓';setTimeout(()=>this.textContent='Copier',2000)">Copier</button>
+                    </div>
+                </div>
+                <div class="d-sep"></div>
+                <div class="d-row">
+                    <span class="d-label">Confirmations</span>
+                    <span class="d-value-label">12</span>
+                </div>
+                <a href="#" class="explorer-btn">
+                    <span class="explorer-text">Voir sur CeloScan</span>
+                    <span style="color:var(--primary);font-size:14px;">›</span>
+                </a>
+            </div>
+
+            <!-- Timeline -->
+            <div class="timeline-card">
+                <div class="block-title">Suivi du transfert</div>
+
+                <div class="timeline-step">
+                    <div class="timeline-left">
+                        <div class="tl-dot done"></div>
+                        <div class="tl-line done"></div>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="tl-label done">Envoyé</div>
+                        <div class="tl-time">14:20:03</div>
+                    </div>
+                </div>
+
+                <div class="timeline-step">
+                    <div class="timeline-left">
+                        <div class="tl-dot done"></div>
+                        <div class="tl-line done"></div>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="tl-label done">Confirmé sur Celo</div>
+                        <div class="tl-time">14:20:50</div>
+                    </div>
+                </div>
+
+                <div class="timeline-step">
+                    <div class="timeline-left">
+                        <div class="tl-dot done"></div>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="tl-label done">Retrait Mobile Money</div>
+                        <div class="tl-time">14:22</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+
+==============================
+Page : Mon Impact Écologique
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Impact</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .imp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-sm);
+            background: var(--surface);
+        }
+        .imp-back { font-size: 24px; color: var(--primary); text-decoration: none; padding: 4px; }
+        .imp-title { font-family: var(--font-title); font-size: 16px; color: var(--on-surface); }
+
+        .imp-scroll { padding: var(--spacing-lg) var(--spacing-xl); padding-bottom: 120px; }
+
+        .hero-title {
+            font-family: var(--font-display); font-size: 36px; color: var(--on-surface);
+            letter-spacing: -0.72px; margin-bottom: var(--spacing-xl); line-height: 44px;
+        }
+
+        /* Connection anim placeholder */
+        .anim-container {
+            display: flex; justify-content: center; margin-bottom: var(--spacing-xxl);
+        }
+        .conn-anim {
+            display: flex; align-items: center; gap: 12px;
+        }
+        .conn-node {
+            width: 56px; height: 56px; border-radius: 50%;
+            background: rgba(117,91,0,0.1);
+            display: flex; align-items: center; justify-content: center; font-size: 28px;
+        }
+        .conn-line { width: 80px; height: 2px; background: linear-gradient(90deg, var(--primary), var(--primary-container)); position: relative; }
+        .conn-dot {
+            width: 10px; height: 10px; border-radius: 50%; background: var(--primary);
+            position: absolute; top: -4px; left: 0;
+            animation: slideDot 1.8s ease-in-out infinite;
+        }
+        @keyframes slideDot { 0%{left:0;opacity:1} 80%{left:calc(100% - 10px);opacity:1} 100%{left:calc(100% - 10px);opacity:0} }
+
+        /* Counters */
+        .counters-row { display: flex; gap: var(--spacing-md); margin-bottom: var(--spacing-md); }
+        .counter-card {
+            flex: 1; background: var(--surface-lowest); border-radius: var(--radius-md);
+            padding: var(--spacing-md); box-shadow: var(--shadow-diffuse);
+        }
+        .counter-card-full {
+            background: var(--surface-lowest); border-radius: var(--radius-md);
+            padding: var(--spacing-lg); box-shadow: var(--shadow-diffuse);
+            margin-bottom: var(--spacing-xxl); text-align: center; width: 100%;
+        }
+        /* Valeurs en font-display gold */
+        .counter-value {
+            font-family: var(--font-display); font-size: 26px; color: var(--on-surface);
+            letter-spacing: -0.5px; margin-bottom: 4px;
+        }
+        .counter-value-large {
+            font-family: var(--font-display); font-size: 40px; color: var(--primary);
+            letter-spacing: -0.8px; margin-bottom: 4px;
+        }
+        .counter-label { font-family: var(--font-label); font-size: 11px; color: var(--on-surface-variant); line-height: 16px; }
+
+        /* Section title */
+        .section-title { font-family: var(--font-title); font-size: 17px; color: var(--on-surface); margin-bottom: var(--spacing-lg); }
+
+        /* ODD cards */
+        .odd-card {
+            display: flex; align-items: flex-start;
+            background: var(--surface-low); padding: var(--spacing-md);
+            border-radius: var(--radius-md); margin-bottom: var(--spacing-md); gap: var(--spacing-md);
+        }
+        .odd-badge {
+            width: 36px; height: 36px; border-radius: 4px;
+            background: rgba(117,91,0,0.1);
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .odd-num { font-family: var(--font-label); font-size: 16px; color: var(--primary); }
+        .odd-text { flex: 1; }
+        .odd-title { font-family: var(--font-title); font-size: 13px; color: var(--on-surface); margin-bottom: 4px; line-height: 18px; }
+        .odd-desc { font-family: var(--font-body); font-size: 12px; color: var(--on-surface-variant); line-height: 18px; }
+
+        /* Scenario cards */
+        .scenario-card {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--surface-lowest); padding: var(--spacing-md);
+            border-radius: var(--radius-md); margin-bottom: var(--spacing-md);
+            box-shadow: var(--shadow-diffuse); gap: var(--spacing-sm);
+        }
+        .scenario-left { flex: 1; }
+        .scenario-name { font-family: var(--font-title); font-size: 14px; color: var(--on-surface); margin-bottom: 2px; }
+        .scenario-amount { font-family: var(--font-label); font-size: 12px; color: var(--on-surface-variant); }
+        .scenario-right { display: flex; flex-direction: column; align-items: flex-end; flex-shrink: 0; text-align: right; }
+        .scenario-savings-label { font-family: var(--font-body); font-size: 11px; color: var(--on-surface-variant); margin-bottom: 2px; }
+        .scenario-savings { font-family: var(--font-label); font-size: 15px; color: var(--primary); letter-spacing: -0.32px; }
+    </style>
+</head>
+<body>
+    <div class="mobile-view" style="background:var(--surface);">
+    <nav class="dc-topnav"><a href="splash.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg><span>Accueil</span></a><a href="onboarding.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Onboarding</span></a><a href="calculator.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>Envoi</span></a><a href="send-step3.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Confirmation</span></a><a href="home-receiver.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Réception</span></a><a href="home-sender.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span></a></nav>
+                <div class="imp-header">
+            <a href="profile.html" class="imp-back">←</a>
+            <span class="imp-title">Impact</span>
+            <div style="width:40px;"></div>
+        </div>
+
+        <div class="imp-scroll">
+            <div class="hero-title">Notre impact<br>ensemble</div>
+
+            <!-- Connection anim -->
+            <div class="anim-container">
+                <div class="conn-anim">
+                    <div class="conn-node">🌍</div>
+                    <div class="conn-line"><div class="conn-dot"></div></div>
+                    <div class="conn-node" style="background:rgba(117,91,0,0.15);">🇧🇯</div>
+                </div>
+            </div>
+
+            <!-- Compteurs -->
+            <div class="counters-row">
+                <div class="counter-card">
+                    <div class="counter-value" id="cnt1">0</div>
+                    <div class="counter-label">familles aidées</div>
+                </div>
+                <div class="counter-card">
+                    <div class="counter-value" id="cnt2">0 $</div>
+                    <div class="counter-label">économisés en frais</div>
+                </div>
+            </div>
+            <div class="counter-card-full">
+                <div class="counter-value-large">&lt; 1 %</div>
+                <div class="counter-label">de frais moyens par transfert</div>
+            </div>
+
+            <!-- ODD -->
+            <div class="section-title">Objectifs de Développement Durable</div>
+
+            <div class="odd-card">
+                <div class="odd-badge"><span class="odd-num">1</span></div>
+                <div class="odd-text">
+                    <div class="odd-title">ODD 1 — Fin de la pauvreté</div>
+                    <div class="odd-desc">Réduction des frais pour les familles les plus vulnérables. Chaque USD économisé compte.</div>
+                </div>
+            </div>
+            <div class="odd-card">
+                <div class="odd-badge"><span class="odd-num">8</span></div>
+                <div class="odd-text">
+                    <div class="odd-title">ODD 8 — Travail décent</div>
+                    <div class="odd-desc">Nous soutenons l'économie béninoise en ramenant plus d'argent dans les ménages.</div>
+                </div>
+            </div>
+            <div class="odd-card">
+                <div class="odd-badge"><span class="odd-num">10</span></div>
+                <div class="odd-text">
+                    <div class="odd-title">ODD 10 — Inégalités réduites</div>
+                    <div class="odd-desc">Démocratisation des services financiers pour tous, y compris en zones rurales.</div>
+                </div>
+            </div>
+
+            <!-- Scénarios -->
+            <div class="section-title" style="margin-top:var(--spacing-xl);">Scénarios concrets</div>
+
+            <div class="scenario-card">
+                <div class="scenario-left">
+                    <div class="scenario-name">Kofi (Paris)</div>
+                    <div class="scenario-amount">200 USD envoyés</div>
+                </div>
+                <div class="scenario-right">
+                    <div class="scenario-savings-label">Économie vs WU</div>
+                    <div class="scenario-savings">+26.20 USD</div>
+                </div>
+            </div>
+            <div class="scenario-card">
+                <div class="scenario-left">
+                    <div class="scenario-name">Adjoa (Bruxelles)</div>
+                    <div class="scenario-amount">100 USD envoyés</div>
+                </div>
+                <div class="scenario-right">
+                    <div class="scenario-savings-label">Économie vs WU</div>
+                    <div class="scenario-savings">+13.10 USD</div>
+                </div>
+            </div>
+            <div class="scenario-card">
+                <div class="scenario-left">
+                    <div class="scenario-name">Séraphin (Lyon)</div>
+                    <div class="scenario-amount">500 USD envoyés</div>
+                </div>
+                <div class="scenario-right">
+                    <div class="scenario-savings-label">Économie vs WU</div>
+                    <div class="scenario-savings">+65.50 USD</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function animateCounter(id, target, suffix) {
+            const el = document.getElementById(id);
+            const steps = 60; const duration = 1800;
+            let current = 0;
+            const inc = target / steps;
+            const interval = setInterval(() => {
+                current += inc;
+                if (current >= target) { current = target; clearInterval(interval); }
+                el.textContent = Math.floor(current).toLocaleString('fr-FR') + suffix;
+            }, duration / steps);
+        }
+        animateCounter('cnt1', 1247, '');
+        animateCounter('cnt2', 18653, ' $');
+    </script>
+</body>
+</html>
+
+
+==============================
+Page : Mon Profil
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Profil</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .dc-tabs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;display:flex;justify-content:space-around;padding:8px 0 max(12px,env(safe-area-inset-bottom,8px));background:rgba(250,249,245,0.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(208,197,178,0.4);z-index:100;}
+        .dc-tab{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#4A4A48;font-size:11px;gap:3px;padding:0 12px;font-family:'Public Sans',sans-serif;}
+        .dc-tab .dc-tab-icon{font-size:20px;line-height:1;}
+        .dc-tab.active{color:#755B00;}
+        .pf-header { padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-sm); }
+        .pf-title { font-family: var(--font-display); font-size: 28px; color: var(--on-surface); letter-spacing: -0.56px; }
+
+        .pf-scroll { padding: 0 var(--spacing-xl) 120px; }
+
+        /* Profile card */
+        .profile-card {
+            background: var(--surface-lowest); border-radius: var(--radius-md);
+            padding: var(--spacing-lg); display: flex; flex-direction: column;
+            align-items: center; margin-bottom: var(--spacing-xl);
+            box-shadow: var(--shadow-diffuse);
+        }
+        /* Avatar carré border-radius:8px */
+        .pf-avatar {
+            width: 64px; height: 64px; border-radius: 8px;
+            background: var(--surface-low);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: var(--spacing-md);
+        }
+        .pf-avatar-text { font-family: var(--font-display); font-size: 24px; color: var(--primary); }
+        .pf-name {
+            font-family: var(--font-display); font-size: 20px; color: var(--on-surface);
+            margin-bottom: var(--spacing-md); letter-spacing: -0.4px; text-align: center;
+        }
+        /* Wallet row */
+        .wallet-row {
+            display: flex; align-items: center;
+            background: var(--surface-low); border-radius: 6px;
+            padding: var(--spacing-md); width: 100%;
+        }
+        .wallet-info { flex: 1; margin-right: var(--spacing-sm); }
+        .wallet-label { font-family: var(--font-body); font-size: 11px; color: var(--on-surface-variant); margin-bottom: 2px; }
+        .wallet-address { font-family: var(--font-label); font-size: 13px; color: var(--primary); }
+        .copy-btn {
+            padding: 4px var(--spacing-sm); background: rgba(117,91,0,0.1);
+            border-radius: 4px; font-family: var(--font-label); font-size: 12px;
+            color: var(--primary); border: none; cursor: pointer; flex-shrink: 0;
+        }
+
+        /* Section title */
+        .section-title {
+            font-family: var(--font-title); font-size: 13px; color: var(--on-surface-variant);
+            text-transform: uppercase; letter-spacing: 0.5px;
+            margin-bottom: var(--spacing-sm); margin-top: var(--spacing-lg);
+        }
+
+        /* Lang card */
+        .lang-card {
+            background: var(--surface-lowest); border-radius: var(--radius-md);
+            overflow: hidden; box-shadow: var(--shadow-diffuse);
+        }
+        .lang-row {
+            display: flex; align-items: center; padding: var(--spacing-md);
+            gap: var(--spacing-md); cursor: pointer;
+        }
+        .lang-row.active { background: rgba(117,91,0,0.05); }
+        .lang-flag { font-size: 20px; flex-shrink: 0; }
+        .lang-label { flex: 1; font-family: var(--font-body); font-size: 16px; color: var(--on-surface); }
+        .lang-label.active { font-family: var(--font-title); color: var(--primary); }
+        .lang-check {
+            width: 22px; height: 22px; border-radius: 4px;
+            background: var(--primary);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 13px; flex-shrink: 0;
+        }
+
+        /* Setting card */
+        .setting-card {
+            background: var(--surface-lowest); border-radius: var(--radius-md);
+            padding: var(--spacing-md); box-shadow: var(--shadow-diffuse);
+        }
+        .setting-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: var(--spacing-sm) 0; gap: var(--spacing-sm);
+        }
+        .setting-row-border { border-top: 1px solid rgba(208,197,178,0.15); }
+        .setting-label-row { display: flex; align-items: center; gap: 8px; flex: 1; }
+        .setting-label { font-family: var(--font-body); font-size: 15px; color: var(--on-surface); }
+        .setting-value { font-family: var(--font-label); font-size: 13px; color: var(--primary); flex-shrink: 0; }
+        .setting-value-label { font-family: var(--font-label); font-size: 13px; color: var(--on-surface-variant); flex-shrink: 0; text-align: right; }
+
+        /* Impact btn */
+        .impact-btn {
+            display: flex; align-items: center; gap: var(--spacing-sm);
+            background: rgba(117,91,0,0.06); border-radius: var(--radius-md);
+            padding: var(--spacing-lg); margin-top: var(--spacing-lg);
+            text-decoration: none;
+        }
+        .impact-btn-text { font-family: var(--font-title); font-size: 15px; color: var(--primary); flex: 1; }
+
+        /* Logout */
+        .logout-btn {
+            display: flex; align-items: center; justify-content: center;
+            background: var(--surface-low); border-radius: var(--radius-md);
+            padding: var(--spacing-md); margin-top: var(--spacing-xl);
+            text-decoration: none; gap: 6px;
+        }
+        .logout-text { font-family: var(--font-title); font-size: 15px; color: var(--on-surface); }
+    </style>
+</head>
+<body>
+    <div class="mobile-view">
+    <nav class="dc-topnav"><a href="splash.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg><span>Accueil</span></a><a href="onboarding.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Onboarding</span></a><a href="calculator.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>Envoi</span></a><a href="send-step3.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Confirmation</span></a><a href="home-receiver.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Réception</span></a><a href="home-sender.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span></a></nav>
+                <div class="pf-header">
+            <div class="pf-title">Profil</div>
+        </div>
+
+        <div class="pf-scroll">
+            <!-- Profile card -->
+            <div class="profile-card">
+                <div class="pf-avatar">
+                    <span class="pf-avatar-text">K</span>
+                </div>
+                <div class="pf-name">Kossi</div>
+                <div class="wallet-row">
+                    <div class="wallet-info">
+                        <div class="wallet-label">Portefeuille Celo</div>
+                        <div class="wallet-address">0x742d35...3E1f</div>
+                    </div>
+                    <button class="copy-btn" onclick="this.textContent='✓';setTimeout(()=>this.textContent='Copier',2000)">Copier</button>
+                </div>
+            </div>
+
+            <!-- Langue -->
+            <div class="section-title">Langue</div>
+            <div class="lang-card">
+                <div class="lang-row active" onclick="selectLang(this)">
+                    <span class="lang-flag">🇫🇷</span>
+                    <span class="lang-label active">Français</span>
+                    <div class="lang-check">✓</div>
+                </div>
+                <div class="lang-row" onclick="selectLang(this)">
+                    <span class="lang-flag">🇬🇧</span>
+                    <span class="lang-label">English</span>
+                </div>
+                <div class="lang-row" onclick="selectLang(this)">
+                    <span class="lang-flag">🇧🇯</span>
+                    <span class="lang-label">Fon</span>
+                </div>
+            </div>
+
+            <!-- Sécurité -->
+            <div class="section-title">Sécurité</div>
+            <div class="setting-card">
+                <div class="setting-row">
+                    <div class="setting-label-row">
+                        <span style="font-size:16px;">👆</span>
+                        <span class="setting-label">Authentification biométrique</span>
+                    </div>
+                    <span class="setting-value">Activée</span>
+                </div>
+            </div>
+
+            <!-- Impact -->
+            <a href="impact.html" class="impact-btn">
+                <span style="font-size:18px;">🌍</span>
+                <span class="impact-btn-text">Voir notre impact ODD</span>
+                <span style="color:var(--primary);font-size:18px;">›</span>
+            </a>
+
+            <!-- À propos -->
+            <div class="section-title">À propos</div>
+            <div class="setting-card">
+                <div class="setting-row">
+                    <span class="setting-label">Version</span>
+                    <span class="setting-value-label">1.0.0 — MIABE 2026</span>
+                </div>
+                <div class="setting-row setting-row-border">
+                    <span class="setting-label">Réseau</span>
+                    <span class="setting-value-label">Celo Alfajores</span>
+                </div>
+            </div>
+
+            <!-- Déconnexion -->
+            <button type="button" class="logout-btn" onclick="confirmLogout()">
+                <span style="font-size:16px;">🚪</span>
+                <span class="logout-text">Déconnecter le wallet</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function confirmLogout() {
+            if (confirm('Voulez-vous vous déconnecter ?')) {
+                window.location.href = 'role-selection.html';
+            }
+        }
+
+        function selectLang(el) {
+            document.querySelectorAll('.lang-row').forEach(r => {
+                r.classList.remove('active');
+                r.querySelector('.lang-label').classList.remove('active');
+                const chk = r.querySelector('.lang-check');
+                if (chk) chk.remove();
+            });
+            el.classList.add('active');
+            el.querySelector('.lang-label').classList.add('active');
+            const chk = document.createElement('div');
+            chk.className = 'lang-check'; chk.textContent = '✓';
+            el.appendChild(chk);
+        }
+    </script>
+</body>
+</html>
+
+
+==============================
+Page : Support & Contact
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Contact</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .contact-options {
+            padding: var(--spacing-lg);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+        .contact-btn {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+            padding: var(--spacing-lg);
+            background: var(--surface-lowest);
+            border-radius: var(--radius-lg);
+            text-decoration: none;
+            color: var(--on-surface);
+            box-shadow: var(--shadow-glass);
+            border: 1px solid var(--outline-variant);
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-view">
+    <nav class="dc-topnav"><a href="splash.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg><span>Accueil</span></a><a href="onboarding.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Onboarding</span></a><a href="calculator.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>Envoi</span></a><a href="send-step3.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Confirmation</span></a><a href="home-receiver.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Réception</span></a><a href="home-sender.html" class="dc-tnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span></a></nav>
+                <header>
+            <a href="profile.html" class="back-button">←</a>
+            <h3>Support</h3>
+            <div style="width: 40px;"></div>
+        </header>
+
+        <div style="padding: var(--spacing-lg);">
+            <h1>Besoin d'aide ?</h1>
+            <p>Notre équipe est disponible 7j/7 pour vous accompagner.</p>
+        </div>
+
+        <div class="contact-options fade-in">
+            <a href="https://wa.me/22900000000" class="contact-btn">
+                <div style="font-size: 32px;">💬</div>
+                <div>
+                    <div style="font-weight: 700;">WhatsApp Business</div>
+                    <p style="font-size: 13px; opacity: 0.7;">Réponse en moins de 10 min</p>
+                </div>
+            </a>
+
+            <a href="tel:+22900000000" class="contact-btn">
+                <div style="font-size: 32px;">📞</div>
+                <div>
+                    <div style="font-weight: 700;">Appel direct</div>
+                    <p style="font-size: 13px; opacity: 0.7;">Disponible de 8h à 20h (GMT+1)</p>
+                </div>
+            </a>
+
+            <a href="mailto:support@diasporaconnect.bj" class="contact-btn">
+                <div style="font-size: 32px;">📧</div>
+                <div>
+                    <div style="font-weight: 700;">Email</div>
+                    <p style="font-size: 13px; opacity: 0.7;">support@diasporaconnect.bj</p>
+                </div>
+            </a>
+        </div>
+
+        <div style="padding: var(--spacing-xl); text-align: center;">
+            <p class="label" style="opacity: 0.5;">Version 1.0.0 (Build 2026-MIABE)</p>
+        </div>
+    </div>
+</body>
+</html>
+
+

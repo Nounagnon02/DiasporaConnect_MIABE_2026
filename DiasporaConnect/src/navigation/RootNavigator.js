@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 // We import all screen proxies/placeholders if they exist or the current ones
+import InitialSplashScreen from '../screens/onboarding/InitialSplashScreen';
 import OnboardingScreen from '../screens/onboarding/OnboardingScreen';
 import RoleSelectScreen from '../screens/auth/RoleSelectScreen';
 // SenderAuth & ReceiverAuth will be created
@@ -15,16 +16,19 @@ import ReceiverTabs from './ReceiverTabs';
 import SendFlowStack from './SendFlowStack';
 
 // Other
-import ImpactScreen from '../screens/ImpactScreen';
+import ImpactScreen from '../screens/shared/ImpactScreen';
+import TransactionDetail from '../screens/shared/TransactionDetailScreen';
+import ContactScreen from '../screens/shared/ContactScreen';
 
 const Stack = createStackNavigator();
 
 export default function RootNavigator() {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Onboarding">
+      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Splash">
         
-        {/* Onboarding & Auth */}
+        {/* Entry & Onboarding */}
+        <Stack.Screen name="Splash" component={InitialSplashScreen} options={{ gestureEnabled: false }} />
         <Stack.Screen name="Onboarding" component={OnboardingScreen} options={{ gestureEnabled: false }} />
         <Stack.Screen name="RoleSelect" component={RoleSelectScreen} />
         <Stack.Screen name="SenderAuth" component={SenderAuthScreen} />
@@ -37,6 +41,8 @@ export default function RootNavigator() {
         {/* Sub flows */}
         <Stack.Screen name="SendFlow" component={SendFlowStack} options={{ gestureEnabled: false }} />
         <Stack.Screen name="Impact" component={ImpactScreen} />
+        <Stack.Screen name="TransactionDetail" component={TransactionDetail} />
+        <Stack.Screen name="Contact" component={ContactScreen} />
         
       </Stack.Navigator>
     </NavigationContainer>

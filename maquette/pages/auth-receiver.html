@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Connexion Destinataire</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="../assets/js/nav.js"></script>
+    <style>
+        .ar-header { padding: var(--spacing-md) var(--spacing-xl) var(--spacing-sm); }
+        .ar-back { font-size: 24px; color: var(--primary); text-decoration: none; cursor: pointer; }
+        .ar-scroll { padding: 0 var(--spacing-xl) var(--spacing-xxl); }
+        .ar-title {
+            font-family: var(--font-display); font-size: 30px; color: var(--on-surface);
+            letter-spacing: -0.5px; margin-bottom: var(--spacing-sm); line-height: 38px;
+        }
+        .ar-subtitle {
+            font-family: var(--font-body); font-size: 15px; color: var(--on-surface-variant);
+            margin-bottom: var(--spacing-xl); line-height: 23px;
+        }
+        .hint { font-family: var(--font-label); color: var(--primary); }
+
+        .ledger-label {
+            font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant);
+            margin-bottom: 6px; display: block;
+        }
+        .ledger-input {
+            width: 100%; padding: var(--spacing-md);
+            border: none; border-bottom: 2px solid rgba(208,197,178,0.4);
+            background: transparent;
+            font-family: var(--font-label); font-size: 15px; color: var(--on-surface);
+        }
+        .ledger-input:focus { outline: none; border-color: var(--primary); }
+
+        /* OTP */
+        .otp-row {
+            display: flex; gap: var(--spacing-md);
+            margin: var(--spacing-xl) 0;
+        }
+        .otp-box {
+            flex: 1; height: 64px;
+            background: var(--surface-low);
+            border-radius: 0;
+            border: none; border-bottom: 2px solid rgba(208,197,178,0.4);
+            font-family: var(--font-label); font-size: 28px;
+            color: var(--on-surface); text-align: center;
+            box-shadow: var(--shadow-glass);
+        }
+        .otp-box:focus { outline: none; border-bottom-color: var(--primary); background: rgba(117,91,0,0.04); }
+
+        .actions-block { margin-top: var(--spacing-xl); display: flex; flex-direction: column; gap: var(--spacing-md); }
+        .btn-demo {
+            height: 52px; display: flex; align-items: center; justify-content: center;
+            background: var(--surface-low); border-radius: var(--radius-md);
+            font-family: var(--font-title); font-size: 15px; color: var(--on-surface);
+            text-decoration: none; border: none; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-view">
+        <div id="dc-nav" data-active="receive"></div>
+        <div class="ar-header">
+            <span class="ar-back" id="backBtn" onclick="goBack()">←</span>
+        </div>
+
+        <!-- Step 1 : Téléphone -->
+        <div class="ar-scroll" id="step1">
+            <div class="ar-title">Votre numéro</div>
+            <div class="ar-subtitle">Saisissez votre numéro Mobile Money actif au Bénin.</div>
+
+            <label class="ledger-label">Numéro MTN ou Moov (+229...)</label>
+            <input class="ledger-input" type="tel" id="phoneInput" placeholder="+229 97 00 00 00">
+
+            <div class="actions-block">
+                <button class="btn btn-primary" onclick="goToOTP()">Recevoir mon code SMS</button>
+                <a href="home-receiver.html" class="btn-demo">🚀 Continuer en mode démo</a>
+            </div>
+        </div>
+
+        <!-- Step 2 : OTP -->
+        <div class="ar-scroll" id="step2" style="display:none;">
+            <div class="ar-title">Code de vérification</div>
+            <div class="ar-subtitle" id="otpSubtitle">
+                Code envoyé au <span id="phoneDisplay"></span>.<br>
+                <span class="hint">Code démo : 4242</span>
+            </div>
+
+            <div class="otp-row">
+                <input class="otp-box" type="tel" maxlength="1" id="otp0" oninput="otpNext(0)">
+                <input class="otp-box" type="tel" maxlength="1" id="otp1" oninput="otpNext(1)">
+                <input class="otp-box" type="tel" maxlength="1" id="otp2" oninput="otpNext(2)">
+                <input class="otp-box" type="tel" maxlength="1" id="otp3" oninput="otpNext(3)">
+            </div>
+
+            <div class="actions-block">
+                <a href="home-receiver.html" class="btn btn-primary">Valider et continuer</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+
+        function goToOTP() {
+            const phone = document.getElementById('phoneInput').value;
+            if (phone.length < 8) return;
+            document.getElementById('phoneDisplay').textContent = phone;
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'block';
+            currentStep = 2;
+            setTimeout(() => document.getElementById('otp0').focus(), 100);
+        }
+
+        function goBack() {
+            if (currentStep === 2) {
+                document.getElementById('step2').style.display = 'none';
+                document.getElementById('step1').style.display = 'block';
+                currentStep = 1;
+            } else {
+                window.location.href = 'role-selection.html';
+            }
+        }
+
+        function otpNext(index) {
+            const val = document.getElementById(`otp${index}`).value.replace(/[^0-9]/g, '');
+            document.getElementById(`otp${index}`).value = val.slice(-1);
+            if (val && index < 3) document.getElementById(`otp${index + 1}`).focus();
+        }
+    </script>
+</body>
+</html>

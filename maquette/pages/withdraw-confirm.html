@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Confirmation Retrait</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="../assets/js/nav.js"></script>
+    <style>
+        .wc-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-sm);
+        }
+        .wc-back { font-size: 24px; color: var(--primary); text-decoration: none; }
+        .wc-title {
+            font-family: var(--font-title); font-size: 16px; color: var(--on-surface);
+            flex: 1; text-align: center;
+        }
+
+        .wc-scroll { padding: var(--spacing-lg) var(--spacing-xl); padding-bottom: 120px; }
+
+        /* Confirm card */
+        .confirm-card {
+            background: var(--surface-lowest); padding: var(--spacing-lg);
+            border-radius: var(--radius-md); box-shadow: var(--shadow-diffuse);
+            margin-bottom: var(--spacing-xl);
+        }
+        .cc-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: var(--spacing-sm) 0; gap: var(--spacing-sm);
+        }
+        .cc-row-amount { padding: var(--spacing-md) 0; }
+        .cc-sep { height: 1px; background: rgba(208,197,178,0.15); margin: var(--spacing-xs) 0; }
+        .cc-label { font-family: var(--font-body); font-size: 14px; color: var(--on-surface-variant); flex-shrink: 0; }
+        .cc-label-big { font-family: var(--font-title); font-size: 15px; color: var(--on-surface); }
+        .cc-value { font-family: var(--font-title); font-size: 14px; color: var(--on-surface); flex-shrink: 1; text-align: right; }
+        .cc-value-label { font-family: var(--font-label); font-size: 15px; color: var(--on-surface); flex-shrink: 1; text-align: right; }
+        /* Montant hero — font-display 32px */
+        .cc-value-hero {
+            font-family: var(--font-display); font-size: 32px; color: var(--on-surface);
+            letter-spacing: -0.64px; margin-top: 4px;
+        }
+
+        /* Security box */
+        .security-box {
+            padding: var(--spacing-lg); background: rgba(117,91,0,0.05);
+            border-radius: var(--radius-md); border-left: 3px solid var(--primary);
+        }
+        .security-text { font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant); line-height: 20px; }
+
+        /* Footer */
+        .wc-footer {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 430px;
+            padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl);
+            background: var(--surface);
+            border-top: 1px solid rgba(208,197,178,0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-view">
+        <div id="dc-nav" data-active="confirm"></div>
+        <div class="wc-header">
+            <a href="withdraw-operator.html" class="wc-back">←</a>
+            <span class="wc-title">Confirmation</span>
+            <div style="width:40px;"></div>
+        </div>
+
+        <div class="wc-scroll">
+            <div class="confirm-card">
+                <div class="cc-row">
+                    <span class="cc-label">Opérateur</span>
+                    <span class="cc-value">🟡 MTN Money</span>
+                </div>
+                <div class="cc-sep"></div>
+                <div class="cc-row">
+                    <span class="cc-label">Numéro de retrait</span>
+                    <span class="cc-value-label">+229 97 00 00 00</span>
+                </div>
+                <div class="cc-sep"></div>
+                <div class="cc-row-amount">
+                    <div class="cc-label-big">Montant à recevoir</div>
+                    <div class="cc-value-hero">131 191 FCFA</div>
+                </div>
+            </div>
+
+            <div class="security-box">
+                <div class="security-text">🔒 Transaction sécurisée par The Private Ledger. Le montant sera versé sur votre compte mobile money sous 2 minutes.</div>
+            </div>
+        </div>
+
+        <div class="wc-footer">
+            <a href="withdraw-success.html" class="btn btn-primary">Confirmer le retrait</a>
+        </div>
+    </div>
+</body>
+</html>

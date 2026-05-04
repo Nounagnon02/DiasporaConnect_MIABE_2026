@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiasporaConnect - Connexion Expéditeur</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="../assets/js/nav.js"></script>
+    <style>
+        .as-header { padding: var(--spacing-md) var(--spacing-xl) var(--spacing-sm); }
+        .as-back { font-size: 24px; color: var(--primary); text-decoration: none; }
+        .as-scroll { padding: 0 var(--spacing-xl) var(--spacing-xxl); }
+        .as-title {
+            font-family: var(--font-display); font-size: 30px; color: var(--on-surface);
+            margin-bottom: var(--spacing-sm); letter-spacing: -0.02em; line-height: 38px;
+        }
+        .as-subtitle {
+            font-family: var(--font-body); font-size: 15px; color: var(--on-surface-variant);
+            margin-bottom: var(--spacing-xl); line-height: 23px;
+        }
+        .section-label {
+            font-family: var(--font-title); font-size: 13px; color: var(--on-surface-variant);
+            margin-bottom: var(--spacing-md); text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .chain-card {
+            display: flex; align-items: center;
+            background: var(--surface-lowest);
+            border-radius: var(--radius-md); padding: var(--spacing-md);
+            margin-bottom: var(--spacing-sm);
+            border: 1px solid transparent;
+            box-shadow: var(--shadow-glass);
+            cursor: pointer; transition: border-color 0.2s, background 0.2s;
+        }
+        .chain-card.active {
+            border-color: var(--primary);
+            background: rgba(117,91,0,0.04);
+        }
+        .chain-emoji { font-size: 26px; margin-right: var(--spacing-md); flex-shrink: 0; }
+        .chain-info { flex: 1; margin-right: var(--spacing-sm); }
+        .chain-name {
+            font-family: var(--font-title); font-size: 15px; color: var(--on-surface); margin-bottom: 2px;
+        }
+        .chain-name.active { color: var(--primary); }
+        .chain-desc { font-family: var(--font-body); font-size: 12px; color: var(--on-surface-variant); line-height: 17px; }
+        .check-badge {
+            width: 24px; height: 24px; border-radius: 12px;
+            background: var(--primary);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 13px; font-family: var(--font-title);
+            flex-shrink: 0;
+        }
+
+        .divider {
+            display: flex; align-items: center; gap: 10px;
+            margin: var(--spacing-xl) 0;
+        }
+        .divider-line { flex: 1; height: 1px; background: rgba(208,197,178,0.3); }
+        .divider-text { font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant); }
+
+        .ledger-input-wrap { margin-bottom: var(--spacing-md); }
+        .ledger-label {
+            font-family: var(--font-body); font-size: 13px; color: var(--on-surface-variant);
+            margin-bottom: 6px; display: block;
+        }
+        .ledger-input {
+            width: 100%; padding: var(--spacing-md);
+            border: none; border-bottom: 2px solid rgba(208,197,178,0.4);
+            background: transparent;
+            font-family: var(--font-label); font-size: 15px;
+            color: var(--on-surface);
+        }
+        .ledger-input:focus { outline: none; border-color: var(--primary); }
+
+        .actions-block { margin-top: var(--spacing-xl); display: flex; flex-direction: column; gap: var(--spacing-md); }
+        .btn-demo {
+            height: 52px; display: flex; align-items: center; justify-content: center;
+            background: var(--surface-low); border-radius: var(--radius-md);
+            font-family: var(--font-title); font-size: 15px; color: var(--on-surface);
+            text-decoration: none; border: none; cursor: pointer;
+        }
+        .secure-note {
+            display: flex; align-items: center; justify-content: center;
+            padding: var(--spacing-sm) 0;
+            font-family: var(--font-body); font-size: 12px; color: var(--on-surface-variant);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-view">
+        <div id="dc-nav" data-active="send"></div>
+        <div class="as-header">
+            <a href="role-selection.html" class="as-back">←</a>
+        </div>
+
+        <div class="as-scroll">
+            <div class="as-title">Connecter votre<br>portefeuille</div>
+            <div class="as-subtitle">DiasporaConnect utilise la blockchain Celo pour des transferts sécurisés et transparents.</div>
+
+            <div class="section-label">Choisir le réseau</div>
+
+            <div class="chain-card active" onclick="selectChain(this, 'celo')">
+                <span class="chain-emoji">🟡</span>
+                <div class="chain-info">
+                    <div class="chain-name active">Celo</div>
+                    <div class="chain-desc">Réseau principal DiasporaConnect</div>
+                </div>
+                <div class="check-badge">✓</div>
+            </div>
+
+            <div class="chain-card" onclick="selectChain(this, 'ethereum')">
+                <span class="chain-emoji">🔷</span>
+                <div class="chain-info">
+                    <div class="chain-name">Ethereum</div>
+                    <div class="chain-desc">Compatible EVM</div>
+                </div>
+            </div>
+
+            <div class="chain-card" onclick="selectChain(this, 'polygon')">
+                <span class="chain-emoji">🟣</span>
+                <div class="chain-info">
+                    <div class="chain-name">Polygon</div>
+                    <div class="chain-desc">Frais réduits</div>
+                </div>
+            </div>
+
+            <div class="divider">
+                <div class="divider-line"></div>
+                <span class="divider-text">ou saisir manuellement</span>
+                <div class="divider-line"></div>
+            </div>
+
+            <div class="ledger-input-wrap">
+                <label class="ledger-label">Adresse du portefeuille (0x...)</label>
+                <input class="ledger-input" type="text" placeholder="0x1a3b5c..." autocapitalize="none">
+            </div>
+
+            <div class="actions-block">
+                <a href="home-sender.html" class="btn btn-primary">Connecter le portefeuille</a>
+                <a href="home-sender.html" class="btn-demo">🚀 Continuer en mode démo</a>
+                <div class="secure-note">🔒 Connexion chiffrée de bout en bout</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function selectChain(el, id) {
+            document.querySelectorAll('.chain-card').forEach(c => {
+                c.classList.remove('active');
+                c.querySelector('.chain-name').classList.remove('active');
+                const badge = c.querySelector('.check-badge');
+                if (badge) badge.remove();
+            });
+            el.classList.add('active');
+            el.querySelector('.chain-name').classList.add('active');
+            const badge = document.createElement('div');
+            badge.className = 'check-badge';
+            badge.textContent = '✓';
+            el.appendChild(badge);
+        }
+    </script>
+</body>
+</html>

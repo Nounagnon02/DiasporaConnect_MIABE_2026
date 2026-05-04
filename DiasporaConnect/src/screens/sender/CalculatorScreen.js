@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
+import {
+  View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions,
+} from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { colors, fonts, spacing, radius, shadows, letterSpacing } from '../../theme/theme';
 import GoldButton from '../../components/ui/GoldButton';
@@ -8,13 +11,17 @@ import FeeComparator from '../../components/ui/FeeComparator';
 import { calculateTransfer } from '../../services/blockchainService';
 import useStore from '../../store/useStore';
 
+const { width } = Dimensions.get('window');
+const isSmall = width < 380;
+
 export default function CalculatorScreen({ navigation }) {
   const { updateTransferData } = useStore();
   const [amount, setAmount] = useState('200');
   const [currency, setCurrency] = useState('EUR');
-  
-  const calcResult = amount && !isNaN(parseFloat(amount)) 
-    ? calculateTransfer(parseFloat(amount), currency) 
+  const insets = useSafeAreaInsets();
+
+  const calcResult = amount && !isNaN(parseFloat(amount))
+    ? calculateTransfer(parseFloat(amount), currency)
     : calculateTransfer(0, currency);
 
   const formatFCFA = (num) => new Intl.NumberFormat('fr-FR').format(Math.round(num));
@@ -31,8 +38,10 @@ export default function CalculatorScreen({ navigation }) {
       recipientGetsFCFA: calcResult.recipientGetsFCFA,
       savings: calcResult.savings,
     });
-    navigation.navigate('SendFlow', { screen: 'SendStep2' }); // Jump to Step 2 since Amount is done here
+    navigation.navigate('SendFlow', { screen: 'SendStep2' });
   };
+
+  const ctaBottom = insets.bottom + 16;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -41,23 +50,26 @@ export default function CalculatorScreen({ navigation }) {
         <Text style={styles.headerTitle}>Estimer un transfert</Text>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-        
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[styles.scroll, { paddingBottom: 100 + ctaBottom }]}
+        keyboardShouldPersistTaps="handled"
+      >
         {/* Input Card */}
         <View style={styles.card}>
+          {/* Toggle devise */}
           <View style={styles.currencyToggle}>
-            <TouchableOpacity 
-              style={[styles.toggleBtn, currency === 'EUR' && styles.toggleBtnActive]}
-              onPress={() => setCurrency('EUR')}
-            >
-              <Text style={[styles.toggleText, currency === 'EUR' && styles.toggleTextActive]}>EUR</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.toggleBtn, currency === 'USD' && styles.toggleBtnActive]}
-              onPress={() => setCurrency('USD')}
-            >
-              <Text style={[styles.toggleText, currency === 'USD' && styles.toggleTextActive]}>USD</Text>
-            </TouchableOpacity>
+            {['EUR', 'USD'].map((cur) => (
+              <TouchableOpacity
+                key={cur}
+                style={[styles.toggleBtn, currency === cur && styles.toggleBtnActive]}
+                onPress={() => setCurrency(cur)}
+              >
+                <Text style={[styles.toggleText, currency === cur && styles.toggleTextActive]}>
+                  {cur}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
 
           <LedgerInput
@@ -70,32 +82,41 @@ export default function CalculatorScreen({ navigation }) {
 
           <View style={styles.resultContainer}>
             <Text style={styles.resultLabel}>Le bénéficiaire reçoit environ</Text>
-            <Text style={styles.resultAmount}>{formatFCFA(calcResult.recipientGetsFCFA)} FCFA</Text>
+            <Text
+              style={styles.resultAmount}
+              adjustsFontSizeToFit
+              minimumFontScale={0.7}
+              numberOfLines={1}
+            >
+              {formatFCFA(calcResult.recipientGetsFCFA)} FCFA
+            </Text>
           </View>
         </View>
 
-        {/* Fees Comparison */}
+        {/* Comparateur de frais */}
         {calcResult.amountUSD > 0 && (
           <>
-            <FeeComparator calcResult={calcResult} style={{ marginBottom: spacing.xl }} />
-            
+            <FeeComparator calcResult={calcResult} style={styles.feeComp} />
+
             <View style={styles.savingsBanner}>
               <Text style={styles.savingsIcon}>✨</Text>
               <Text style={styles.savingsText}>
-                En envoyant avec DiasporaConnect, vous conservez <Text style={styles.savingsBold}>${calcResult.savings.toFixed(2)} USD</Text> dans la famille par rapport au marché.
+                En envoyant avec DiasporaConnect, vous conservez{' '}
+                <Text style={styles.savingsBold}>
+                  ${calcResult.savings.toFixed(2)} USD
+                </Text>{' '}
+                dans la famille vs. le marché.
               </Text>
             </View>
           </>
         )}
-
-        <View style={{ height: 120 }} />
       </ScrollView>
 
-      {/* Floating CTA */}
-      <View style={styles.bottomCta}>
-        <GoldButton 
-          title="Continuer le transfert" 
-          onPress={handleNext} 
+      {/* CTA flottant */}
+      <View style={[styles.bottomCta, { paddingBottom: ctaBottom + spacing.md }]}>
+        <GoldButton
+          title="Continuer le transfert"
+          onPress={handleNext}
           disabled={!calcResult || calcResult.amountUSD <= 0}
         />
       </View>
@@ -111,13 +132,14 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: spacing.xl,
     paddingTop: spacing.lg,
-    paddingBottom: spacing.lg,
+    paddingBottom: spacing.md,
   },
   headerTitle: {
     fontFamily: fonts.display,
-    fontSize: 28,
+    fontSize: isSmall ? 24 : 28,
     color: colors.onSurface,
     letterSpacing: -0.02,
+    flexShrink: 1,
   },
   scroll: {
     paddingHorizontal: spacing.xl,
@@ -162,33 +184,38 @@ const styles = StyleSheet.create({
   },
   resultLabel: {
     fontFamily: fonts.body,
-    fontSize: 14,
+    fontSize: 13,
     color: colors.onSurfaceVariant,
     marginBottom: 4,
   },
   resultAmount: {
     fontFamily: fonts.label,
-    fontSize: 32,
+    fontSize: isSmall ? 26 : 32,
     color: colors.onSurface,
     letterSpacing: letterSpacing.amounts,
   },
+  feeComp: {
+    marginBottom: spacing.xl,
+  },
   savingsBanner: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     backgroundColor: colors.surfaceContainerLow,
     padding: spacing.lg,
     borderRadius: radius.md,
+    gap: spacing.md,
   },
   savingsIcon: {
-    fontSize: 24,
-    marginRight: spacing.md,
+    fontSize: 22,
+    flexShrink: 0,
   },
   savingsText: {
     flex: 1,
     fontFamily: fonts.body,
-    fontSize: 14,
+    fontSize: 13,
     color: colors.onSurfaceVariant,
     lineHeight: 20,
+    flexShrink: 1,
   },
   savingsBold: {
     fontFamily: fonts.title,
@@ -199,8 +226,10 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    padding: spacing.xl,
-    paddingBottom: 40, // for safe area essentially + glass nav
-    backgroundColor: 'transparent',
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing.lg,
+    backgroundColor: 'rgba(250,249,245,0.95)',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(208,197,178,0.15)',
   },
 });

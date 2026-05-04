@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { View, TextInput, Animated, Text, StyleSheet } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, TextInput, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { colors, fonts, spacing } from '../../theme/theme';
 
 export default function LedgerInput({
@@ -11,59 +11,57 @@ export default function LedgerInput({
   secureTextEntry = false,
   style,
   autoCapitalize = 'none',
+  prefix,
+  suffix,
+  onSuffixPress,
 }) {
   const [isFocused, setIsFocused] = useState(false);
-  const animatedValue = useRef(new Animated.Value(value ? 1 : 0)).current;
+  const hasValue = value && value.length > 0;
 
-  useEffect(() => {
-    Animated.timing(animatedValue, {
-      toValue: isFocused || value ? 1 : 0,
-      duration: 150,
-      useNativeDriver: false,
-    }).start();
-  }, [isFocused, value]);
+  const progress = useRef(new Animated.Value(hasValue ? 1 : 0)).current;
 
-  const labelTop = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [24, 6],
-  });
+  const labelTop = progress.interpolate({ inputRange: [0, 1], outputRange: [20, 6] });
+  const labelFontSize = progress.interpolate({ inputRange: [0, 1], outputRange: [16, 11] });
 
-  const labelFontSize = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [16, 12],
-  });
+  const labelStyle = {
+    top: labelTop,
+    fontSize: labelFontSize,
+    color: isFocused ? colors.primary : colors.onSurfaceVariant,
+  };
 
-  const labelColor = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [colors.onSurfaceVariant, colors.primary],
-  });
+  const onFocus = () => {
+    setIsFocused(true);
+    Animated.timing(progress, { toValue: 1, duration: 150, useNativeDriver: false }).start();
+  };
+
+  const onBlur = () => {
+    setIsFocused(false);
+    if (!value) Animated.timing(progress, { toValue: 0, duration: 150, useNativeDriver: false }).start();
+  };
 
   return (
     <View style={[styles.container, style]}>
-      <Animated.Text
-        style={[
-          styles.label,
-          {
-            top: labelTop,
-            fontSize: labelFontSize,
-            color: labelColor,
-          },
-        ]}
-      >
-        {label}
-      </Animated.Text>
-      <TextInput
-        style={[styles.input, isFocused && styles.inputFocused]}
-        value={value}
-        onChangeText={onChangeText}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-        keyboardType={keyboardType}
-        secureTextEntry={secureTextEntry}
-        placeholder={isFocused ? placeholder : ''}
-        placeholderTextColor={colors.outlineVariant}
-        autoCapitalize={autoCapitalize}
-      />
+      <Animated.Text style={[styles.label, labelStyle]}>{label}</Animated.Text>
+      <View style={[styles.row, isFocused && styles.rowFocused]}>
+        {prefix ? <Text style={styles.prefix}>{prefix}</Text> : null}
+        <TextInput
+          style={styles.input}
+          value={value}
+          onChangeText={onChangeText}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          keyboardType={keyboardType}
+          secureTextEntry={secureTextEntry}
+          placeholder={isFocused ? placeholder : ''}
+          placeholderTextColor={colors.outlineVariant}
+          autoCapitalize={autoCapitalize}
+        />
+        {suffix ? (
+          <TouchableOpacity onPress={onSuffixPress} style={styles.suffix}>
+            <Text style={styles.suffixText}>{suffix}</Text>
+          </TouchableOpacity>
+        ) : null}
+      </View>
     </View>
   );
 }
@@ -76,23 +74,46 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 4,
     borderTopRightRadius: 4,
     marginBottom: spacing.md,
+    justifyContent: 'flex-end',
   },
   label: {
     position: 'absolute',
     left: spacing.md,
     fontFamily: fonts.body,
   },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(208, 197, 178, 0.4)',
+    marginBottom: 4,
+  },
+  rowFocused: {
+    borderBottomWidth: 2,
+    borderBottomColor: colors.primary,
+  },
   input: {
     flex: 1,
-    marginTop: 16,
     fontFamily: fonts.body,
     fontSize: 16,
     color: colors.onSurface,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(208, 197, 178, 0.5)', // outlineVariant + alpha as alternative for shadow
+    paddingVertical: 6,
   },
   inputFocused: {
-    borderBottomWidth: 2,
-    borderBottomColor: colors.primary,
+    // border handled on row via parent state — override row border
+  },
+  prefix: {
+    fontFamily: fonts.label,
+    fontSize: 16,
+    color: colors.onSurfaceVariant,
+    marginRight: 4,
+  },
+  suffix: {
+    paddingLeft: spacing.sm,
+  },
+  suffixText: {
+    fontFamily: fonts.label,
+    fontSize: 14,
+    color: colors.primary,
   },
 });
