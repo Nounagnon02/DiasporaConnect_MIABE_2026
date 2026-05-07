@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   Animated, Dimensions,
@@ -6,21 +6,25 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing, radius, shadows, letterSpacing } from '../../theme/theme';
 import useStore from '../../store/useStore';
 import { MOCK_TRANSACTIONS } from '../../services/mockData';
 import TransactionItem from '../../components/ui/TransactionItem';
 import { GlassCard } from '../../components/ui/GlassCard';
 import ArrowIcon from '../../components/ui/ArrowIcon';
+import RatesAlertBanner from '../../components/ui/RatesAlertBanner';
 
 const { width } = Dimensions.get('window');
 const isSmall = width < 380;
 
 export default function HomeScreen({ navigation }) {
-  const { senderUser } = useStore();
+  const { senderUser, rates, rateAlert, refreshRates, dismissRateAlert, impactScore } = useStore();
   const userName = senderUser?.name || 'Kossi';
   const balanceUSD = 1242.80;
-  const balanceFCFA = balanceUSD * 612.5;
+  const balanceFCFA = balanceUSD * (rates?.USD_FCFA || 612.5);
+
+  useEffect(() => { refreshRates(); }, []);
 
   const scale = useRef(new Animated.Value(1)).current;
   const animatedStyle = { transform: [{ scale }] };
@@ -52,6 +56,13 @@ export default function HomeScreen({ navigation }) {
             <Text style={styles.profileInitials}>{userName.charAt(0)}</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Bannière taux */}
+        {rateAlert ? (
+          <RatesAlertBanner alert={rateAlert} onDismiss={dismissRateAlert} />
+        ) : (
+          <RatesAlertBanner rates={rates} />
+        )}
 
         {/* Hero Balance */}
         <View style={styles.heroSection}>
@@ -95,16 +106,36 @@ export default function HomeScreen({ navigation }) {
           </Animated.View>
         </TouchableOpacity>
 
-        {/* Économies */}
+        {/* Économies + Score */}
         <GlassCard style={styles.savingsCard}>
           <Text style={styles.savingsLabel}>Économies réalisées ce mois-ci</Text>
           <Text style={styles.savingsAmount} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
             41.30 USD
           </Text>
           <Text style={styles.savingsSub} numberOfLines={2}>
-            Soit environ {formatFCFA(41.30 * 612.5)} FCFA économisés
+            Soit environ {formatFCFA(41.30 * (rates?.USD_FCFA || 612.5))} FCFA économisés
           </Text>
         </GlassCard>
+
+        {/* Raccourcis nouvelles fonctionnalités */}
+        <View style={styles.shortcutsRow}>
+          <TouchableOpacity style={styles.shortcut} onPress={() => navigation.navigate('Recurring')}>
+            <Ionicons name="repeat" size={20} color={colors.primary} />
+            <Text style={styles.shortcutLabel}>Récurrent</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.shortcut} onPress={() => navigation.navigate('Savings')}>
+            <Ionicons name="wallet" size={20} color={colors.primary} />
+            <Text style={styles.shortcutLabel}>Épargne</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.shortcut} onPress={() => navigation.navigate('Referral')}>
+            <Ionicons name="people" size={20} color={colors.primary} />
+            <Text style={styles.shortcutLabel}>Parrainage</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.shortcut} onPress={() => navigation.navigate('Impact')}>
+            <Ionicons name="earth" size={20} color={colors.primary} />
+            <Text style={styles.shortcutLabel}>Impact</Text>
+          </TouchableOpacity>
+        </View>
 
         {/* Transactions récentes */}
         <View style={styles.transactionsSection}>
@@ -178,6 +209,14 @@ const styles = StyleSheet.create({
     color: colors.primary, letterSpacing: letterSpacing.display, marginBottom: 2,
   },
   savingsSub: { fontFamily: fonts.label, fontSize: 12, color: colors.onSurfaceVariant, lineHeight: 17 },
+  shortcutsRow: {
+    flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.xl,
+  },
+  shortcut: {
+    flex: 1, backgroundColor: colors.surfaceContainerLowest, borderRadius: radius.md,
+    padding: spacing.sm, alignItems: 'center', gap: 4, ...shadows.glass,
+  },
+  shortcutLabel: { fontFamily: fonts.body, fontSize: 10, color: colors.onSurfaceVariant, textAlign: 'center' },
   transactionsSection: { marginBottom: spacing.lg },
   sectionHeader: {
     flexDirection: 'row', justifyContent: 'space-between',

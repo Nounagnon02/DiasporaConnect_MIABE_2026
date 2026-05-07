@@ -11,6 +11,7 @@ import { useFonts as useSpaceGrotesk, SpaceGrotesk_500Medium } from '@expo-googl
 import './src/i18n';
 import RootNavigator from './src/navigation/RootNavigator';
 import { colors } from './src/theme/theme';
+import { requestNotificationPermission } from './src/services/notificationService';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -27,6 +28,7 @@ export default function App() {
   useEffect(() => {
     async function prepare() {
       try {
+        await requestNotificationPermission();
         await new Promise(r => setTimeout(r, 500));
       } catch (e) {
         console.warn(e);

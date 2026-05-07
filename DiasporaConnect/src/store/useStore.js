@@ -5,6 +5,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MOCK_TRANSACTIONS } from '../services/mockData';
+import { fetchLiveRates, getRateAlert } from '../services/ratesService';
 
 const useStore = create(
   persist(
@@ -42,9 +43,45 @@ const useStore = create(
 
       // ---- Rates ----
       rates: {
+        EUR_USD: 1.08,
         USD_FCFA: 612.5,
-        EUR_FCFA: 655.957,
+        CELO_USD: 0.65,
         lastUpdated: new Date().toISOString(),
+        isLive: false,
+      },
+      rateAlert: null,
+
+      // ---- Impact Score ----
+      impactScore: {
+        totalSavedUSD: 187.4,
+        totalTransfers: 12,
+        familiesHelped: 1,
+        badges: ['first_transfer', 'saver_100'],
+        co2SavedKg: 0.24,
+      },
+
+      // ---- Recurring Transfers ----
+      recurringTransfers: [],
+
+      // ---- Referral ----
+      referral: {
+        code: 'KOFI2026',
+        referredCount: 2,
+        earnedUSD: 1.0,
+        pendingUSD: 0.5,
+      },
+
+      // ---- Savings Pool ----
+      savingsPool: {
+        balanceUSD: 4.80,
+        contributions: [
+          { date: '2026-04-28', amountUSD: 0.60, txId: 'tx_001' },
+          { date: '2026-04-15', amountUSD: 0.50, txId: 'tx_002' },
+          { date: '2026-03-30', amountUSD: 1.00, txId: 'tx_003' },
+          { date: '2026-03-12', amountUSD: 0.90, txId: 'tx_004' },
+          { date: '2026-02-20', amountUSD: 1.80, txId: 'tx_006' },
+        ],
+        yieldPercent: 4.2,
       },
 
       // ---- Actions ----
@@ -79,6 +116,72 @@ const useStore = create(
       setLanguage: (lang) => set({ language: lang }),
 
       setLoading: (val) => set({ isLoading: val }),
+
+      // ---- Rates Actions ----
+      refreshRates: async () => {
+        try {
+          const newRates = await fetchLiveRates();
+          const alert = getRateAlert(newRates);
+          set({ rates: newRates, rateAlert: alert });
+        } catch {}
+      },
+
+      dismissRateAlert: () => set({ rateAlert: null }),
+
+      // ---- Impact Actions ----
+      updateImpactScore: (savedUSD) =>
+        set(state => {
+          const total = state.impactScore.totalSavedUSD + savedUSD;
+          const transfers = state.impactScore.totalTransfers + 1;
+          const badges = [...state.impactScore.badges];
+          if (total >= 100 && !badges.includes('saver_100')) badges.push('saver_100');
+          if (total >= 500 && !badges.includes('saver_500')) badges.push('saver_500');
+          if (transfers >= 5 && !badges.includes('loyal_5')) badges.push('loyal_5');
+          if (transfers >= 10 && !badges.includes('loyal_10')) badges.push('loyal_10');
+          return {
+            impactScore: {
+              ...state.impactScore,
+              totalSavedUSD: parseFloat(total.toFixed(2)),
+              totalTransfers: transfers,
+              co2SavedKg: parseFloat((transfers * 0.02).toFixed(3)),
+              badges,
+            },
+          };
+        }),
+
+      // ---- Recurring Actions ----
+      addRecurringTransfer: (recurring) =>
+        set(state => ({
+          recurringTransfers: [
+            ...state.recurringTransfers,
+            { ...recurring, id: `rec_${Date.now()}`, active: true, createdAt: new Date().toISOString() },
+          ],
+        })),
+
+      toggleRecurring: (id) =>
+        set(state => ({
+          recurringTransfers: state.recurringTransfers.map(r =>
+            r.id === id ? { ...r, active: !r.active } : r
+          ),
+        })),
+
+      deleteRecurring: (id) =>
+        set(state => ({
+          recurringTransfers: state.recurringTransfers.filter(r => r.id !== id),
+        })),
+
+      // ---- Savings Pool Actions ----
+      addSavingsContribution: (amountUSD, txId) =>
+        set(state => ({
+          savingsPool: {
+            ...state.savingsPool,
+            balanceUSD: parseFloat((state.savingsPool.balanceUSD + amountUSD).toFixed(2)),
+            contributions: [
+              { date: new Date().toISOString(), amountUSD, txId },
+              ...state.savingsPool.contributions,
+            ],
+          },
+        })),
 
       updateTransferData: (data) =>
         set(state => ({
