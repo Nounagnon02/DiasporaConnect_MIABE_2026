@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing, radius, shadows } from '../../../theme/theme';
 import GoldButton from '../../../components/ui/GoldButton';
 
@@ -17,7 +18,7 @@ export default function OperatorScreen({ navigation }) {
       <StatusBar style="dark" />
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Text style={styles.backIcon}>←</Text>
+          <Ionicons name="arrow-back" size={24} color={colors.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Retrait</Text>
         <View style={{ width: 40 }} />
@@ -87,7 +88,6 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.sm,
   },
   backBtn: { padding: spacing.xs },
-  backIcon: { fontSize: 24, color: colors.primary },
   headerTitle: { fontFamily: fonts.title, fontSize: 16, color: colors.onSurface },
   scroll: {
     paddingHorizontal: spacing.xl,

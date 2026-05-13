@@ -100,7 +100,11 @@ export default function ReceiverHomeScreen({ navigation }) {
             </TouchableOpacity>
           </View>
           {MOCK_RECIPIENT_TRANSACTIONS.map(tx => (
-            <TransactionItem key={tx.id} transaction={tx} onPress={() => {}} />
+            <TransactionItem
+              key={tx.id}
+              transaction={tx}
+              onPress={() => navigation.navigate('TransactionDetail', { transaction: tx })}
+            />
           ))}
         </View>
 

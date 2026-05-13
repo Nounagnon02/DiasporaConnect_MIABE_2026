@@ -154,5 +154,55 @@
     "fcfa": "FCFA",
     "usd": "USD",
     "eur": "EUR"
+  },
+  "kyc": {
+    "title": "Identity Verification",
+    "subtitle": "Required to send more than $500/month. Takes less than 2 minutes.",
+    "start": "Start verification",
+    "selfie": "Selfie",
+    "document": "Document",
+    "verifying": "Verifying your identity...",
+    "success": "Identity verified!",
+    "successDesc": "You can now send up to $2,000 per transfer.",
+    "passport": "Passport",
+    "idCard": "ID Card",
+    "residence": "Residence permit"
+  },
+  "tracker": {
+    "title": "Transfer tracking",
+    "inProgress": "Processing",
+    "completed": "Transfer completed",
+    "signed": "Transaction signed",
+    "confirmed": "Confirmed on Celo",
+    "notified": "Recipient notified",
+    "withdrawn": "Mobile Money withdrawal",
+    "viewExplorer": "View on CeloScan"
+  },
+  "beneficiaries": {
+    "title": "Beneficiaries",
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "empty": "No beneficiaries",
+    "emptyDesc": "Add your contacts to send money faster.",
+    "name": "Full name",
+    "phone": "Mobile Money number",
+    "city": "City (optional)",
+    "operator": "Operator"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "rateAlert": "Favorable rate alerts",
+    "rateAlertDesc": "Notified when EUR/FCFA rate is at its highest",
+    "transferSent": "Transfer sent",
+    "transferReceived": "Money received",
+    "recurringReminder": "Recurring reminders",
+    "securityAlert": "Security alerts",
+    "weeklyReport": "Weekly report"
+  },
+  "offline": {
+    "banner": "Offline \u00b7 Calculator mode available",
+    "reconnected": "Reconnected",
+    "queued": "transfer(s) queued"
   }
 }

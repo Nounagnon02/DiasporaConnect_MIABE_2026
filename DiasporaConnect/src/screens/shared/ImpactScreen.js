@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing, radius, shadows } from '../../theme/theme';
 import useStore from '../../store/useStore';
 import ConnectionAnim from '../../components/animations/ConnectionAnim';
+import { generateImpactNarrative } from '../../services/aiService';
 
 const { width } = Dimensions.get('window');
 const isSmall = width < 380;
@@ -52,8 +53,9 @@ function CounterDisplay({ target, suffix, prefix, style }) {
 }
 
 export default function ImpactScreen({ navigation }) {
-  const { impactScore } = useStore();
+  const { impactScore, language } = useStore();
   const earnedBadges = impactScore?.badges || [];
+  const narrative = generateImpactNarrative(impactScore, language);
 
   const formatUSD = (n) => `${(n || 0).toFixed(2)} USD`;
 
@@ -70,6 +72,15 @@ export default function ImpactScreen({ navigation }) {
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <Text style={styles.heroTitle}>Notre impact{'\n'}ensemble</Text>
+
+        {/* Résumé IA narratif */}
+        <View style={styles.aiNarrativeCard}>
+          <View style={styles.aiNarrativeHeader}>
+            <Text style={styles.aiLabel}>✨ IA</Text>
+            <Text style={styles.aiNarrativeTitle}>Votre impact en mots</Text>
+          </View>
+          <Text style={styles.aiNarrativeText}>{narrative}</Text>
+        </View>
 
         <View style={styles.animContainer}>
           <ConnectionAnim />
@@ -182,6 +193,43 @@ const styles = StyleSheet.create({
     letterSpacing: -0.72, marginBottom: spacing.xl, lineHeight: isSmall ? 38 : 44,
   },
   animContainer: { alignItems: 'center', marginBottom: spacing.xxl },
+
+  aiNarrativeCard: {
+    backgroundColor: 'rgba(117,91,0,0.06)',
+    borderRadius: radius.md,
+    padding: spacing.lg,
+    marginBottom: spacing.xl,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.primary,
+  },
+  aiNarrativeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginBottom: spacing.sm,
+  },
+  aiLabel: {
+    fontFamily: fonts.label,
+    fontSize: 10,
+    color: colors.onPrimary,
+    backgroundColor: colors.primary,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: radius.round,
+    overflow: 'hidden',
+  },
+  aiNarrativeTitle: {
+    fontFamily: fonts.title,
+    fontSize: 13,
+    color: colors.primary,
+  },
+  aiNarrativeText: {
+    fontFamily: fonts.headline,
+    fontSize: 15,
+    color: colors.onSurface,
+    lineHeight: 24,
+    fontStyle: 'italic',
+  },
 
   personalCard: {
     backgroundColor: colors.surfaceContainerLowest, borderRadius: radius.md,

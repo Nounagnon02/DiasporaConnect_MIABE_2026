@@ -8,6 +8,7 @@ import { colors, fonts, spacing, radius, shadows, letterSpacing } from '../../th
 import GoldButton from '../../components/ui/GoldButton';
 import LedgerInput from '../../components/ui/LedgerInput';
 import FeeComparator from '../../components/ui/FeeComparator';
+import SmartAmountSuggestion from '../../components/ui/SmartAmountSuggestion';
 import { calculateTransfer } from '../../services/blockchainService';
 import useStore from '../../store/useStore';
 
@@ -79,6 +80,8 @@ export default function CalculatorScreen({ navigation }) {
             keyboardType="decimal-pad"
             placeholder="0.00"
           />
+
+          <SmartAmountSuggestion onSelect={(amt) => setAmount(String(amt))} />
 
           <View style={styles.resultContainer}>
             <Text style={styles.resultLabel}>Le bénéficiaire reçoit environ</Text>

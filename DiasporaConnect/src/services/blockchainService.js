@@ -6,8 +6,8 @@ import { ethers } from 'ethers';
 import { DIASPORA_CONNECT_ABI } from './abi';
 
 // Config réseau — fallback si .env absent
-const RPC_URL = 'https://alfajores-forno.celo-testnet.org';
-const CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000000'; // remplacer après deploy
+const RPC_URL = 'https://celo-sepolia.g.alchemy.com/v2/I1xh_Goyq-cWc8zodzOBv';
+const CONTRACT_ADDRESS = '0xc7e7a393A3621EAEd1502196a2cF389AeA01CFCB';
 const CUSD_ADDRESS = '0x765DE816845861e75A25fCA122bb6898B8B1282a';
 const USD_FCFA = 612.5;
 const EUR_USD = 1.08;
@@ -93,19 +93,39 @@ export const executeTransferDemo = async (amountUSD, recipientPhone, onProgress)
 
 // ─── Exécution réelle (si wallet connecté) ────────────────────────────────────
 
-export const executeTransfer = async (amountUSD, recipientPhone, signer, onProgress) => {
+export const executeTransfer = async (amountUSD, recipientPhone, operator, signer, onProgress) => {
   try {
     onProgress?.('Préparation de la transaction...');
+    const provider = new ethers.JsonRpcProvider(RPC_URL);
     const contract = new ethers.Contract(CONTRACT_ADDRESS, DIASPORA_CONNECT_ABI, signer);
+
+    // 1. Approve cUSD spend
+    const CUSD_ADDRESS = '0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1';
+    const cusd = new ethers.Contract(
+      CUSD_ADDRESS,
+      ['function approve(address spender, uint256 amount) external returns (bool)'],
+      signer
+    );
     const amountInWei = ethers.parseEther(amountUSD.toString());
 
-    onProgress?.('Signature Web3 en attente...');
-    const tx = await contract.deposit(recipientPhone, { value: amountInWei });
+    onProgress?.('Approbation cUSD en cours...');
+    const approveTx = await cusd.approve(CONTRACT_ADDRESS, amountInWei);
+    await approveTx.wait();
 
-    onProgress?.('Confirmation sur Celo Alfajores...');
+    // 2. Deposit
+    onProgress?.('Signature Web3 en attente...');
+    const tx = await contract.deposit(recipientPhone, operator, amountInWei);
+
+    onProgress?.('Confirmation sur Celo Sepolia...');
     const receipt = await tx.wait();
 
-    return { success: true, txHash: receipt.hash };
+    // Extract transferId from event
+    const event = receipt.logs.find(log => {
+      try { return contract.interface.parseLog(log)?.name === 'TransferCreated'; } catch { return false; }
+    });
+    const transferId = event ? contract.interface.parseLog(event).args.transferId : null;
+
+    return { success: true, txHash: receipt.hash, transferId };
   } catch (error) {
     console.warn('Blockchain unavailable, switching to demo mode:', error.message);
     return executeTransferDemo(amountUSD, recipientPhone, onProgress);

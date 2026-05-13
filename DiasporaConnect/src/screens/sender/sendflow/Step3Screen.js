@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Dimensions,
+  View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Dimensions, Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -8,30 +8,63 @@ import { colors, fonts, spacing, radius, shadows } from '../../../theme/theme';
 import StepIndicator from '../../../components/ui/StepIndicator';
 import GoldButton from '../../../components/ui/GoldButton';
 import useStore from '../../../store/useStore';
+import { detectAnomaly } from '../../../services/aiService';
+import BiometricGuard from '../../../components/ui/BiometricGuard';
+import { Ionicons } from '@expo/vector-icons';
+import { executeTransferDemo } from '../../../services/blockchainService';
 
 const { width } = Dimensions.get('window');
 const STEP_LABELS = ['Montant', 'Destinataire', 'Confirmation', 'Succès'];
 
 export default function Step3Screen({ navigation }) {
-  const { transferData, addTransaction, updateTransferData, senderUser } = useStore();
+  const { transferData, addTransaction, updateTransferData, senderUser, transactions, language } = useStore();
   const [loading, setLoading] = useState(false);
+  const [showBiometric, setShowBiometric] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
+  const isEn = language === 'en';
+
+  const verifiedName = transferData.verifiedName || transferData.recipient?.name || 'ce destinataire';
+
+  const maskedPhone = (p = '') => {
+    const clean = p.replace(/\s/g, '');
+    if (clean.length < 6) return p;
+    return clean.slice(0, -6) + '••••' + clean.slice(-2);
+  };
+
+  // Détection IA d'anomalie
+  const anomaly = detectAnomaly(
+    { amountUSD: transferData.amountUSD, recipientPhone: transferData.recipient?.phone },
+    transactions
+  );
+
+  const handleConfirmPress = () => {
+    if (!confirmed) {
+      Alert.alert('Confirmation requise', `Cochez la case pour confirmer l'envoi à ${verifiedName}.`);
+      return;
+    }
+    setShowBiometric(true);
+  };
+  const handleBiometricSuccess = () => { setShowBiometric(false); handleConfirm(); };
+  const handleBiometricCancel  = () => setShowBiometric(false);
 
   const formatFCFA = (num) => new Intl.NumberFormat('fr-FR').format(Math.round(num || 0));
 
   const handleConfirm = async () => {
     setLoading(true);
     try {
-      await new Promise(r => setTimeout(r, 2000));
+      const result = await executeTransferDemo(
+        transferData.amountUSD,
+        transferData.recipient?.phone,
+        () => {} // progression gérée par l'UI de loading
+      );
 
-      const mockTxHash = '0x' + Array.from({ length: 64 }, () =>
-        Math.floor(Math.random() * 16).toString(16)
-      ).join('');
+      if (!result.success) throw new Error('Transfer failed');
 
-      updateTransferData({ txHash: mockTxHash, status: 'completed' });
+      updateTransferData({ txHash: result.txHash, status: 'completed' });
       addTransaction({
         id: `tx_${Date.now()}`,
-        txHashFull: mockTxHash,
-        txHash: mockTxHash.slice(0, 10) + '...' + mockTxHash.slice(-8),
+        txHashFull: result.txHash,
+        txHash: result.txHash.slice(0, 10) + '...' + result.txHash.slice(-8),
         type: 'send',
         amountUSD: transferData.amountUSD,
         amountFCFA: transferData.amountFCFA,
@@ -43,6 +76,7 @@ export default function Step3Screen({ navigation }) {
         status: 'completed',
         network: 'Celo Alfajores',
         confirmations: 1,
+        gasFeeCELO: '0.003',
         savedVsWU: transferData.savings || 0,
       });
       navigation.replace('SendStep4');
@@ -56,9 +90,15 @@ export default function Step3Screen({ navigation }) {
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar style="dark" />
+      <BiometricGuard
+        visible={showBiometric}
+        onSuccess={handleBiometricSuccess}
+        onCancel={handleBiometricCancel}
+        reason={isEn ? 'Confirm this transfer' : 'Confirmez ce transfert'}
+      />
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Text style={styles.backIcon}>←</Text>
+          <Ionicons name="arrow-back" size={24} color={colors.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Confirmation</Text>
         <View style={{ width: 40 }} />
@@ -70,6 +110,21 @@ export default function Step3Screen({ navigation }) {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
+        {/* Alerte IA fraude/anomalie */}
+        {anomaly && (
+          <View style={[styles.anomalyBanner, anomaly.level === 'high' && styles.anomalyHigh]}>
+            <Text style={styles.anomalyIcon}>
+              {anomaly.level === 'high' ? '🚨' : anomaly.level === 'medium' ? '⚠️' : 'ℹ️'}
+            </Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.anomalyTitle}>✨ IA — {anomaly.level === 'high' ? 'Alerte sécurité' : 'Attention'}</Text>
+              <Text style={styles.anomalyText}>
+                {isEn ? anomaly.reasonEn : anomaly.reason}
+              </Text>
+            </View>
+          </View>
+        )}
+
         {/* Récapitulatif */}
         <View style={styles.recapCard}>
           <View style={styles.recapRow}>
@@ -112,15 +167,28 @@ export default function Step3Screen({ navigation }) {
           </View>
         </View>
 
-        {/* Bénéficiaire */}
+        {/* Bénéficiaire + case à cocher obligatoire */}
         <View style={styles.recipientCard}>
-          <Text style={styles.recipientLabel}>Bénéficiaire</Text>
+          <Text style={styles.recipientLabel}>Bénéficiaire vérifié</Text>
           <Text style={styles.recipientName} numberOfLines={1}>
-            {transferData.recipient?.name || 'Inconnu'}
+            {verifiedName}
           </Text>
           <Text style={styles.recipientPhone} numberOfLines={1}>
-            {transferData.recipient?.phone} · {transferData.operator || 'MTN'}
+            {maskedPhone(transferData.recipient?.phone)} · {transferData.operator || 'MTN'}
           </Text>
+
+          <TouchableOpacity
+            style={styles.confirmCheckRow}
+            onPress={() => setConfirmed(v => !v)}
+            activeOpacity={0.8}
+          >
+            <View style={[styles.checkbox, confirmed && styles.checkboxChecked]}>
+              {confirmed && <Ionicons name="checkmark" size={12} color="#FFF" />}
+            </View>
+            <Text style={styles.confirmCheckText}>
+              Je confirme envoyer à <Text style={{ fontFamily: fonts.title }}>{verifiedName}</Text>
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* Info légale */}
@@ -136,8 +204,8 @@ export default function Step3Screen({ navigation }) {
       <View style={styles.footer}>
         <GoldButton
           title={loading ? 'Signature en cours...' : 'Confirmer et Envoyer'}
-          onPress={handleConfirm}
-          disabled={loading}
+          onPress={handleConfirmPress}
+          disabled={loading || !confirmed}
         />
       </View>
     </SafeAreaView>
@@ -155,7 +223,6 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.sm,
   },
   backBtn: { padding: spacing.xs },
-  backIcon: { fontSize: 24, color: colors.primary },
   headerTitle: { fontFamily: fonts.title, fontSize: 16, color: colors.onSurface },
   scroll: { paddingHorizontal: spacing.xl, paddingTop: spacing.lg },
   recapCard: {
@@ -235,6 +302,21 @@ const styles = StyleSheet.create({
     fontFamily: fonts.label,
     fontSize: 13,
     color: colors.onSurfaceVariant,
+    marginBottom: spacing.md,
+  },
+  confirmCheckRow: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.sm,
+    paddingTop: spacing.sm,
+    borderTopWidth: 1, borderTopColor: 'rgba(208, 197, 178, 0.3)',
+  },
+  checkbox: {
+    width: 20, height: 20, borderRadius: 4,
+    borderWidth: 1.5, borderColor: colors.primary,
+    alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+  },
+  checkboxChecked: { backgroundColor: colors.primary, borderColor: colors.primary },
+  confirmCheckText: {
+    fontFamily: fonts.body, fontSize: 13, color: colors.onSurface, flex: 1,
   },
   infoBox: {
     backgroundColor: 'rgba(117, 91, 0, 0.05)',
@@ -249,6 +331,34 @@ const styles = StyleSheet.create({
     color: colors.onSurfaceVariant,
     lineHeight: 19,
     flexShrink: 1,
+  },
+  anomalyBanner: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.sm,
+    backgroundColor: 'rgba(201,168,76,0.1)',
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginBottom: spacing.lg,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.primaryContainer,
+  },
+  anomalyHigh: {
+    backgroundColor: 'rgba(186,26,26,0.06)',
+    borderLeftColor: colors.error,
+  },
+  anomalyIcon: { fontSize: 20, flexShrink: 0 },
+  anomalyTitle: {
+    fontFamily: fonts.title,
+    fontSize: 12,
+    color: colors.primary,
+    marginBottom: 4,
+  },
+  anomalyText: {
+    fontFamily: fonts.body,
+    fontSize: 12,
+    color: colors.onSurface,
+    lineHeight: 18,
   },
   footer: {
     paddingHorizontal: spacing.xl,

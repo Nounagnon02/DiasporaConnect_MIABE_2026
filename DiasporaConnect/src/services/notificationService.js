@@ -69,3 +69,27 @@ export const notifyRecurringReminder = (recipientName, amountUSD) =>
     '🔄 Transfert récurrent',
     `Rappel : envoyer ${amountUSD} USD à ${recipientName} ce mois-ci`
   );
+
+// Notification intelligente taux favorable (IA)
+export const notifySmartRateAlert = (prediction) => {
+  if (!prediction?.message) return;
+  const confidence = Math.round((prediction.confidence || 0.7) * 100);
+  sendLocalNotification(
+    '✨ IA — Taux favorable détecté',
+    `${prediction.message} (Confiance : ${confidence}%)`
+  );
+};
+
+// Notification rapport hebdomadaire
+export const notifyWeeklyReport = (totalSavedUSD, totalTransfers) =>
+  sendLocalNotification(
+    '📊 Votre rapport de la semaine',
+    `${totalTransfers} transfert(s) · ${totalSavedUSD.toFixed(2)} USD économisés en frais cette semaine.`
+  );
+
+// Notification sécurité (anomalie IA)
+export const notifySecurityAlert = (reason) =>
+  sendLocalNotification(
+    '🚨 Alerte sécurité DiasporaConnect',
+    reason
+  );

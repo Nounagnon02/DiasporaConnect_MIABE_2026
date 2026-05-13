@@ -14,17 +14,32 @@ import TransactionItem from '../../components/ui/TransactionItem';
 import { GlassCard } from '../../components/ui/GlassCard';
 import ArrowIcon from '../../components/ui/ArrowIcon';
 import RatesAlertBanner from '../../components/ui/RatesAlertBanner';
+import RateChart from '../../components/ui/RateChart';
+import { predictRateTrend } from '../../services/aiService';
+import SkeletonLoader from '../../components/ui/SkeletonLoader';
+import NetworkStatus from '../../components/ui/NetworkStatus';
 
 const { width } = Dimensions.get('window');
 const isSmall = width < 380;
 
 export default function HomeScreen({ navigation }) {
-  const { senderUser, rates, rateAlert, refreshRates, dismissRateAlert, impactScore } = useStore();
+  const { senderUser, rates, rateAlert, refreshRates, dismissRateAlert, impactScore, transactions, language, isOfflineMode } = useStore();
   const userName = senderUser?.name || 'Kossi';
   const balanceUSD = 1242.80;
   const balanceFCFA = balanceUSD * (rates?.USD_FCFA || 612.5);
+  const isEn = language === 'en';
+  const [ratesLoading, setRatesLoading] = React.useState(true);
 
-  useEffect(() => { refreshRates(); }, []);
+  // Prédiction IA du taux (simulé avec historique mock)
+  const ratesHistory = [
+    { EUR_USD: 1.06 }, { EUR_USD: 1.07 }, { EUR_USD: 1.075 },
+    { EUR_USD: rates?.EUR_USD || 1.08 },
+  ];
+  const ratePrediction = predictRateTrend(ratesHistory);
+
+  useEffect(() => {
+    refreshRates().finally(() => setRatesLoading(false));
+  }, []);
 
   const scale = useRef(new Animated.Value(1)).current;
   const animatedStyle = { transform: [{ scale }] };
@@ -57,28 +72,47 @@ export default function HomeScreen({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        {/* Bannière taux */}
+        {/* Indicateur réseau */}
+        <NetworkStatus />
+
+        {/* Bannière taux */}}
         {rateAlert ? (
           <RatesAlertBanner alert={rateAlert} onDismiss={dismissRateAlert} />
         ) : (
           <RatesAlertBanner rates={rates} />
         )}
 
+        {/* Prédiction IA du taux */}
+        {ratePrediction?.message && (
+          <View style={styles.aiPredictionBanner}>
+            <Text style={styles.aiPredictionLabel}>✨ IA</Text>
+            <Text style={styles.aiPredictionText} numberOfLines={2}>
+              {isEn ? ratePrediction.messageEn : ratePrediction.message}
+            </Text>
+            {ratePrediction.bestTimeHours > 0 && (
+              <View style={styles.aiConfidenceBadge}>
+                <Text style={styles.aiConfidenceText}>
+                  {Math.round(ratePrediction.confidence * 100)}% confiance
+                </Text>
+              </View>
+            )}
+          </View>
+        )}
+
         {/* Hero Balance */}
-        <View style={styles.heroSection}>
-          <Text style={styles.balanceLabel}>Votre solde</Text>
-          <Text
-            style={styles.balanceUSD}
-            adjustsFontSizeToFit
-            minimumFontScale={0.7}
-            numberOfLines={1}
-          >
-            {formatAmount(balanceUSD)} USD
-          </Text>
-          <Text style={styles.balanceFCFA} numberOfLines={1}>
-            ≈ {formatFCFA(balanceFCFA)} FCFA
-          </Text>
-        </View>
+        {ratesLoading ? (
+          <SkeletonLoader variant="balance" />
+        ) : (
+          <View style={styles.heroSection}>
+            <Text style={styles.balanceLabel}>Votre solde</Text>
+            <Text style={styles.balanceUSD} adjustsFontSizeToFit minimumFontScale={0.7} numberOfLines={1}>
+              {formatAmount(balanceUSD)} USD
+            </Text>
+            <Text style={styles.balanceFCFA} numberOfLines={1}>
+              ≈ {formatFCFA(balanceFCFA)} FCFA
+            </Text>
+          </View>
+        )}
 
         {/* CTA Transfert */}
         <TouchableOpacity
@@ -135,7 +169,14 @@ export default function HomeScreen({ navigation }) {
             <Ionicons name="earth" size={20} color={colors.primary} />
             <Text style={styles.shortcutLabel}>Impact</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={styles.shortcut} onPress={() => navigation.navigate('Beneficiaries')}>
+            <Ionicons name="people" size={20} color={colors.primary} />
+            <Text style={styles.shortcutLabel}>Contacts</Text>
+          </TouchableOpacity>
         </View>
+
+        {/* Graphique taux */}
+        <RateChart style={{ marginBottom: spacing.xl }} />
 
         {/* Transactions récentes */}
         <View style={styles.transactionsSection}>
@@ -224,4 +265,46 @@ const styles = StyleSheet.create({
   },
   sectionTitle: { fontFamily: fonts.title, fontSize: 17, color: colors.onSurface },
   seeAll: { fontFamily: fonts.label, fontSize: 13, color: colors.primary },
+
+  aiPredictionBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    backgroundColor: 'rgba(117,91,0,0.06)',
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginBottom: spacing.xl,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.primaryContainer,
+  },
+  aiPredictionLabel: {
+    fontFamily: fonts.label,
+    fontSize: 10,
+    color: colors.onPrimary,
+    backgroundColor: colors.primary,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: radius.round,
+    overflow: 'hidden',
+    flexShrink: 0,
+  },
+  aiPredictionText: {
+    flex: 1,
+    fontFamily: fonts.body,
+    fontSize: 12,
+    color: colors.onSurface,
+    lineHeight: 18,
+  },
+  aiConfidenceBadge: {
+    backgroundColor: 'rgba(117,91,0,0.1)',
+    borderRadius: radius.round,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    flexShrink: 0,
+  },
+  aiConfidenceText: {
+    fontFamily: fonts.label,
+    fontSize: 10,
+    color: colors.primary,
+  },
 });

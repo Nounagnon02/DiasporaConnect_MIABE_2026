@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import {
-  View, Text, StyleSheet, Dimensions, Animated, TouchableOpacity,
+  View, Text, StyleSheet, Dimensions, Animated, TouchableOpacity, TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -11,6 +11,49 @@ import ConnectionAnim from '../../components/animations/ConnectionAnim';
 
 const { width, height } = Dimensions.get('window');
 const isSmall = height < 700;
+
+// ─── Slide 1 : simulateur interactif ────────────────────────────────────────
+function SimulatorIllustration() {
+  const [amount, setAmount] = React.useState('100');
+  const EUR_USD = 1.08;
+  const USD_FCFA = 612.5;
+  const parsed = parseFloat(amount) || 0;
+  const received = ((parsed * EUR_USD) * (1 - 0.008) * USD_FCFA);
+  const wuReceived = ((parsed * EUR_USD) * (1 - 0.14) * USD_FCFA);
+  const savings = received - wuReceived;
+  const formatFCFA = (n) => new Intl.NumberFormat('fr-FR').format(Math.round(n));
+
+  return (
+    <View style={styles.simContainer}>
+      <View style={styles.simInputRow}>
+        <Text style={styles.simLabel}>Vous envoyez</Text>
+        <View style={styles.simInputWrap}>
+          <TextInput
+            style={styles.simInput}
+            value={amount}
+            onChangeText={setAmount}
+            keyboardType="decimal-pad"
+            maxLength={6}
+            selectTextOnFocus
+          />
+          <Text style={styles.simCurrency}>EUR</Text>
+        </View>
+      </View>
+      <View style={styles.simArrow}>
+        <Ionicons name="arrow-down" size={20} color={colors.primary} />
+      </View>
+      <View style={styles.simResultCard}>
+        <Text style={styles.simResultLabel}>Votre famille reçoit</Text>
+        <Text style={styles.simResultAmount} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+          {formatFCFA(received)} FCFA
+        </Text>
+        {savings > 0 && (
+          <Text style={styles.simSavings}>✨ +{formatFCFA(savings)} FCFA vs Western Union</Text>
+        )}
+      </View>
+    </View>
+  );
+}
 
 // ─── Slide 2 : graphique comparaison frais ───────────────────────────────────
 function FeeIllustration() {
@@ -104,9 +147,9 @@ function SecurityIllustration() {
 const SLIDES = [
   {
     id: '1',
-    title: 'Une technologie\nqui vous rapproche.',
-    description: 'DiasporaConnect lie la diaspora béninoise à ses familles grâce à la blockchain Celo.',
-    illustration: <ConnectionAnim />,
+    title: 'Calculez avant\nde vous inscrire.',
+    description: 'Essayez maintenant — sans compte requis.',
+    illustration: <SimulatorIllustration />,
   },
   {
     id: '2',
@@ -266,6 +309,31 @@ const styles = StyleSheet.create({
     borderRadius: radius.round,
   },
   feeBadgeText: { fontFamily: fonts.label, fontSize: 13, color: colors.primary },
+
+  // SimulatorIllustration
+  simContainer: { width: '100%', alignItems: 'center' },
+  simInputRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: spacing.sm },
+  simLabel: { fontFamily: fonts.body, fontSize: 14, color: colors.onSurfaceVariant },
+  simInputWrap: {
+    flexDirection: 'row', alignItems: 'center',
+    backgroundColor: colors.surfaceContainerLowest, borderRadius: radius.md,
+    paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
+    borderWidth: 1.5, borderColor: 'rgba(117,91,0,0.2)',
+  },
+  simInput: {
+    fontFamily: fonts.label, fontSize: 22, color: colors.primary,
+    minWidth: 60, textAlign: 'right', letterSpacing: -0.44,
+  },
+  simCurrency: { fontFamily: fonts.label, fontSize: 14, color: colors.onSurfaceVariant, marginLeft: 6 },
+  simArrow: { marginVertical: spacing.sm },
+  simResultCard: {
+    width: '100%', backgroundColor: colors.surfaceContainerLowest,
+    borderRadius: radius.md, padding: spacing.lg, alignItems: 'center',
+    borderLeftWidth: 3, borderLeftColor: colors.primary,
+  },
+  simResultLabel: { fontFamily: fonts.body, fontSize: 12, color: colors.onSurfaceVariant, marginBottom: 4 },
+  simResultAmount: { fontFamily: fonts.display, fontSize: isSmall ? 22 : 26, color: colors.onSurface, letterSpacing: -0.52, marginBottom: 4 },
+  simSavings: { fontFamily: fonts.label, fontSize: 12, color: colors.primary },
 
   // SecurityIllustration — STATIQUE
   shieldOuter: {

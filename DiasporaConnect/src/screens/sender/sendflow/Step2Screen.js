@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Dimensions,
+  View, Text, StyleSheet, ScrollView, TouchableOpacity,
+  Alert, Modal, ActivityIndicator, Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing, radius, shadows } from '../../../theme/theme';
 import StepIndicator from '../../../components/ui/StepIndicator';
 import LedgerInput from '../../../components/ui/LedgerInput';
@@ -14,32 +16,189 @@ import useStore from '../../../store/useStore';
 
 const STEP_LABELS = ['Montant', 'Destinataire', 'Confirmation', 'Succès'];
 
+const OPERATORS = [
+  { id: 'MTN', label: 'MTN Money', color: '#FFCC00', textColor: '#1B1C1A' },
+  { id: 'MOOV', label: 'Moov Money', color: '#005BBB', textColor: '#FFFFFF' },
+];
+
+// ─── Name Enquiry ─────────────────────────────────────────────────────────────
+// En production : appel réel à MTN MoMo Open API
+// GET /v1_0/accountholder/msisdn/{phone}/basicuserinfo
+// En démo : mock avec délai simulé
+
+const MOCK_NAME_ENQUIRY = {
+  '+22997451287': { name: 'ADJOVI Adjoua', exists: true },
+  '+22996234567': { name: 'KOFFI Papa', exists: true },
+  '+22997890123': { name: 'AFI Maman', exists: true },
+  '+22996567890': { name: 'SEKOU Oncle', exists: true },
+  '+22997345678': { name: 'ROSINE Tante', exists: true },
+};
+
+const normalizePhone = (phone) => phone.replace(/[\s\-().+]/g, '').replace(/^00/, '');
+
+const nameEnquiry = async (phone, operator) => {
+  // Simuler latence réseau
+  await new Promise(r => setTimeout(r, 1500));
+
+  const normalized = '+' + normalizePhone(phone);
+  const result = MOCK_NAME_ENQUIRY[normalized];
+
+  if (result) return { success: true, name: result.name };
+
+  // Numéro inconnu → simuler réponse opérateur
+  const digits = normalizePhone(phone);
+  if (digits.length < 8) return { success: false, error: 'invalid' };
+
+  // En prod : si l'API répond 404 → compte inexistant
+  return { success: false, error: 'not_found' };
+};
+
+// ─── Composant ────────────────────────────────────────────────────────────────
+
 export default function Step2Screen({ navigation }) {
   const { transferData, updateTransferData } = useStore();
+
+  const [operator, setOperator] = useState(transferData.operator || null);
   const [phone, setPhone] = useState(transferData.recipient?.phone || '');
   const [selected, setSelected] = useState(
     transferData.recipient?.id ? transferData.recipient : null
   );
 
+  // Name Enquiry state
+  const [enquiryState, setEnquiryState] = useState('idle'); // idle | loading | success | error | warning
+  const [enquiryName, setEnquiryName] = useState(null);
+  const [enquiryError, setEnquiryError] = useState(null);
+  const [forceConfirmed, setForceConfirmed] = useState(false);
+
+  const [showQRScanner, setShowQRScanner] = useState(false);
+  const [qrScanning, setQRScanning] = useState(false);
+
+  const enquiryTimer = useRef(null);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  const fadeIn = () => Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }).start();
+
+  // Déclencher Name Enquiry après 600ms de pause dans la saisie
+  const handlePhoneChange = (text) => {
+    setPhone(text);
+    setSelected(null);
+    setEnquiryState('idle');
+    setEnquiryName(null);
+    setEnquiryError(null);
+    setForceConfirmed(false);
+    fadeAnim.setValue(0);
+
+    if (enquiryTimer.current) clearTimeout(enquiryTimer.current);
+
+    const digits = normalizePhone(text);
+    if (!operator) return;
+    if (digits.length < 8) return;
+
+    enquiryTimer.current = setTimeout(() => triggerEnquiry(text), 600);
+  };
+
+  const triggerEnquiry = async (phoneValue) => {
+    if (!operator) {
+      Alert.alert('Opérateur requis', 'Sélectionnez MTN ou Moov avant de saisir le numéro.');
+      return;
+    }
+    setEnquiryState('loading');
+    setEnquiryName(null);
+    setEnquiryError(null);
+
+    const result = await nameEnquiry(phoneValue, operator);
+
+    if (result.success) {
+      setEnquiryState('success');
+      setEnquiryName(result.name);
+    } else if (result.error === 'not_found') {
+      setEnquiryState('error');
+      setEnquiryError(`Ce numéro n'est pas enregistré sur ${operator} Money. Vérifiez le numéro et l'opérateur.`);
+    } else if (result.error === 'api_failure') {
+      setEnquiryState('warning');
+      setEnquiryError('Impossible de vérifier le nom. Vous confirmez envoyer à ce numéro à vos risques ?');
+    } else {
+      setEnquiryState('error');
+      setEnquiryError('Numéro invalide. Vérifiez le format (+229 XX XX XX XX).');
+    }
+    fadeIn();
+  };
+
+  const handleOperatorSelect = (op) => {
+    setOperator(op);
+    setEnquiryState('idle');
+    setEnquiryName(null);
+    setEnquiryError(null);
+    setForceConfirmed(false);
+    fadeAnim.setValue(0);
+    // Re-déclencher enquiry si numéro déjà saisi
+    if (phone && normalizePhone(phone).length >= 8) {
+      setTimeout(() => triggerEnquiry(phone), 300);
+    }
+  };
+
   const handleContact = (contact) => {
     setSelected(contact);
     setPhone(contact.phone);
+    setOperator(contact.operator);
+    setEnquiryState('idle');
+    setEnquiryName(null);
+    setEnquiryError(null);
+    setForceConfirmed(false);
+    fadeAnim.setValue(0);
     updateTransferData({ recipient: contact, operator: contact.operator });
+    // Déclencher enquiry pour le contact sélectionné
+    setTimeout(() => triggerEnquiry(contact.phone), 300);
+  };
+
+  const handleQRScan = () => {
+    setShowQRScanner(true);
+    setQRScanning(true);
+    setTimeout(() => {
+      const mockPhone = '+229 97 45 12 87';
+      const mockContact = { phone: mockPhone, operator: 'MTN', name: 'Adjoua Adjovi' };
+      setPhone(mockPhone);
+      setOperator('MTN');
+      setSelected(mockContact);
+      updateTransferData({ recipient: mockContact, operator: 'MTN' });
+      setQRScanning(false);
+      setShowQRScanner(false);
+      setTimeout(() => triggerEnquiry(mockPhone), 300);
+    }, 2000);
+  };
+
+  const canProceed = () => {
+    if (!phone || !operator) return false;
+    if (enquiryState === 'loading') return false;
+    if (enquiryState === 'error') return false;
+    if (enquiryState === 'warning' && !forceConfirmed) return false;
+    return true;
   };
 
   const handleNext = () => {
-    const recipient = selected || { phone, operator: 'MTN', name: 'Nouveau Destinataire' };
-    if (!phone) return Alert.alert('Attention', 'Veuillez renseigner le numéro de téléphone.');
-    updateTransferData({ recipient, operator: recipient.operator || 'MTN' });
+    const recipient = {
+      ...(selected || {}),
+      phone,
+      operator,
+      name: enquiryName || selected?.name || 'Destinataire',
+    };
+    updateTransferData({ recipient, operator, verifiedName: enquiryName });
     navigation.navigate('SendStep3');
+  };
+
+  const maskedPhone = (p) => {
+    const clean = p.replace(/\s/g, '');
+    if (clean.length < 6) return p;
+    return clean.slice(0, -6) + '••••' + clean.slice(-2);
   };
 
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar style="dark" />
+
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Text style={styles.backIcon}>←</Text>
+          <Ionicons name="arrow-back" size={24} color={colors.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Destinataire</Text>
         <View style={{ width: 40 }} />
@@ -52,24 +211,100 @@ export default function Step2Screen({ navigation }) {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
+        {/* ── Sélection opérateur ── */}
+        <Text style={styles.sectionLabel}>Opérateur Mobile Money</Text>
+        <View style={styles.operatorRow}>
+          {OPERATORS.map(op => (
+            <TouchableOpacity
+              key={op.id}
+              style={[
+                styles.operatorBtn,
+                operator === op.id && { borderColor: op.color, borderWidth: 2.5 },
+              ]}
+              onPress={() => handleOperatorSelect(op.id)}
+              activeOpacity={0.85}
+            >
+              <View style={[styles.operatorDot, { backgroundColor: op.color }]} />
+              <Text style={styles.operatorLabel}>{op.label}</Text>
+              {operator === op.id && (
+                <Ionicons name="checkmark-circle" size={18} color={colors.primary} style={{ marginLeft: 'auto' }} />
+              )}
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* ── Saisie numéro ── */}
         <View style={styles.card}>
           <LedgerInput
             label="Numéro Mobile Money (+229)"
             value={phone}
-            onChangeText={(t) => {
-              setPhone(t);
-              setSelected(null);
-            }}
+            onChangeText={handlePhoneChange}
             keyboardType="phone-pad"
             placeholder="97 00 00 00"
+            editable={!!operator}
           />
+          {!operator && (
+            <Text style={styles.hintText}>Sélectionnez d'abord l'opérateur</Text>
+          )}
+
+          {/* ── Résultat Name Enquiry ── */}
+          {enquiryState === 'loading' && (
+            <View style={styles.enquiryRow}>
+              <ActivityIndicator size="small" color={colors.primary} />
+              <Text style={styles.enquiryLoadingText}>Vérification du compte {operator} Money...</Text>
+            </View>
+          )}
+
+          {enquiryState === 'success' && (
+            <Animated.View style={[styles.enquirySuccess, { opacity: fadeAnim }]}>
+              <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
+              <View style={{ flex: 1, marginLeft: spacing.sm }}>
+                <Text style={styles.enquirySuccessName}>{enquiryName}</Text>
+                <Text style={styles.enquirySuccessPhone}>
+                  Ce numéro appartient à <Text style={{ fontFamily: fonts.title }}>{enquiryName}</Text> — est-ce le bon destinataire ?
+                </Text>
+              </View>
+            </Animated.View>
+          )}
+
+          {enquiryState === 'error' && (
+            <Animated.View style={[styles.enquiryError, { opacity: fadeAnim }]}>
+              <Ionicons name="close-circle" size={20} color={colors.error} />
+              <Text style={[styles.enquiryErrorText, { flex: 1, marginLeft: spacing.sm }]}>
+                {enquiryError}
+              </Text>
+            </Animated.View>
+          )}
+
+          {enquiryState === 'warning' && (
+            <Animated.View style={[styles.enquiryWarning, { opacity: fadeAnim }]}>
+              <Ionicons name="warning" size={20} color="#B45309" />
+              <View style={{ flex: 1, marginLeft: spacing.sm }}>
+                <Text style={styles.enquiryWarningText}>{enquiryError}</Text>
+                <TouchableOpacity
+                  style={styles.forceConfirmBtn}
+                  onPress={() => setForceConfirmed(v => !v)}
+                  activeOpacity={0.8}
+                >
+                  <View style={[styles.checkbox, forceConfirmed && styles.checkboxChecked]}>
+                    {forceConfirmed && <Ionicons name="checkmark" size={12} color="#FFF" />}
+                  </View>
+                  <Text style={styles.forceConfirmText}>
+                    Je confirme envoyer à ce numéro à mes risques
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </Animated.View>
+          )}
+
           <SecondaryButton
             title="Scanner QR Code"
-            onPress={() => {}}
+            onPress={handleQRScan}
             style={{ marginTop: spacing.md }}
           />
         </View>
 
+        {/* ── Contacts récents ── */}
         <Text style={styles.sectionLabel}>Destinataires récents</Text>
 
         {MOCK_CONTACTS.slice(0, 3).map(c => (
@@ -83,11 +318,9 @@ export default function Step2Screen({ navigation }) {
               <Text style={[styles.contactInitials, { color: c.color }]}>{c.initials}</Text>
             </View>
             <View style={styles.contactInfo}>
-              <Text style={styles.contactName} numberOfLines={1} ellipsizeMode="tail">
-                {c.name}
-              </Text>
+              <Text style={styles.contactName} numberOfLines={1}>{c.name}</Text>
               <Text style={styles.contactPhone} numberOfLines={1}>
-                {c.phone} · {c.operator}
+                {maskedPhone(c.phone)} · {c.operator}
               </Text>
             </View>
             {selected?.id === c.id && (
@@ -102,8 +335,39 @@ export default function Step2Screen({ navigation }) {
       </ScrollView>
 
       <View style={styles.footer}>
-        <GoldButton title="Continuer" onPress={handleNext} disabled={!phone} />
+        <GoldButton
+          title={enquiryState === 'loading' ? 'Vérification...' : 'Continuer'}
+          onPress={handleNext}
+          disabled={!canProceed()}
+        />
       </View>
+
+      {/* ── Modal QR Scanner ── */}
+      <Modal visible={showQRScanner} transparent animationType="fade" presentationStyle="overFullScreen">
+        <View style={styles.qrOverlay}>
+          <View style={styles.qrSheet}>
+            <View style={styles.qrFrame}>
+              {qrScanning
+                ? <ActivityIndicator size="large" color={colors.primary} />
+                : <Ionicons name="qr-code-outline" size={80} color="rgba(117,91,0,0.3)" />
+              }
+              <View style={[styles.qrCorner, styles.qrCornerTL]} />
+              <View style={[styles.qrCorner, styles.qrCornerTR]} />
+              <View style={[styles.qrCorner, styles.qrCornerBL]} />
+              <View style={[styles.qrCorner, styles.qrCornerBR]} />
+            </View>
+            <Text style={styles.qrHint}>
+              {qrScanning ? 'Lecture du QR code...' : 'Pointez vers le QR code du destinataire'}
+            </Text>
+            <TouchableOpacity
+              style={styles.qrCancelBtn}
+              onPress={() => { setShowQRScanner(false); setQRScanning(false); }}
+            >
+              <Text style={styles.qrCancelText}>Annuler</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -111,82 +375,148 @@ export default function Step2Screen({ navigation }) {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.surface },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.xl,
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.sm,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: spacing.xl, paddingTop: spacing.lg, paddingBottom: spacing.sm,
   },
   backBtn: { padding: spacing.xs },
-  backIcon: { fontSize: 24, color: colors.primary },
   headerTitle: { fontFamily: fonts.title, fontSize: 16, color: colors.onSurface },
   scroll: { paddingHorizontal: spacing.xl, paddingTop: spacing.lg },
-  card: {
-    backgroundColor: colors.surfaceContainerLowest,
-    padding: spacing.lg,
-    borderRadius: radius.md,
-    marginBottom: spacing.xl,
+
+  sectionLabel: {
+    fontFamily: fonts.title, fontSize: 16,
+    color: colors.onSurface, marginBottom: spacing.md,
+  },
+
+  // Opérateur
+  operatorRow: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.xl },
+  operatorBtn: {
+    flex: 1, flexDirection: 'row', alignItems: 'center',
+    backgroundColor: colors.surfaceContainerLow,
+    padding: spacing.md, borderRadius: radius.md,
+    borderWidth: 1.5, borderColor: 'transparent',
     ...shadows.diffuse,
   },
-  sectionLabel: {
-    fontFamily: fonts.title,
-    fontSize: 16,
-    color: colors.onSurface,
-    marginBottom: spacing.md,
+  operatorDot: { width: 12, height: 12, borderRadius: 6, marginRight: spacing.sm },
+  operatorLabel: { fontFamily: fonts.body, fontSize: 13, color: colors.onSurface },
+
+  // Card saisie
+  card: {
+    backgroundColor: colors.surfaceContainerLowest,
+    padding: spacing.lg, borderRadius: radius.md,
+    marginBottom: spacing.xl, ...shadows.diffuse,
   },
+  hintText: {
+    fontFamily: fonts.label, fontSize: 12,
+    color: colors.onSurfaceVariant, marginTop: spacing.sm,
+  },
+
+  // Name Enquiry
+  enquiryRow: {
+    flexDirection: 'row', alignItems: 'center',
+    marginTop: spacing.md, gap: spacing.sm,
+  },
+  enquiryLoadingText: {
+    fontFamily: fonts.label, fontSize: 13, color: colors.onSurfaceVariant,
+  },
+  enquirySuccess: {
+    flexDirection: 'row', alignItems: 'flex-start',
+    marginTop: spacing.md, padding: spacing.md,
+    backgroundColor: 'rgba(117, 91, 0, 0.06)',
+    borderRadius: radius.md, borderWidth: 1,
+    borderColor: 'rgba(117, 91, 0, 0.2)',
+  },
+  enquirySuccessName: {
+    fontFamily: fonts.title, fontSize: 15, color: colors.primary, marginBottom: 2,
+  },
+  enquirySuccessPhone: {
+    fontFamily: fonts.body, fontSize: 12, color: colors.onSurfaceVariant,
+  },
+  enquiryError: {
+    flexDirection: 'row', alignItems: 'flex-start',
+    marginTop: spacing.md, padding: spacing.md,
+    backgroundColor: 'rgba(186, 26, 26, 0.06)',
+    borderRadius: radius.md, borderWidth: 1,
+    borderColor: 'rgba(186, 26, 26, 0.2)',
+  },
+  enquiryErrorText: {
+    fontFamily: fonts.body, fontSize: 12, color: colors.error,
+  },
+  enquiryWarning: {
+    flexDirection: 'row', alignItems: 'flex-start',
+    marginTop: spacing.md, padding: spacing.md,
+    backgroundColor: 'rgba(180, 83, 9, 0.06)',
+    borderRadius: radius.md, borderWidth: 1,
+    borderColor: 'rgba(180, 83, 9, 0.2)',
+  },
+  enquiryWarningText: {
+    fontFamily: fonts.body, fontSize: 12, color: '#92400E', marginBottom: spacing.sm,
+  },
+  forceConfirmBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  checkbox: {
+    width: 18, height: 18, borderRadius: 4,
+    borderWidth: 1.5, borderColor: '#B45309',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  checkboxChecked: { backgroundColor: '#B45309', borderColor: '#B45309' },
+  forceConfirmText: {
+    fontFamily: fonts.label, fontSize: 11, color: '#92400E', flex: 1,
+  },
+
+  // Contacts
   contactCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: 'row', alignItems: 'center',
     backgroundColor: colors.surfaceContainerLow,
-    padding: spacing.md,
-    borderRadius: radius.md,
-    marginBottom: spacing.sm,
-    borderWidth: 1.5,
-    borderColor: 'transparent',
+    padding: spacing.md, borderRadius: radius.md,
+    marginBottom: spacing.sm, borderWidth: 1.5, borderColor: 'transparent',
   },
   contactCardActive: {
     borderColor: 'rgba(117, 91, 0, 0.3)',
     backgroundColor: colors.surfaceContainerLowest,
   },
   contactAvatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.md,
-    flexShrink: 0,
+    width: 44, height: 44, borderRadius: 22,
+    alignItems: 'center', justifyContent: 'center',
+    marginRight: spacing.md, flexShrink: 0,
   },
   contactInitials: { fontFamily: fonts.title, fontSize: 15 },
   contactInfo: { flex: 1, marginRight: spacing.sm },
-  contactName: {
-    fontFamily: fonts.body,
-    fontSize: 15,
-    color: colors.onSurface,
-    marginBottom: 2,
-  },
-  contactPhone: {
-    fontFamily: fonts.label,
-    fontSize: 12,
-    color: colors.onSurfaceVariant,
-  },
+  contactName: { fontFamily: fonts.body, fontSize: 15, color: colors.onSurface, marginBottom: 2 },
+  contactPhone: { fontFamily: fonts.label, fontSize: 12, color: colors.onSurfaceVariant },
   selectedBadge: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 24, height: 24, borderRadius: 12,
     backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
+    alignItems: 'center', justifyContent: 'center', flexShrink: 0,
   },
   selectedBadgeText: { color: '#FFF', fontSize: 13, fontFamily: fonts.title },
+
   footer: {
-    paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.xl,
-    paddingTop: spacing.lg,
+    paddingHorizontal: spacing.xl, paddingBottom: spacing.xl, paddingTop: spacing.lg,
     backgroundColor: colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(208, 197, 178, 0.2)',
+    borderTopWidth: 1, borderTopColor: 'rgba(208, 197, 178, 0.2)',
   },
+
+  // QR Scanner
+  qrOverlay: {
+    flex: 1, backgroundColor: 'rgba(27,28,26,0.85)',
+    justifyContent: 'center', alignItems: 'center',
+  },
+  qrSheet: {
+    backgroundColor: colors.surface, borderRadius: 20,
+    padding: spacing.xl, alignItems: 'center', width: '85%',
+  },
+  qrFrame: {
+    width: 200, height: 200, alignItems: 'center', justifyContent: 'center',
+    marginBottom: spacing.lg, position: 'relative',
+  },
+  qrCorner: { position: 'absolute', width: 24, height: 24, borderColor: colors.primary, borderWidth: 3 },
+  qrCornerTL: { top: 0, left: 0, borderRightWidth: 0, borderBottomWidth: 0 },
+  qrCornerTR: { top: 0, right: 0, borderLeftWidth: 0, borderBottomWidth: 0 },
+  qrCornerBL: { bottom: 0, left: 0, borderRightWidth: 0, borderTopWidth: 0 },
+  qrCornerBR: { bottom: 0, right: 0, borderLeftWidth: 0, borderTopWidth: 0 },
+  qrHint: {
+    fontFamily: fonts.body, fontSize: 14, color: colors.onSurfaceVariant,
+    textAlign: 'center', marginBottom: spacing.xl,
+  },
+  qrCancelBtn: { padding: spacing.md },
+  qrCancelText: { fontFamily: fonts.title, fontSize: 15, color: colors.primary },
 });

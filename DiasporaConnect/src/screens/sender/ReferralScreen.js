@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import Svg, { Rect, G } from 'react-native-svg';
 import { colors, fonts, spacing, radius, shadows } from '../../theme/theme';
 import useStore from '../../store/useStore';
 
@@ -36,6 +37,25 @@ export default function ReferralScreen({ navigation }) {
   };
 
   const formatUSD = (n) => `${(n || 0).toFixed(2)} USD`;
+
+  // QR code minimaliste généré en SVG (pattern pseudo-aléatoire basé sur le code)
+  const generateQRPattern = (str) => {
+    const cells = [];
+    const size = 9;
+    let seed = str.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+    const rand = () => { seed = (seed * 1664525 + 1013904223) & 0xffffffff; return (seed >>> 0) / 0xffffffff; };
+    for (let r = 0; r < size; r++) {
+      for (let c = 0; c < size; c++) {
+        // Coins fixes (pattern QR)
+        const isCorner = (r < 3 && c < 3) || (r < 3 && c >= size - 3) || (r >= size - 3 && c < 3);
+        const filled = isCorner ? true : rand() > 0.45;
+        if (filled) cells.push({ r, c });
+      }
+    }
+    return cells;
+  };
+  const qrCells = generateQRPattern(code);
+  const cellSize = 8;
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -80,6 +100,28 @@ export default function ReferralScreen({ navigation }) {
             <Ionicons name={copied ? 'checkmark' : 'copy-outline'} size={18} color={colors.primary} />
             <Text style={styles.copyText}>{copied ? 'Copié !' : 'Copier'}</Text>
           </TouchableOpacity>
+        </View>
+
+        {/* QR Code */}
+        <View style={styles.qrCard}>
+          <Text style={styles.qrLabel}>QR Code partageable</Text>
+          <Svg width={cellSize * 9 + 24} height={cellSize * 9 + 24}>
+            <Rect width={cellSize * 9 + 24} height={cellSize * 9 + 24} fill={colors.surfaceContainerLowest} rx={8} />
+            <G transform="translate(12, 12)">
+              {qrCells.map(({ r, c }, i) => (
+                <Rect
+                  key={i}
+                  x={c * cellSize}
+                  y={r * cellSize}
+                  width={cellSize - 1}
+                  height={cellSize - 1}
+                  fill={colors.primary}
+                  rx={1}
+                />
+              ))}
+            </G>
+          </Svg>
+          <Text style={styles.qrSub}>Scannez pour rejoindre DiasporaConnect</Text>
         </View>
 
         <TouchableOpacity style={styles.shareBtn} onPress={handleShare}>
@@ -168,4 +210,17 @@ const styles = StyleSheet.create({
     padding: spacing.md, marginTop: spacing.md,
   },
   legalText: { fontFamily: fonts.body, fontSize: 11, color: colors.onSurfaceVariant, lineHeight: 17 },
+
+  qrCard: {
+    alignItems: 'center', backgroundColor: colors.surfaceContainerLowest,
+    borderRadius: radius.md, padding: spacing.lg, marginBottom: spacing.md, ...shadows.glass,
+  },
+  qrLabel: {
+    fontFamily: fonts.label, fontSize: 12, color: colors.onSurfaceVariant,
+    textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: spacing.md,
+  },
+  qrSub: {
+    fontFamily: fonts.body, fontSize: 12, color: colors.onSurfaceVariant,
+    marginTop: spacing.sm, textAlign: 'center',
+  },
 });

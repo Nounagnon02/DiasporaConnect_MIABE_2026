@@ -154,5 +154,55 @@
     "fcfa": "FCFA",
     "usd": "USD",
     "eur": "EUR"
+  },
+  "kyc": {
+    "title": "Vérification d'identité",
+    "subtitle": "Requis pour envoyer plus de 500 USD/mois. Moins de 2 minutes.",
+    "start": "Commencer la vérification",
+    "selfie": "Selfie",
+    "document": "Document",
+    "verifying": "Vérification en cours...",
+    "success": "Identité vérifiée !",
+    "successDesc": "Vous pouvez maintenant envoyer jusqu'à 2 000 USD par transfert.",
+    "passport": "Passeport",
+    "idCard": "Carte d'identité",
+    "residence": "Titre de séjour"
+  },
+  "tracker": {
+    "title": "Suivi du transfert",
+    "inProgress": "En cours de traitement",
+    "completed": "Transfert complété",
+    "signed": "Transaction signée",
+    "confirmed": "Confirmée sur Celo",
+    "notified": "Destinataire notifié",
+    "withdrawn": "Retrait Mobile Money",
+    "viewExplorer": "Voir sur CeloScan"
+  },
+  "beneficiaries": {
+    "title": "Bénéficiaires",
+    "add": "Ajouter",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "empty": "Aucun bénéficiaire",
+    "emptyDesc": "Ajoutez vos proches pour envoyer plus rapidement.",
+    "name": "Nom complet",
+    "phone": "Numéro Mobile Money",
+    "city": "Ville (optionnel)",
+    "operator": "Opérateur"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "rateAlert": "Alertes taux favorables",
+    "rateAlertDesc": "Notifié quand le taux EUR/FCFA est au plus haut",
+    "transferSent": "Transfert envoyé",
+    "transferReceived": "Argent reçu",
+    "recurringReminder": "Rappels récurrents",
+    "securityAlert": "Alertes sécurité",
+    "weeklyReport": "Rapport hebdomadaire"
+  },
+  "offline": {
+    "banner": "Hors-ligne · Mode calculateur disponible",
+    "reconnected": "Reconnecté",
+    "queued": "transfert(s) en file d'attente"
   }
 }

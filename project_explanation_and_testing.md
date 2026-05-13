@@ -1,270 +1,287 @@
-# 📱 DiasporaConnect — Présentation et Guide de Test
+# DiasporaConnect — Présentation complète & Guide de Test
 
-Ce document résume le fonctionnement de l'application mobile DiasporaConnect, les travaux réalisés pour intégrer le design system "The Private Ledger", ainsi que les instructions nécessaires pour tester l'application en environnement réel avec **Expo Go** et **ngrok**.
-
----
-
-## 1. Ce que fait l'application (et ce qui a été fait)
-
-**DiasporaConnect** est une plateforme de transfert d'argent (Remittance) basée sur la blockchain Celo (réseau Alfajores en test). Elle vise à supprimer les frais exorbitants des opérateurs traditionnels (estimés entre 7 et 15%) grâce à un smart contract qui réduit les frais à moins de 1%. 
-
-L'application a deux facettes prêtes pour la démonstration :
-- **Un parcours Expéditeur (Diaspora)** : Où l'utilisateur connecte son portefeuille Web3 (simulé par MetaMask), estime les frais avec un comparateur temps réel, puis valide la transaction validée par un contrat Solidity.
-- **Un parcours Destinataire (Bénin)** : Plus simplifié, où l'utilisateur s'identifie via un OTP (One Time Password) lié à son numéro de téléphone, voit son solde en FCFA et peut initier un retrait direct vers son compte Mobile Money (MTN ou Moov).
-
-**Travaux réalisés lors de la dernière phase de développement :**
-- Refonte complète de la charte graphique sous le design system haut de gamme **"The Private Ledger"** (fonds texturés `surface`, accents or massif, typographies `Newsreader`, `Space Grotesk` et `Public Sans`).
-- Développement des **22 écrans** répartis en 8 blocs, de l'onboarding au retrait, en passant par des calculateurs asymétriques et des dashboards.
-- Création de composants UI premium (Shadows diffuses, Glassmorphism pour la bottom tab, Boutons dégradés Gold).
-- Création du véritable smart contract en Solidity `DiasporaConnect.sol` incluant les paiements conditionnels et les remboursements d'urgence.
+> Hackathon MIABE 2026 — Plateforme de transfert d'argent blockchain (Celo) pour la diaspora africaine
 
 ---
 
-## 2. Environnement de Test : Expo Go et ngrok
+## 1. Ce qu'est DiasporaConnect
 
-Pour tester et présenter l'application lors du Hackathon MIABE 2026 en utilisant de vrais smartphones, nous allons utiliser **Expo Go** pour compiler l'application de façon instantanée, et **ngrok** pour exposer le backend local au reste du monde (ou au réseau Wi-Fi).
+DiasporaConnect est une application mobile React Native (Expo) qui connecte la diaspora africaine en Europe à leurs familles au Bénin via la blockchain Celo. L'objectif central : réduire les frais de transfert de 7–15% (opérateurs traditionnels) à **moins de 1%** grâce à un smart contract Solidity.
+
+L'application couvre deux parcours utilisateurs complets :
+
+- **Expéditeur (Diaspora)** — Connecte son wallet Web3, compare les frais en temps réel, et valide une transaction sécurisée par le smart contract `DiasporaConnect.sol` sur Celo Alfajores.
+- **Destinataire (Bénin)** — S'identifie via OTP lié à son numéro de téléphone, consulte son solde en FCFA, et initie un retrait vers MTN Money ou Moov Money.
+
+---
+
+## 2. Fonctionnalités détaillées
+
+### 2.1 Onboarding (5 écrans)
+
+- **Splash** — Animation d'entrée avec le logo DiasporaConnect.
+- **Welcome** — Présentation de la valeur principale : transferts < 1% de frais.
+- **Sécurité blockchain** — Explication du smart contract Celo et de la protection des fonds.
+- **Rapidité** — Mise en avant de la confirmation en < 60 secondes.
+- **Économies** — Comparaison visuelle des frais vs Western Union, MoneyGram, SWIFT.
+
+### 2.2 Authentification
+
+- **Sélection du rôle** — L'utilisateur choisit entre "Expéditeur" et "Destinataire".
+- **Auth Expéditeur** — Connexion simulée avec wallet Web3 (MetaMask / WalletConnect). En démo, un wallet mock est injecté automatiquement avec un solde de 1 242,80 USD.
+- **Auth Destinataire** — Saisie du numéro de téléphone + code OTP à 6 chiffres. En démo, tout code OTP est accepté.
+- **KYC** — Écran de vérification d'identité (statut : `none` / `pending` / `verified`). Simulé en démo.
+
+### 2.3 Parcours Expéditeur
+
+#### Dashboard (Home Expéditeur)
+- Solde affiché en USD et en équivalent FCFA (taux live ou fallback 612,5).
+- **Bannière taux de change** — Alerte si le taux EUR/USD évolue significativement.
+- **Prédiction IA du taux** — Le module `aiService.predictRateTrend` analyse les 5 dernières valeurs et affiche un conseil : "Bon moment pour envoyer 📈" ou "Attendez 2–4h 📉" avec un score de confiance en %.
+- **Bouton CTA "Faire un transfert"** — Accès direct au calculateur.
+- **Carte économies du mois** — Affiche les USD économisés vs Western Union ce mois-ci.
+- **Raccourcis rapides** — 5 boutons : Récurrent, Épargne, Parrainage, Impact, Contacts.
+- **Graphique taux EUR/USD** — Courbe historique des taux (composant `RateChart`).
+- **3 dernières transactions** — Avec lien vers l'historique complet.
+- **Indicateur réseau** — Affiche si l'app est en mode hors-ligne.
+
+#### Calculateur de frais
+- Saisie du montant en **EUR ou USD** (toggle).
+- Calcul instantané de ce que le bénéficiaire reçoit en **FCFA**.
+- **Comparateur de frais** (`FeeComparator`) — Tableau comparatif en temps réel :
+  - DiasporaConnect : **0,8%**
+  - WorldRemit : 7%
+  - MoneyGram : 11%
+  - Western Union : 14%
+  - SWIFT : 18%
+- **Suggestions intelligentes de montant** (`SmartAmountSuggestion`) — Propose des montants basés sur l'historique, la période du mois (fin de mois, rentrée scolaire, fêtes), et le solde disponible.
+- Bannière "Vous économisez X USD vs le marché".
+- Bouton "Continuer le transfert" → lance le flux d'envoi en 4 étapes.
+
+#### Flux d'envoi (4 étapes)
+
+**Étape 1 — Initialisation**
+- Écran de transition avec indicateur de progression (4 étapes).
+- Si le montant est déjà défini (venant du calculateur), passe automatiquement à l'étape 2.
+
+**Étape 2 — Destinataire**
+- Saisie manuelle du numéro Mobile Money (+229).
+- **Scanner QR Code** — Simule un scan (en prod : expo-camera). Après 2 secondes, remplit automatiquement le numéro `+229 97 45 12 87` (Adjoua Adjovi, MTN).
+- **Destinataires récents** — Liste des 3 bénéficiaires sauvegardés avec avatar coloré, nom, numéro et opérateur. Sélection en un tap.
+
+**Étape 3 — Confirmation**
+- **Détection IA d'anomalie** (`aiService.detectAnomaly`) — Analyse comportementale avant envoi :
+  - Niveau `high` 🚨 : montant inhabituel + nouveau destinataire.
+  - Niveau `medium` ⚠️ : montant 3× la moyenne ou plusieurs transferts en < 10 min.
+  - Niveau `low` ℹ️ : montant plus élevé que d'habitude.
+- **Récapitulatif complet** : montant envoyé, frais Celo (0,002 CELO), frais DiasporaConnect (0,8%), montant reçu en FCFA et USD.
+- **Carte bénéficiaire** : nom, numéro, opérateur.
+- **Validation biométrique** (`BiometricGuard`) — Popup de confirmation simulant Face ID / empreinte digitale avant l'envoi.
+- Bouton "Confirmer et Envoyer" → déclenche `executeTransferDemo` (simulation 4,5 secondes avec étapes progressives).
+
+**Étape 4 — Succès**
+- **Animation confettis** au chargement.
+- **Checkmark animé** (spring animation).
+- Carte de détail de la transaction : référence, hash Celo (tronqué + bouton "Copier"), statut "En confirmation" avec dot clignotant, réseau "Celo Alfajores".
+- **Barre de progression** de confirmation Celo (~60 secondes).
+- Encart "Vous avez économisé X USD vs Western Union".
+- Boutons : "Nouveau transfert", "Suivre ce transfert", "Voir l'historique".
+
+#### Historique des transactions
+- Filtres : Tous / Envoyés / Reçus.
+- **Groupement par date** : Aujourd'hui / Cette semaine / Ce mois / Plus ancien.
+- **Skeleton loader** animé pendant le chargement (1,2 secondes).
+- Pull-to-refresh.
+- Tap sur une transaction → écran de détail complet.
+- État vide avec illustration si aucune transaction.
+
+#### Écran Impact
+- **Résumé IA narratif** (`generateImpactNarrative`) — Texte personnalisé selon le nombre de transferts et les économies réalisées, avec équivalences concrètes (repas familiaux, jours d'école, mois de courses).
+- **Animation de connexion** (composant `ConnectionAnim`).
+- **Score personnel** : total économisé vs WU, nombre de transferts, CO₂ évité.
+- **Système de badges** (6 badges) : Premier envoi 🚀, Économiseur 💰, Champion 🏆, Fidèle ⭐, Diamant 💎, Ambassadeur 🤝. Les badges non débloqués sont grisés avec un cadenas.
+- **Compteurs globaux animés** : 1 247 familles aidées, 18 653 $ économisés, < 1% de frais.
+- **Alignement ODD** : ODD 1 (Fin de la pauvreté), ODD 8 (Travail décent), ODD 10 (Inégalités réduites).
+- **Scénarios concrets** : Kofi (Paris, 200 USD → économie 26,20 USD), Adjoa (Bruxelles), Séraphin (Lyon).
+
+#### Micro-épargne
+- **Solde épargne** affiché sur fond sombre avec intérêts générés (taux DeFi Celo : 4,2%/an via Moola Market).
+- **Projection annuelle** calculée automatiquement.
+- **Arrondi automatique** (toggle) — À chaque transfert, la différence est épargnée. 3 options : arrondi au dollar supérieur, aux 5 USD, ou 1 USD fixe.
+- **Historique des contributions** avec date et ID de transaction.
+- Bouton "Retirer l'épargne" avec confirmation Alert.
+
+#### Transferts récurrents
+- Création de transferts programmés (hebdomadaire, mensuel).
+- Toggle actif/inactif par transfert.
+- Suppression avec confirmation.
+
+#### Parrainage
+- **Code unique** affiché (ex: `KOFI2026`) avec bouton "Copier".
+- **QR Code généré en SVG** (pattern pseudo-aléatoire basé sur le code).
+- Bouton "Partager mon code" → ouvre le share natif du téléphone.
+- **Statistiques** : amis parrainés, gains totaux en USD, gains en attente.
+- Explication du mécanisme en 3 étapes.
+- Récompense : 0,50 USD en cUSD sur wallet Celo par filleul.
+
+#### Gestion des bénéficiaires
+- Liste des contacts sauvegardés avec avatar coloré.
+- Ajout, modification, suppression de bénéficiaires.
+
+#### Profil & Paramètres
+- Informations utilisateur.
+- **Paramètres de notifications** (6 toggles) : alerte taux, transfert envoyé, transfert reçu, rappel récurrent, alerte sécurité, rapport hebdomadaire.
+- Sélection de la langue : Français, English, Fɔngbè (FON).
+- Déconnexion.
+
+### 2.4 Parcours Destinataire
+
+#### Dashboard (Home Destinataire)
+- **Solde disponible à retirer** en FCFA (ex: 131 191 FCFA).
+- Bouton CTA "Retirer maintenant" → flux de retrait.
+- 3 badges info : Instantané ⚡, Sécurisé 🔒, Sans frais 💵.
+- **Transferts reçus récents** avec détail par transaction.
+
+#### Flux de retrait (3 étapes)
+
+**Sélection de l'opérateur**
+- Choix entre **MTN Money** et **Moov Money**.
+- Affichage du montant disponible.
+
+**Confirmation**
+- Récapitulatif : montant en FCFA, opérateur choisi, numéro de téléphone.
+- Bouton "Confirmer le retrait".
+
+**Succès**
+- Confirmation visuelle du retrait initié.
+- Délai estimé affiché.
+
+### 2.5 Écrans partagés
+
+- **Contact / Support** — Formulaire de contact et FAQ.
+- **Détail de transaction** — Hash Celo complet, statut, confirmations, frais gas, économies vs WU.
+- **Suivi de transfert** (`TransferTracker`) — Suivi en temps réel de l'état d'un transfert en cours.
+- **Paramètres de notifications** — Accessible depuis le profil.
+
+### 2.6 Assistant IA "Lumière"
+
+L'assistant conversationnel multilingue répond en **Français, Anglais et Fɔngbè** :
+- Calculs de transfert à la demande.
+- Informations sur les frais, taux, sécurité, Mobile Money.
+- En production : connecté à GPT-4o-mini (OpenAI). En démo : réponses hors-ligne basées sur mots-clés.
+
+### 2.7 Smart Contract `DiasporaConnect.sol`
+
+Déployé sur Celo Alfajores (testnet). Trois fonctions principales :
+
+| Fonction | Description |
+|---|---|
+| `deposit(phone)` | L'expéditeur verrouille les fonds dans le contrat |
+| `release(id, node)` | Le nœud Mobile Money confirme et libère les fonds |
+| `refund(id)` | Remboursement automatique après 72h si non libéré |
+
+En démo, `executeTransferDemo` simule le cycle complet en ~4,5 secondes avec étapes progressives visibles à l'écran.
+
+---
+
+## 3. Ce qu'on voit à l'écran lors des tests
+
+### Lancement de l'app
+
+1. **Splash screen** avec logo animé (~2 secondes).
+2. **Onboarding** — 4 slides swipables avec illustrations et textes sur la blockchain, la rapidité et les économies. Bouton "Commencer" sur le dernier slide.
+3. **Sélection du rôle** — Deux cartes : "Expéditeur" et "Destinataire".
+
+### Parcours Expéditeur — ce qu'on voit
+
+- **Auth** : Bouton "Connecter mon wallet" → confirmation instantanée (mock), accès au dashboard.
+- **Dashboard** : Fond crème texturé (`#FAF9F5`), solde `1 242,80 USD` en typographie Newsreader, bannière taux or, prédiction IA avec badge "✨ IA", graphique de courbe, 3 transactions récentes.
+- **Calculateur** : Saisie `200 EUR` → affichage immédiat `≈ 121 985 FCFA` reçus. Tableau comparatif avec barres de progression colorées montrant DiasporaConnect en vert (0,8%) vs les autres en rouge/orange.
+- **Étape 2** : Tap sur "Adjoua Adjovi" → carte surlignée avec badge ✓ doré.
+- **Étape 3** : Si c'est un nouveau destinataire avec un gros montant, une bannière ⚠️ IA apparaît en haut. Tap "Confirmer" → popup biométrique simulé → bouton en état "Signature en cours...".
+- **Étape 4** : Confettis dorés, checkmark animé qui "pop", hash Celo tronqué `0x3f4a8b2c...`, barre de progression qui avance lentement, encart vert "Vous avez économisé 26,20 USD".
+
+### Parcours Destinataire — ce qu'on voit
+
+- **Auth** : Saisie du numéro → bouton "Envoyer le code" → champ OTP à 6 cases → n'importe quel code → accès au dashboard.
+- **Dashboard** : Solde `131 191 FCFA` en grand, bouton doré "Retirer maintenant", liste des transferts reçus.
+- **Retrait** : Sélection MTN ou Moov → confirmation → écran de succès.
+
+### Design system "The Private Ledger" — ce qu'on voit
+
+- Fond texturé chaud `#FAF9F5` (surface).
+- Accents **or massif** `#755B00` / `#C9A84C` sur tous les boutons CTA, badges, montants.
+- Typographies : **Newsreader** (serif, pour les grands montants), **Space Grotesk** (titres), **Public Sans** (corps de texte).
+- Bottom tab avec effet **glassmorphism** (fond semi-transparent flouté).
+- Boutons CTA en **dégradé or** `#755B00 → #C9A84C`.
+- Shadows diffuses (pas de bordures dures).
+- Skeleton loaders animés (pulse) pendant les chargements.
+
+---
+
+## 4. Environnement de test : Expo Go + ngrok
 
 ### Prérequis
-1. L'application **Expo Go** installée sur le smartphone de test (Android ou iOS).
-2. Un compte ngrok et l'outil installé sur la machine hébergeant le backend (ex: votre ordinateur portable).
-3. Assurez-vous d'être connecté au même réseau Wi-Fi (recommandé pour Expo Go).
+1. **Expo Go** installé sur le smartphone de test (Android ou iOS).
+2. Être sur le même réseau Wi-Fi que la machine qui lance Expo.
+3. (Optionnel) **ngrok** si un backend local doit être exposé.
 
-### Étape 2.1 : Exposer le Backend avec ngrok
-Votre backend (ex: Node.js) fonctionne probablement sur un port local, disons le `3000` ou `8080`. Vous devez relier ce tunnel local vers une URL publique :
-```bash
-# Dans le terminal du serveur Backend de votre ordinateur :
-ngrok http 3000
-```
-ngrok vous fournira une URL du type `https://abcdef123.ngrok-free.app`. **Copiez cette URL**.
+### Lancer l'application
 
-### Étape 2.2 : Démarrer l'Application Mobile
-Dans le dossier du projet React Native (DiasporaConnect), lancez le serveur Expo :
 ```bash
+cd DiasporaConnect
+npm install
 npx expo start
 ```
-- Scannez le **QR code** qui s'affiche dans votre terminal avec l'application Expo Go de votre téléphone (ou avec l'appareil photo si vous êtes sur iOS).
 
----
+Scannez le QR code avec Expo Go (Android) ou l'appareil photo (iOS).
 
-## 3. Configuration réseau : Où modifier l'Adresse IP ou l'URL
+### Exposer le backend avec ngrok (si nécessaire)
 
-Puisque que le port du backend pointe maintenant vers une adresse ngrok au lieu de `localhost` (ou si vous utilisez simplement une adresse IP locale IPv4 de type `192.168.x.x`), vous devrez mettre à jour cette adresse dans le code de l'application mobile pour qu'elle puisse communiquer avec l'API.
-
-> [!CAUTION]
-> **Ne laissez jamais `localhost` ou `127.0.0.1` dans le simulateur ou le téléphone, car l'application cherchera l'API sur le téléphone lui-même, occasionnant une erreur.** 
+```bash
+ngrok http 3000
+# → Copiez l'URL générée (ex: https://abcdef123.ngrok-free.app)
+```
 
 ### Fichier à modifier : `src/services/apiService.js`
 
-Allez dans le fichier source qui gère toutes les requêtes, repérez la constante `BASE_URL`, et remplacez la valeur :
-
 ```javascript
-// Chemin : src/services/apiService.js
+// ❌ Ne pas laisser localhost
+const BASE_URL = 'https://api.diasporaconnect.africa/v1';
 
-// ❌ Avant (ou environnement mocké par défaut) :
-const BASE_URL = 'https://api.diasporaconnect.africa/v1'; 
-
-// ✅ Après (utilisant ngrok) :
+// ✅ Avec ngrok
 const BASE_URL = 'https://abcdef123.ngrok-free.app/v1';
 
-// ✅ Ou si vous testez via IP locale (ex: 192.168.1.50) sans ngrok :
+// ✅ Avec IP locale
 const BASE_URL = 'http://192.168.1.50:3000/v1';
 ```
 
-**(Optionnel) Fichiers réseau supplémentaires :**
-Si vous possédez d'autres services comme WebSockets ou l'accès au nœud RPC Celo hébergé localement, modifiez l'adresse dans :
-`src/services/blockchainService.js` (où se trouvent l'intégration ethers.js et les URLs du Provider RPC si vous ne pointez pas directement vers un RPC public Celo Alfajores).
+> **Important :** Ne jamais laisser `localhost` ou `127.0.0.1` — l'app cherchera l'API sur le téléphone lui-même.
 
 ---
 
-## 4. Astuces pour le jury
+## 5. Données de démo (mock)
 
-> [!TIP]
-> - Mettez en avant le fait que la démo tourne réellement sur téléphone, rendue possible via **Expo Go**.
-> - Pour éviter que l'URL ne change toutes les 2h avec ngrok gratuit, prévoyez de modifier le fichier `apiService.js` **juste avant** votre présentation.
-> - Rappelez que les animations et la rapidité du flux sur téléphone simulent l'immédiateté d'une interaction blockchain !
+Tout fonctionne sans backend réel. Les données mock sont dans `src/services/mockData.js` :
 
+| Donnée | Valeur démo |
+|---|---|
+| Wallet expéditeur | `0x742d...3E1f` — 1 242,80 USD |
+| Destinataire par défaut | Adjoua Adjovi, +229 97 45 12 87, MTN |
+| Solde destinataire | 131 191 FCFA |
+| Taux EUR/USD | 1,08 |
+| Taux USD/FCFA | 612,5 |
+| Frais DiasporaConnect | 0,8% |
+| Code OTP valide | N'importe quel code à 6 chiffres |
+| Durée simulation transfert | ~4,5 secondes |
 
+---
 
+## 6. Astuces pour la présentation au jury
 
-Tu es un expert en localisation de documentation technique, spécialisé dans les systèmes de paiement interopérables. Tu maîtrises MojaLoop, plateforme open source de paiements instantanés interconnectant des institutions financières (DFSPs) via un Hub central.
-
-Ta mission : comparer le texte anglais original et sa traduction française, identifier les erreurs, et produire un tableau de review au format strict défini ci-dessous.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-## 1. CE QUE JE VAIS TE FOURNIR
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-À chaque session :
-- L'URL de la page
-- Le nom de la section principale
-- Le texte EN (original anglais)
-- Le texte FR (traduction française à reviewer)
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-## 2. FORMAT DE SORTIE OBLIGATOIRE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Retourne UNIQUEMENT un tableau Markdown avec ces 7 colonnes exactes, dans cet ordre :
-
-| Page / URL | Sous section de la page | Problème | Section | Solution proposée | Type du problème | Commentaire |
-|---|---|---|---|---|---|---|
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-## 3. RÈGLES PAR COLONNE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-### Page / URL
-→ L'URL exacte fournie, sans modification.
-
-### Sous section de la page
-→ Tu détermines toi-même cette valeur en analysant le contenu fourni.
-→ Identifier le titre ou l'ancre de sous-section auquel appartient l'erreur détectée (ex: #services-mojaloop, #prérequis, #déploiement-helm).
-→ Si le contenu ne contient pas de sous-section identifiable, laisser vide.
-
-### Problème
-→ Toujours formuler ainsi : « [terme/phrase anglais] » traduit par « [terme/phrase français problématique] »
-→ Exemples du style attendu :
-  - « Encryption » traduit par « Cryptage »
-  - « split into the following domains » traduit par « divisé dans les domaines suivants »
-  - « support this functionality » traduit par « supporter cette fonctionnalité »
-→ Si le problème est une omission ou incohérence interne (pas une traduction directe), décrire le constat entre guillemets français :
-  - « couche applicative » / « couche application » utilisés pour le même concept dans le même paragraphe
-
-### Section
-→ VALEUR OBLIGATOIREMENT CHOISIE PARMI CETTE LISTE FERMÉE (select strict) :
-  ✅ Technique
-  ✅ Adoption
-→ Ne jamais écrire une autre valeur.
-→ Règle : si le contenu est technique (API, déploiement, architecture, sécurité, code…) → "Technique". Si c'est lié à la présentation, la vulgarisation ou à l'adoption du produit → "Adoption".
-
-### Solution proposée
-→ La correction concrète, entre guillemets français « » si c'est un remplacement direct.
-→ Plusieurs options séparées par " ou " si pertinent.
-→ Exemples : « Chiffrement » / « règles du système » ou « règles du réseau » / « prendre en charge cette fonctionnalité »
-→ Si la VF a raison malgré une apparence d'erreur : (Aucune — correction juste)
-
-### Type du problème
-→ VALEUR OBLIGATOIREMENT CHOISIE PARMI CETTE LISTE FERMÉE (select strict) :
-  ✅ Traduction
-  ✅ Traduction, Sens
-  ✅ Style
-  ✅ Style, Sens
-  ✅ Sens
-  ✅ Sens, Style
-  ✅ Grammaire
-  ✅ Grammaire, Sens
-  ✅ Faute de frappe
-  ✅ Document source
-→ Choisir la valeur la plus précise. Combiner avec ", " si deux types s'appliquent simultanément.
-→ "Document source" : uniquement pour signaler une erreur ou coquille présente dans le texte anglais original (non imputable au traducteur).
-→ Ne JAMAIS écrire une valeur hors de cette liste.
-
-### Commentaire
-→ 1 à 2 phrases maximum, ton technique et factuel.
-→ Expliquer POURQUOI c'est une erreur, avec la justification linguistique ou technique.
-→ Exemples du style attendu :
-  - « Fees = frais, pas coûts. De plus, « no fees » signifie « sans frais » pour l'utilisateur, pas « gratuit » (un service financier n'est jamais gratuit, il peut être sans frais). »
-  - « Supported au sens de standard technique se traduit par « pris en charge », pas « supporté ». »
-  - « En français, on est « divisé en », pas « divisé dans » pour ce contexte. »
-  - « Le même concept est traduit de deux manières à quelques lignes d'intervalle (application layer). »
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-## 4. RÈGLES GÉNÉRALES
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-- Ne signaler QUE les vraies erreurs. Une traduction correcte n'est pas mentionnée.
-- Termes à surveiller particulièrement : Hub, DFSP, Payer, Payee, Scheme, Settlement, Clearing, Callback, Endpoint, Datastore, Bounded Context, Hub Operator, Switch Operator.
-- Un terme anglais sans équivalent français établi peut rester en anglais, SAUF si c'est utilisé de façon incohérente d'une section à l'autre (→ signaler alors comme "Style").
-- Chaque ligne = UNE seule erreur spécifique.
-- Aucun texte en dehors du tableau : pas d'introduction, pas de conclusion, pas de commentaire global, pas de résumé.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-## 5. MODÈLE DE SAISIE (à remplir à chaque session)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-**URL :** https://docs.jengacore.com/technical/reference-architecture/furtherReading/
-**Section :** [Technique ]
-
-**Texte EN :**
-Further Reading
-#
-Team Resources
-
-During the Reference Architecture planning work sessions, the Team made use of different resources to build and retain a record of discussions and to build the Use Case Models required to support all of the possible stakeholder requirements for the new architecture.
-
-Please feel free to visit the Team’s resources using the links provided.
-
-P.S. One resource that you might find particularly useful is Miro, where we keep a record of all of the Bounded Context Use Cases in use by the system.
-
-Note: Please bear in mind that the Reference Architecture document is a living document, and as a result is updated from time to time for various reasons. This means that the resources that we have shared with you are still in use and will change occasionally.
-Resource 	Purpose 	Link/URL
-Miro 	Build Use Case flow diagrams 	Miro - Mojaloop Reference Architecture (opens new window)
-Google Docs 	Session work notes for the team providing details of Reference Architecture for inclusion in the proposal and introductory documentation. 	Mojaloop 2.0 Reference Architecture Work Sessions (opens new window)
-Google Sheets 	Record of Common Interfaces in use in the Switch architecture, along with various other bits and pieces. 	Mojaloop 2.0 Reference Architecture (opens new window)
-#
-Reference Articles and Documents
-
-The resources below were sourced to provide additional insight into the architecture models that have been implemented.
-Resource 	Details
-Domain-Driven Design, from Wikipedia, the free encyclopedia (opens new window) 	Publisher: Wikipedia, the free encyclopedia; Author: Community; Date: non-specific; ±7mins to read
-Domain, Subdomain, Bounded Context, Problem/Solution Space in DDD: Clearly Defined (opens new window) 	Publisher: Medium.com; Author: Nick Tune; Date: 11/07/2020; ±7mins to read
-Strategic Domain-Driven Design (opens new window) 	Publisher: Vaadin.com; Author: Petter Holmstrom
-Pattern: Decompose by Subdomain Context (opens new window) 	Publisher: Microservices Architecture; Author: Chris Richardson
-Rest API Tutorial (opens new window) 	Publisher: Self-published; Author: Todd Fredrich; License: Creative Commons Attribution ShareAlike 4.0 International License (opens new window)
-Use Case, from Wikipedia, the free encyclopedia (opens new window) 	In brief, and quoting from the opening blurb of the Wikipedia article, a use case is a list of actions or event steps typically defining the interactions between a role (known in the Unified Modeling Language (UML) as an actor) and a system to achieve a goal. The actor can be a human or other external system. In systems engineering, use cases are used at a higher level than within software engineering, often representing missions or stakeholder goals. The detailed requirements may then be captured in the Systems Modeling Language (SysML) or as contractual statements.
-#
-Project Iteration Convenings
-
-The resources below are inclusions to the Mojaloop Technical Convenings by the Reference Architecture Team starting at the beginning of 2021. Resources include notes, slides, and video recordings.
-Project Iteration (PI) 	Period 	Description 	Link/URL
-PI-13 	January 2021 	Mojaloop Performance, Scalability and Architecture Update 	PI-13 Slides & Recording (opens new window)
-PI-14 	April 2021 	Opening and Mojaloop Reference Architecture and TigerBeetle 	PI-14 Recording (YouTube) (opens new window)
-PI-15 	July 2021 	Reference Architecture v1.0 	PI-15 Resources (opens new window) / PI-15 Video Library (YouTube) (opens new window)
-PI-16 	October 2021 	Reference Architecture and V2 update 	PI-16 Agenda (opens new window) / PI-16 Video Library (opens new window)
-PI-17 	January 2022 	Reference Architecture: Documentation and v.Next Updates 	PI-17 Reference Architecture Presentation (YouTube) (opens new window)
-Edit this page on GitHub (opens new window)
-Last Updated: 4/29/2026, 9:24:59 PM
-
-← Glossary Overview →
-
-**Texte FR :**
-Lectures complémentaires
-#
-Ressources de l’équipe
-
-Lors des sessions de planification de l’Architecture de Référence, l’équipe a utilisé différentes ressources pour conserver un historique des discussions et construire les modèles de cas d’utilisation nécessaires afin de répondre à l’ensemble des exigences possibles des parties prenantes pour la nouvelle architecture.
-
-N’hésitez pas à consulter les ressources de l’équipe via les liens fournis.
-
-P.S. Une ressource que vous pourriez particulièrement trouver utile est Miro, où nous conservons un enregistrement de l’ensemble des cas d’utilisation de « Bounded Context » actuellement utilisés par le système.
-
-Note : Veuillez garder à l’esprit que le document de l’Architecture de Référence est un document vivant et, en conséquence, il est mis à jour périodiquement pour diverses raisons. Cela signifie que les ressources que nous partageons avec vous sont toujours utilisées et peuvent changer occasionnellement.
-Ressource 	Objectif 	Lien/URL
-Miro 	Création de diagrammes de flux des cas d’utilisation 	Miro - Architecture de Référence Mojaloop (opens new window)
-Google Docs 	Notes de sessions de travail pour l’équipe, fournissant des détails sur l’architecture de référence à inclure dans la proposition et la documentation d’introduction. 	Mojaloop 2.0 Reference Architecture Work Sessions (opens new window)
-Google Sheets 	Registre des interfaces courantes utilisées dans l’architecture Switch, ainsi que divers autres éléments. 	Mojaloop 2.0 Reference Architecture (opens new window)
-#
-Articles et documents de référence
-
-Les ressources ci-dessous ont été sélectionnées pour offrir un éclairage supplémentaire sur les modèles d’architecture ayant été mis en œuvre.
-Ressource 	Détails
-Domain-Driven Design, extrait de Wikipédia, l’encyclopédie libre (opens new window) 	Éditeur : Wikipédia, l’encyclopédie libre ; Auteur : Communauté ; Date : non-spécifiée ; ±7min de lecture
-Domain, Subdomain, Bounded Context, Problem/Solution Space in DDD: Clearly Defined (opens new window) 	Éditeur : Medium.com ; Auteur : Nick Tune ; Date : 11/07/2020 ; ±7min de lecture
-Strategic Domain-Driven Design (opens new window) 	Éditeur : Vaadin.com ; Auteur : Petter Holmstrom
-Pattern: Decompose by Subdomain Context (opens new window) 	Éditeur : Microservices Architecture ; Auteur : Chris Richardson
-Rest API Tutorial (opens new window) 	Éditeur : Auto-édité ; Auteur : Todd Fredrich ; Licence : Creative Commons Attribution ShareAlike 4.0 International License (opens new window)
-Use Case, extrait de Wikipédia, l’encyclopédie libre (opens new window) 	En bref, et pour reprendre l’introduction de l’article Wikipédia, un cas d’utilisation est une liste d’actions ou d’étapes, généralement définissant les interactions entre un rôle (connu en Unified Modeling Language (UML) sous le nom d’acteur) et un système afin d’atteindre un objectif. L’acteur peut être un humain ou un autre système externe. En ingénierie système, les cas d’utilisation sont utilisés à un niveau plus élevé que dans l’ingénierie logicielle, représentant souvent des missions ou des objectifs de parties prenantes. Les exigences détaillées peuvent ensuite être capturées dans le Systems Modeling Language (SysML) ou comme des énoncés contractuels.
-#
-Réunions d’itération de projet
-
-Les ressources ci-dessous sont des contributions aux « Technical Convenings » de Mojaloop par l’équipe d’architecture de référence à partir du début de l’année 2021. Elles incluent notes, diapositives et enregistrements vidéo.
-Itération de projet (PI) 	Période 	Description 	Lien/URL
-PI-13 	Janvier 2021 	Performance de Mojaloop, évolutivité et mise à jour de l’architecture 	PI-13 Slides & Recording (opens new window)
-PI-14 	Avril 2021 	Introduction et Architecture de Référence Mojaloop et TigerBeetle 	Enregistrement PI-14 (YouTube) (opens new window)
-PI-15 	Juillet 2021 	Architecture de Référence v1.0 	Ressources PI-15 (opens new window) / Vidéothèque PI-15 (YouTube) (opens new window)
-PI-16 	Octobre 2021 	Architecture de Référence et mise à jour V2 	Agenda PI-16 (opens new window) / Vidéothèque PI-16 (opens new window)
-PI-17 	Janvier 2022 	Architecture de Référence : Documentation et mises à jour v.Next 	Présentation Architecture de Référence PI-17 (YouTube) (opens new window)
-Modifier cette page sur GitHub (opens new window)
-Dernière mise à jour: 29/04/2026 21:24:59
-
-← TBD Placeholder API FSPIOP →
+- **Montrez le comparateur de frais** sur le calculateur : c'est l'argument choc. Entrez 200 EUR et montrez que WU prendrait 28 USD vs 1,80 USD avec DiasporaConnect.
+- **Déclenchez la détection IA** : entrez un montant très élevé (ex: 5000 USD) vers un nouveau destinataire pour voir la bannière d'alerte 🚨.
+- **Montrez l'écran Impact** : les compteurs animés et les badges créent un effet visuel fort.
+- **Démontrez le multilingue** : changez la langue en Fɔngbè dans le profil pour montrer la localisation.
+- **Modifiez `apiService.js` juste avant** la présentation si vous utilisez ngrok (l'URL change toutes les 2h avec le plan gratuit).
+- L'app fonctionne **100% hors-ligne** en mode démo — pas besoin de connexion internet pour la démonstration principale.

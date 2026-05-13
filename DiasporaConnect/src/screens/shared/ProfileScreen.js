@@ -142,6 +142,37 @@ export default function ProfileScreen({ navigation }) {
 
         <TouchableOpacity
           style={[styles.impactBtn, { marginTop: spacing.sm }]}
+          onPress={() => navigation.navigate('NotificationSettings')}
+        >
+          <Ionicons name="notifications-outline" size={18} color={colors.primary} />
+          <Text style={styles.impactBtnText} numberOfLines={1}>Préférences notifications</Text>
+          <ArrowIcon color={colors.primary} size={18} thickness={2} />
+        </TouchableOpacity>
+
+        {isSender && (
+          <TouchableOpacity
+            style={[styles.impactBtn, { marginTop: spacing.sm }]}
+            onPress={() => navigation.navigate('Beneficiaries')}
+          >
+            <Ionicons name="people-outline" size={18} color={colors.primary} />
+            <Text style={styles.impactBtnText} numberOfLines={1}>Gérer les bénéficiaires</Text>
+            <ArrowIcon color={colors.primary} size={18} thickness={2} />
+          </TouchableOpacity>
+        )}
+
+        {isSender && (
+          <TouchableOpacity
+            style={[styles.impactBtn, { marginTop: spacing.sm }]}
+            onPress={() => navigation.navigate('KYC')}
+          >
+            <Ionicons name="shield-checkmark-outline" size={18} color={colors.primary} />
+            <Text style={styles.impactBtnText} numberOfLines={1}>Vérification d’identité (KYC)</Text>
+            <ArrowIcon color={colors.primary} size={18} thickness={2} />
+          </TouchableOpacity>
+        )}
+
+        <TouchableOpacity
+          style={[styles.impactBtn, { marginTop: spacing.sm }]}
           onPress={() => navigation.navigate('Contact')}
         >
           <Ionicons name="chatbubble-ellipses-outline" size={18} color={colors.primary} />

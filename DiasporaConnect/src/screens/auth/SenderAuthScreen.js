@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing, radius, shadows } from '../../theme/theme';
 import GoldButton from '../../components/ui/GoldButton';
 import LedgerInput from '../../components/ui/LedgerInput';
@@ -70,7 +71,7 @@ export default function SenderAuthScreen({ navigation }) {
         {/* Header fixe */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-            <Text style={styles.backIcon}>←</Text>
+            <Ionicons name="arrow-back" size={24} color={colors.primary} />
           </TouchableOpacity>
         </View>
 
@@ -164,7 +165,6 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.sm,
   },
   backBtn: { padding: spacing.xs, alignSelf: 'flex-start' },
-  backIcon: { fontSize: 24, color: colors.primary },
   scroll: {
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing.xxl,

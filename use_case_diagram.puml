@@ -1,0 +1,365 @@
+@startuml DiasporaConnect_UseCases
+!theme plain
+skinparam backgroundColor #FAFAF5
+skinparam actorStyle awesome
+
+skinparam usecase {
+  BackgroundColor #FFF8E7
+  BorderColor #755B00
+  FontName "Arial"
+  FontSize 12
+}
+skinparam actor {
+  BackgroundColor #F5F0E8
+  BorderColor #755B00
+  FontName "Arial"
+  FontSize 12
+}
+skinparam package {
+  BackgroundColor #FFFDF5
+  BorderColor #C9A84C
+  FontSize 13
+  FontStyle bold
+}
+skinparam ArrowColor #755B00
+skinparam ArrowFontSize 10
+
+' ─────────────────────────────────────────────
+'  ACTEURS
+' ─────────────────────────────────────────────
+actor "Expéditeur\n(Diaspora)" as Sender
+actor "Destinataire\n(Bénin)" as Receiver
+actor "Nœud Mobile Money\n(MTN / Moov)" as MobileMoneyNode
+actor "Smart Contract\n(Celo Blockchain)" as SmartContract
+actor "API Taux de Change\n(CoinGecko / ExchangeRate)" as RatesAPI
+actor "Backend\nDiasporaConnect" as Backend
+
+' Héritage d'acteurs
+actor "Utilisateur\n(Commun)" as User
+Sender -up-|> User
+Receiver -up-|> User
+
+' ─────────────────────────────────────────────
+'  BLOC 1 — ONBOARDING
+' ─────────────────────────────────────────────
+package "Onboarding" {
+  usecase "Voir l'écran de démarrage\n(Splash)" as UC_Splash
+  usecase "Parcourir l'onboarding\n(Sécurité, Rapidité, Économies)" as UC_Onboarding
+  usecase "Sélectionner son rôle\n(Expéditeur / Destinataire)" as UC_RoleSelect
+}
+
+' ─────────────────────────────────────────────
+'  BLOC 2 — AUTHENTIFICATION
+' ─────────────────────────────────────────────
+package "Authentification" {
+  usecase "Connecter un portefeuille Web3\n(Celo / Ethereum / Polygon)" as UC_SenderAuth
+  usecase "Saisir adresse wallet\nmanuellement" as UC_WalletManual
+  usecase "Continuer en mode démo" as UC_DemoMode
+
+  usecase "S'authentifier via OTP\n(numéro Mobile Money)" as UC_ReceiverAuth
+  usecase "Recevoir un code SMS" as UC_SendOTP
+  usecase "Vérifier le code OTP" as UC_VerifyOTP
+
+  usecase "S'authentifier par biométrie\n(Face ID / Touch ID)" as UC_Biometric
+
+  usecase "Se déconnecter" as UC_Logout
+
+  package "KYC — Vérification d'identité" {
+    usecase "Lancer la vérification KYC" as UC_KYC
+    usecase "Prendre un selfie" as UC_KYC_Selfie
+    usecase "Scanner un document\n(Passeport / CNI / Titre séjour)" as UC_KYC_Doc
+    usecase "Vérification IA\n(détection visage + document)" as UC_KYC_Verify
+    usecase "Obtenir le statut KYC\nNiveau 2 (jusqu'à 2 000 USD)" as UC_KYC_Success
+  }
+}
+
+' ─────────────────────────────────────────────
+'  BLOC 3 — PARCOURS EXPÉDITEUR
+' ─────────────────────────────────────────────
+package "Parcours Expéditeur" {
+
+  package "Tableau de bord" {
+    usecase "Consulter le solde\n(USD / FCFA)" as UC_SenderHome
+    usecase "Voir les taux en temps réel\n(EUR/USD, FCFA, CELO)" as UC_LiveRates
+    usecase "Recevoir une alerte de taux\nfavorable" as UC_RateAlert
+    usecase "Voir les transferts récents" as UC_RecentTx
+  }
+
+  package "Calculateur de Frais" {
+    usecase "Estimer un transfert\n(EUR ou USD)" as UC_Calculator
+    usecase "Comparer les frais\n(WU, MoneyGram, SWIFT)" as UC_FeeComparison
+    usecase "Voir le montant reçu\nen FCFA" as UC_FCFAPreview
+  }
+
+  package "Flux de Transfert (4 étapes)" {
+    usecase "Initier un transfert\n(Étape 1 — Montant)" as UC_Step1
+    usecase "Saisir le destinataire\n(Étape 2 — Numéro Mobile Money)" as UC_Step2
+    usecase "Scanner un QR Code\ndestinaire" as UC_QRScan
+    usecase "Confirmer le transfert\n(Étape 3 — Récapitulatif)" as UC_Step3
+    usecase "Signer la transaction\nWeb3 (wallet)" as UC_Sign
+    usecase "Déposer les fonds\ndans le smart contract" as UC_Deposit
+    usecase "Voir la confirmation\n(Étape 4 — Hash Celo)" as UC_Step4
+    usecase "Copier le hash\nde transaction" as UC_CopyHash
+  }
+
+  package "Bénéficiaires" {
+    usecase "Consulter la liste\ndes bénéficiaires" as UC_BenefList
+    usecase "Ajouter un bénéficiaire\n(nom, numéro, opérateur, ville)" as UC_BenefAdd
+    usecase "Modifier un bénéficiaire" as UC_BenefEdit
+    usecase "Supprimer un bénéficiaire" as UC_BenefDelete
+    usecase "Sélectionner un bénéficiaire\nlors d'un transfert" as UC_BenefSelect
+  }
+
+  package "Fonctionnalités Avancées" {
+    usecase "Programmer un transfert\nrécurrent (mensuel / bi-mensuel)" as UC_Recurring
+    usecase "Activer / Désactiver\nun transfert récurrent" as UC_ToggleRecurring
+    usecase "Supprimer un transfert\nrécurrent" as UC_DeleteRecurring
+
+    usecase "Gérer la micro-épargne\n(arrondi automatique)" as UC_Savings
+    usecase "Retirer l'épargne\nvers le wallet Celo" as UC_WithdrawSavings
+    usecase "Voir les intérêts DeFi\n(Moola Market, 4.2%/an)" as UC_DeFiYield
+
+    usecase "Parrainer un ami\n(code de parrainage)" as UC_Referral
+    usecase "Partager le code\nde parrainage" as UC_ShareReferral
+    usecase "Gagner des récompenses\ncUSD" as UC_ReferralReward
+  }
+}
+
+' ─────────────────────────────────────────────
+'  BLOC 4 — PARCOURS DESTINATAIRE
+' ─────────────────────────────────────────────
+package "Parcours Destinataire" {
+  usecase "Consulter le solde\ndisponible (FCFA)" as UC_ReceiverHome
+  usecase "Voir les transferts reçus" as UC_ReceivedTx
+
+  package "Flux de Retrait" {
+    usecase "Initier un retrait\nMobile Money" as UC_WithdrawInit
+    usecase "Choisir l'opérateur\n(MTN / Moov)" as UC_OperatorSelect
+    usecase "Confirmer le retrait\n(montant + numéro)" as UC_WithdrawConfirm
+    usecase "Libérer les fonds\ndu smart contract" as UC_Release
+    usecase "Voir la confirmation\nde retrait (succès)" as UC_WithdrawSuccess
+  }
+}
+
+' ─────────────────────────────────────────────
+'  BLOC 4b — SUIVI DE TRANSFERT
+' ─────────────────────────────────────────────
+package "Suivi de Transfert" {
+  usecase "Suivre un transfert\nen temps réel (4 étapes)" as UC_Tracker
+  usecase "Voir la progression\n(Signé → Celo → Notifié → Retiré)" as UC_TrackerSteps
+  usecase "Voir les détails blockchain\n(hash, gas, confirmations)" as UC_TrackerDetails
+  usecase "Ouvrir sur CeloScan" as UC_CeloScan
+}
+
+' ─────────────────────────────────────────────
+'  BLOC 5 — FONCTIONS PARTAGÉES
+' ─────────────────────────────────────────────
+package "Fonctions Partagées" {
+  usecase "Consulter l'historique\ndes transactions" as UC_History
+  usecase "Filtrer les transactions\n(Tous / Envoyés / Reçus)" as UC_FilterTx
+  usecase "Voir le détail\nd'une transaction" as UC_TxDetail
+
+  usecase "Consulter l'impact\nsocial (ODD)" as UC_Impact
+  usecase "Voir les badges\net récompenses" as UC_Badges
+  usecase "Voir les compteurs\nglobaux DiasporaConnect" as UC_GlobalStats
+
+  usecase "Gérer le profil\nutilisateur" as UC_Profile
+  usecase "Changer la langue\n(FR / EN / FON)" as UC_Language
+  usecase "Copier l'adresse\ndu wallet" as UC_CopyWallet
+
+  usecase "Contacter le support\n(WhatsApp / Email)" as UC_Contact
+  usecase "Consulter la FAQ" as UC_FAQ
+  usecase "Envoyer un message\nau support" as UC_SendMessage
+
+  package "Notifications" {
+    usecase "Gérer les préférences\nde notifications" as UC_NotifSettings
+    usecase "Activer / Désactiver\nune catégorie de notification" as UC_NotifToggle
+  }
+
+  package "Assistant IA — Lumière" {
+    usecase "Ouvrir le chatbot\nLumière (FR/EN/FON)" as UC_AI
+    usecase "Poser une question\nà l'assistant" as UC_AI_Ask
+    usecase "Utiliser une question\nrapide (suggestions)" as UC_AI_Quick
+  }
+}
+
+' ─────────────────────────────────────────────
+'  BLOC 6 — SMART CONTRACT (Celo)
+' ─────────────────────────────────────────────
+package "Smart Contract — Celo" {
+  usecase "Verrouiller les fonds\n(deposit)" as UC_SC_Deposit
+  usecase "Libérer les fonds\nvers le nœud MM (release)" as UC_SC_Release
+  usecase "Rembourser l'expéditeur\naprès 72h (refund)" as UC_SC_Refund
+  usecase "Émettre un événement\nblockchain (TransferCreated)" as UC_SC_Event
+  usecase "Notifier le remboursement\nautomatique" as UC_SC_RefundNotify
+}
+
+' ─────────────────────────────────────────────
+'  RELATIONS — UTILISATEUR COMMUN
+' ─────────────────────────────────────────────
+User --> UC_Biometric
+User --> UC_AI
+User --> UC_NotifSettings
+User --> UC_Splash
+User --> UC_Onboarding
+User --> UC_RoleSelect
+User --> UC_History
+User --> UC_FilterTx
+User --> UC_TxDetail
+User --> UC_Impact
+User --> UC_Badges
+User --> UC_GlobalStats
+User --> UC_Profile
+User --> UC_Language
+User --> UC_Contact
+User --> UC_FAQ
+User --> UC_SendMessage
+User --> UC_Logout
+
+' ─────────────────────────────────────────────
+'  RELATIONS — EXPÉDITEUR
+' ─────────────────────────────────────────────
+Sender --> UC_SenderAuth
+Sender --> UC_KYC
+Sender --> UC_SenderHome
+Sender --> UC_LiveRates
+Sender --> UC_RecentTx
+Sender --> UC_Calculator
+Sender --> UC_Step1
+Sender --> UC_Step2
+Sender --> UC_Step3
+Sender --> UC_Step4
+Sender --> UC_Tracker
+Sender --> UC_BenefList
+Sender --> UC_Recurring
+Sender --> UC_Savings
+Sender --> UC_Referral
+Sender --> UC_CopyWallet
+
+' ─────────────────────────────────────────────
+'  RELATIONS — DESTINATAIRE
+' ─────────────────────────────────────────────
+Receiver --> UC_ReceiverAuth
+Receiver --> UC_ReceiverHome
+Receiver --> UC_ReceivedTx
+Receiver --> UC_WithdrawInit
+
+' ─────────────────────────────────────────────
+'  RELATIONS — ACTEURS EXTERNES
+' ─────────────────────────────────────────────
+Backend --> UC_SendOTP
+Backend --> UC_VerifyOTP
+Backend --> UC_KYC_Verify
+Backend --> UC_SC_RefundNotify
+
+RatesAPI --> UC_LiveRates
+RatesAPI --> UC_RateAlert
+
+SmartContract --> UC_SC_Deposit
+SmartContract --> UC_SC_Release
+SmartContract --> UC_SC_Refund
+SmartContract --> UC_SC_Event
+SmartContract --> UC_SC_RefundNotify
+
+MobileMoneyNode --> UC_Release
+MobileMoneyNode --> UC_WithdrawSuccess
+
+' ─────────────────────────────────────────────
+'  INCLUDE / EXTEND
+' ─────────────────────────────────────────────
+
+' Auth Expéditeur
+UC_SenderAuth ..> UC_WalletManual : <<extend>>
+UC_SenderAuth ..> UC_DemoMode : <<extend>>
+UC_SenderAuth ..> UC_Biometric : <<extend>>
+
+' KYC
+UC_KYC ..> UC_KYC_Selfie : <<include>>
+UC_KYC_Selfie ..> UC_KYC_Doc : <<include>>
+UC_KYC_Doc ..> UC_KYC_Verify : <<include>>
+UC_KYC_Verify ..> UC_KYC_Success : <<include>>
+
+' Bénéficiaires
+UC_BenefList ..> UC_BenefAdd : <<extend>>
+UC_BenefList ..> UC_BenefEdit : <<extend>>
+UC_BenefList ..> UC_BenefDelete : <<extend>>
+UC_Step2 ..> UC_BenefSelect : <<extend>>
+
+' Auth Destinataire
+UC_ReceiverAuth ..> UC_SendOTP : <<include>>
+UC_SendOTP ..> UC_VerifyOTP : <<include>>
+
+' Calculateur → Transfert
+UC_Calculator ..> UC_FeeComparison : <<include>>
+UC_Calculator ..> UC_FCFAPreview : <<include>>
+UC_Step1 ..> UC_Calculator : <<include>>
+
+' Flux de transfert
+UC_Step2 ..> UC_QRScan : <<extend>>
+UC_Step3 ..> UC_Sign : <<include>>
+UC_Step3 ..> UC_Biometric : <<include>>
+UC_Sign ..> UC_Deposit : <<include>>
+UC_Deposit ..> UC_SC_Deposit : <<include>>
+UC_SC_Deposit ..> UC_SC_Event : <<include>>
+UC_Step4 ..> UC_CopyHash : <<extend>>
+UC_Step4 ..> UC_Tracker : <<extend>>
+
+' Taux (RatesAPI est un acteur externe, la relation est déjà déclarée ci-dessus)
+UC_SenderHome ..> UC_LiveRates : <<include>>
+UC_SenderHome ..> UC_RateAlert : <<extend>>
+
+' Récurrents
+UC_Recurring ..> UC_ToggleRecurring : <<extend>>
+UC_Recurring ..> UC_DeleteRecurring : <<extend>>
+
+' Épargne
+UC_Savings ..> UC_DeFiYield : <<include>>
+UC_Savings ..> UC_WithdrawSavings : <<extend>>
+
+' Parrainage
+UC_Referral ..> UC_ShareReferral : <<extend>>
+UC_Referral ..> UC_ReferralReward : <<extend>>
+
+' Retrait destinataire
+UC_WithdrawInit ..> UC_OperatorSelect : <<include>>
+UC_OperatorSelect ..> UC_WithdrawConfirm : <<include>>
+UC_WithdrawConfirm ..> UC_Release : <<include>>
+UC_Release ..> UC_SC_Release : <<include>>
+UC_Release ..> UC_WithdrawSuccess : <<include>>
+
+' Historique
+UC_History ..> UC_FilterTx : <<include>>
+UC_History ..> UC_TxDetail : <<extend>>
+
+' Impact
+UC_Impact ..> UC_Badges : <<include>>
+UC_Impact ..> UC_GlobalStats : <<include>>
+
+' Profil
+UC_Profile ..> UC_Language : <<extend>>
+UC_Profile ..> UC_CopyWallet : <<extend>>
+UC_Profile ..> UC_Impact : <<extend>>
+UC_Profile ..> UC_Contact : <<extend>>
+UC_Profile ..> UC_KYC : <<extend>>
+UC_Profile ..> UC_NotifSettings : <<extend>>
+
+' Suivi de transfert
+UC_Tracker ..> UC_TrackerSteps : <<include>>
+UC_Tracker ..> UC_TrackerDetails : <<extend>>
+UC_TrackerDetails ..> UC_CeloScan : <<extend>>
+
+' Notifications
+UC_NotifSettings ..> UC_NotifToggle : <<include>>
+
+' Assistant IA
+UC_AI ..> UC_AI_Ask : <<include>>
+UC_AI ..> UC_AI_Quick : <<extend>>
+
+' Support
+UC_Contact ..> UC_FAQ : <<include>>
+UC_Contact ..> UC_SendMessage : <<extend>>
+
+' Remboursement automatique (72h) — le smart contract notifie le backend
+UC_SC_Refund ..> UC_SC_RefundNotify : <<include>>
+
+@enduml

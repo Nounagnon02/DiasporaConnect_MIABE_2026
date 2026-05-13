@@ -12,6 +12,7 @@ import './src/i18n';
 import RootNavigator from './src/navigation/RootNavigator';
 import { colors } from './src/theme/theme';
 import { requestNotificationPermission } from './src/services/notificationService';
+import AIAssistant from './src/components/ui/AIAssistant';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -58,6 +59,7 @@ export default function App() {
       <View style={styles.root} onLayout={onLayoutRootView}>
         <StatusBar style="dark" backgroundColor={colors.surface} />
         <RootNavigator />
+        <AIAssistant />
       </View>
     </SafeAreaProvider>
   );

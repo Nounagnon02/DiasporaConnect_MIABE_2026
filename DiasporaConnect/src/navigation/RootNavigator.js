@@ -19,9 +19,13 @@ import SendFlowStack from './SendFlowStack';
 import ImpactScreen from '../screens/shared/ImpactScreen';
 import TransactionDetail from '../screens/shared/TransactionDetailScreen';
 import ContactScreen from '../screens/shared/ContactScreen';
+import TransferTrackerScreen from '../screens/shared/TransferTrackerScreen';
+import NotificationSettingsScreen from '../screens/shared/NotificationSettingsScreen';
 import RecurringScreen from '../screens/sender/RecurringScreen';
 import ReferralScreen from '../screens/sender/ReferralScreen';
 import SavingsScreen from '../screens/sender/SavingsScreen';
+import BeneficiariesScreen from '../screens/sender/BeneficiariesScreen';
+import KYCScreen from '../screens/auth/KYCScreen';
 
 const Stack = createStackNavigator();
 
@@ -49,6 +53,10 @@ export default function RootNavigator() {
         <Stack.Screen name="Recurring" component={RecurringScreen} />
         <Stack.Screen name="Referral" component={ReferralScreen} />
         <Stack.Screen name="Savings" component={SavingsScreen} />
+        <Stack.Screen name="Beneficiaries" component={BeneficiariesScreen} />
+        <Stack.Screen name="TransferTracker" component={TransferTrackerScreen} />
+        <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
+        <Stack.Screen name="KYC" component={KYCScreen} />
         
       </Stack.Navigator>
     </NavigationContainer>

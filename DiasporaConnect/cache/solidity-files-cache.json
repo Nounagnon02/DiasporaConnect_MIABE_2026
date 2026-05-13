@@ -1,0 +1,41 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "/home/kangbodenounagnonprince/Mes_Projet/DiasporaConnect_MIABE_2026/DiasporaConnect/contracts/DiasporaConnect.sol": {
+      "lastModificationDate": 1778577647277,
+      "contentHash": "24833af80bad38dc562321398b99476f",
+      "sourceName": "contracts/DiasporaConnect.sol",
+      "solcConfig": {
+        "version": "0.8.19",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.19"
+      ],
+      "artifacts": [
+        "DiasporaConnect",
+        "IERC20"
+      ]
+    }
+  }
+}

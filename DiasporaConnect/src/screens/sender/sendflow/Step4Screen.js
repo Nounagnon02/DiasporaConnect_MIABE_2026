@@ -5,12 +5,14 @@ import { StatusBar } from 'expo-status-bar';
 import { colors, fonts, spacing, radius, shadows } from '../../../theme/theme';
 import GoldButton from '../../../components/ui/GoldButton';
 import SecondaryButton from '../../../components/ui/SecondaryButton';
+import ConfettiEffect from '../../../components/ui/ConfettiEffect';
 import useStore from '../../../store/useStore';
 
 const { width } = Dimensions.get('window');
 
 export default function Step4Screen({ navigation }) {
   const { transferData, resetTransferData } = useStore();
+  const [confettiActive, setConfettiActive] = React.useState(false);
 
   const checkScale = useRef(new Animated.Value(0)).current;
   const checkOpacity = useRef(new Animated.Value(0)).current;
@@ -26,6 +28,9 @@ export default function Step4Screen({ navigation }) {
         Animated.timing(checkOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
       ]),
     ]).start();
+    // Lancer les confettis après l'animation du check
+    setTimeout(() => setConfettiActive(true), 400);
+    setTimeout(() => setConfettiActive(false), 3500);
     Animated.sequence([
       Animated.delay(500),
       Animated.timing(contentOpacity, { toValue: 1, duration: 400, useNativeDriver: true }),
@@ -65,6 +70,7 @@ export default function Step4Screen({ navigation }) {
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar style="dark" />
+      <ConfettiEffect active={confettiActive} />
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
@@ -149,6 +155,11 @@ export default function Step4Screen({ navigation }) {
             navigation.navigate('SenderApp', { screen: 'Calculator' });
           }}
           style={styles.btnFull}
+        />
+        <View style={{ height: spacing.md }} />
+        <SecondaryButton
+          title="Suivre ce transfert"
+          onPress={() => navigation.navigate('TransferTracker')}
         />
         <View style={{ height: spacing.md }} />
         <SecondaryButton

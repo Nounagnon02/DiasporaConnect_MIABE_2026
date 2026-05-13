@@ -51,6 +51,30 @@ const useStore = create(
       },
       rateAlert: null,
 
+      // ---- Beneficiaries ----
+      beneficiaries: [
+        { id: 'b_001', name: 'Adjoua Adjovi',  phone: '+229 97 45 12 87', operator: 'MTN',  city: 'Cotonou',        initials: 'AA', color: '#C75B39' },
+        { id: 'b_002', name: 'Papa Koffi',     phone: '+229 96 23 45 67', operator: 'Moov', city: 'Porto-Novo',     initials: 'PK', color: '#2D5A4A' },
+        { id: 'b_003', name: 'Maman Afi',      phone: '+229 97 89 01 23', operator: 'MTN',  city: 'Abomey-Calavi',  initials: 'MA', color: '#D4A574' },
+      ],
+
+      // ---- Notification Settings ----
+      notifSettings: {
+        rateAlert: true,
+        transferSent: true,
+        transferReceived: true,
+        recurringReminder: true,
+        securityAlert: true,
+        weeklyReport: false,
+      },
+
+      // ---- KYC ----
+      kycStatus: 'none', // 'none' | 'pending' | 'verified'
+
+      // ---- Offline ----
+      isOfflineMode: false,
+      offlineQueue: [],
+
       // ---- Impact Score ----
       impactScore: {
         totalSavedUSD: 187.4,
@@ -223,6 +247,44 @@ const useStore = create(
             tx.txHash === txHash ? { ...tx, status } : tx
           ),
         })),
+
+      // ---- Beneficiaries Actions ----
+      addBeneficiary: (b) =>
+        set(state => ({
+          beneficiaries: [
+            ...state.beneficiaries,
+            { ...b, id: `b_${Date.now()}` },
+          ],
+        })),
+
+      updateBeneficiary: (id, data) =>
+        set(state => ({
+          beneficiaries: state.beneficiaries.map(b =>
+            b.id === id ? { ...b, ...data } : b
+          ),
+        })),
+
+      deleteBeneficiary: (id) =>
+        set(state => ({
+          beneficiaries: state.beneficiaries.filter(b => b.id !== id),
+        })),
+
+      // ---- Notification Settings Actions ----
+      updateNotifSettings: (settings) =>
+        set(state => ({
+          notifSettings: { ...state.notifSettings, ...settings },
+        })),
+
+      // ---- KYC Actions ----
+      setKYCStatus: (status) => set({ kycStatus: status }),
+
+      // ---- Offline Actions ----
+      setOfflineMode: (val) => set({ isOfflineMode: val }),
+
+      addToOfflineQueue: (tx) =>
+        set(state => ({ offlineQueue: [...state.offlineQueue, { ...tx, queuedAt: new Date().toISOString() }] })),
+
+      clearOfflineQueue: () => set({ offlineQueue: [] }),
     }),
     {
       name: 'diasporaconnect-storage',
