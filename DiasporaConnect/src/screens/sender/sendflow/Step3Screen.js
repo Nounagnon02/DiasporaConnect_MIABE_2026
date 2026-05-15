@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Dimensions, Animated,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { colors, fonts, spacing, radius, shadows } from '../../../theme/theme';
 import StepIndicator from '../../../components/ui/StepIndicator';
@@ -11,19 +11,23 @@ import useStore from '../../../store/useStore';
 import { detectAnomaly } from '../../../services/aiService';
 import BiometricGuard from '../../../components/ui/BiometricGuard';
 import { Ionicons } from '@expo/vector-icons';
-import { executeTransferDemo } from '../../../services/blockchainService';
+import { executeTransfer } from '../../../services/blockchainService';
+import { useTranslation } from 'react-i18next';
+import { useTabBarHeight } from '../../../hooks/useTabBarHeight';
 
 const { width } = Dimensions.get('window');
-const STEP_LABELS = ['Montant', 'Destinataire', 'Confirmation', 'Succès'];
-
 export default function Step3Screen({ navigation }) {
-  const { transferData, addTransaction, updateTransferData, senderUser, transactions, language } = useStore();
+  const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
+  const tabBarHeight = useTabBarHeight();
+  const bottomPad = tabBarHeight + Math.max(insets.bottom, 0);
+  const { transferData, addTransaction, updateTransferData, senderUser, transactions, updateImpactScore, addSavingsContribution } = useStore();
   const [loading, setLoading] = useState(false);
   const [showBiometric, setShowBiometric] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
-  const isEn = language === 'en';
 
-  const verifiedName = transferData.verifiedName || transferData.recipient?.name || 'ce destinataire';
+  const verifiedName = transferData.verifiedName || transferData.recipient?.name || t('send.thisRecipient');
+  const STEP_LABELS = [t('send.step1'), t('send.step2'), t('send.step3'), t('send.step4')];
 
   const maskedPhone = (p = '') => {
     const clean = p.replace(/\s/g, '');
@@ -39,7 +43,7 @@ export default function Step3Screen({ navigation }) {
 
   const handleConfirmPress = () => {
     if (!confirmed) {
-      Alert.alert('Confirmation requise', `Cochez la case pour confirmer l'envoi à ${verifiedName}.`);
+      Alert.alert(t('send.confirmRequiredTitle'), t('send.confirmRequiredDesc', { name: verifiedName }));
       return;
     }
     setShowBiometric(true);
@@ -52,24 +56,30 @@ export default function Step3Screen({ navigation }) {
   const handleConfirm = async () => {
     setLoading(true);
     try {
-      const result = await executeTransferDemo(
+      const result = await executeTransfer(
         transferData.amountUSD,
         transferData.recipient?.phone,
-        () => {} // progression gérée par l'UI de loading
+        transferData.operator || 'MTN',
+        null, // signer: will be auto-connected from private key
+        (progress) => {
+           console.log(progress);
+        }
       );
 
       if (!result.success) throw new Error('Transfer failed');
 
       updateTransferData({ txHash: result.txHash, status: 'completed' });
+      
+      const newTxId = `tx_${Date.now()}`;
       addTransaction({
-        id: `tx_${Date.now()}`,
+        id: newTxId,
         txHashFull: result.txHash,
         txHash: result.txHash.slice(0, 10) + '...' + result.txHash.slice(-8),
         type: 'send',
         amountUSD: transferData.amountUSD,
         amountFCFA: transferData.amountFCFA,
         fee: transferData.fee,
-        recipient: transferData.recipient?.name || transferData.recipient?.phone || 'Inconnu',
+        recipient: transferData.recipient?.name || transferData.recipient?.phone || t('common.unknown'),
         recipientPhone: transferData.recipient?.phone || '',
         operator: transferData.operator || 'MTN',
         date: new Date().toISOString(),
@@ -79,9 +89,14 @@ export default function Step3Screen({ navigation }) {
         gasFeeCELO: '0.003',
         savedVsWU: transferData.savings || 0,
       });
+
+      // Mises à jour dynamiques de l'Impact et de la Cagnotte (Store Persistant)
+      updateImpactScore(transferData.savings || 0);
+      addSavingsContribution(transferData.savings || 0, newTxId);
+
       navigation.replace('SendStep4');
     } catch (e) {
-      Alert.alert('Erreur', 'Le transfert a échoué. Réessayez.');
+      Alert.alert(t('common.error'), t('send.transferFailed'));
     } finally {
       setLoading(false);
     }
@@ -94,13 +109,13 @@ export default function Step3Screen({ navigation }) {
         visible={showBiometric}
         onSuccess={handleBiometricSuccess}
         onCancel={handleBiometricCancel}
-        reason={isEn ? 'Confirm this transfer' : 'Confirmez ce transfert'}
+        reason={t('send.authReason')}
       />
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={24} color={colors.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Confirmation</Text>
+        <Text style={styles.headerTitle}>{t('send.confirmation')}</Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -113,13 +128,19 @@ export default function Step3Screen({ navigation }) {
         {/* Alerte IA fraude/anomalie */}
         {anomaly && (
           <View style={[styles.anomalyBanner, anomaly.level === 'high' && styles.anomalyHigh]}>
-            <Text style={styles.anomalyIcon}>
-              {anomaly.level === 'high' ? '🚨' : anomaly.level === 'medium' ? '⚠️' : 'ℹ️'}
-            </Text>
+            <Ionicons
+              name={anomaly.level === 'high' ? 'alert-circle-outline' : anomaly.level === 'medium' ? 'warning-outline' : 'information-circle-outline'}
+              size={24}
+              color={colors.onSurface}
+              style={styles.anomalyIcon}
+            />
             <View style={{ flex: 1 }}>
-              <Text style={styles.anomalyTitle}>✨ IA — {anomaly.level === 'high' ? 'Alerte sécurité' : 'Attention'}</Text>
+              <View style={styles.anomalyTitleRow}>
+                <Ionicons name="sparkles" size={14} color={colors.primary} style={styles.anomalyTitleIcon} />
+                <Text style={styles.anomalyTitle}>{anomaly.level === 'high' ? t('send.securityAlert') : t('common.attention')}</Text>
+              </View>
               <Text style={styles.anomalyText}>
-                {isEn ? anomaly.reasonEn : anomaly.reason}
+                {t('common.currentLang') === 'en' ? anomaly.reasonEn : t('common.currentLang') === 'fon' ? (anomaly.reasonFon || anomaly.reason) : anomaly.reason}
               </Text>
             </View>
           </View>
@@ -128,7 +149,7 @@ export default function Step3Screen({ navigation }) {
         {/* Récapitulatif */}
         <View style={styles.recapCard}>
           <View style={styles.recapRow}>
-            <Text style={styles.recapLabel}>Montant envoyé</Text>
+            <Text style={styles.recapLabel}>{t('send.amountSent')}</Text>
             <Text style={styles.recapValueSpace} numberOfLines={1}>
               {transferData.amountUSD?.toFixed(2)} USD
             </Text>
@@ -137,11 +158,11 @@ export default function Step3Screen({ navigation }) {
           <View style={styles.recapSplitter} />
 
           <View style={styles.recapRow}>
-            <Text style={styles.recapLabel}>Frais Celo (estimés)</Text>
+            <Text style={styles.recapLabel}>{t('send.estimatedGas')}</Text>
             <Text style={styles.recapValueSpace}>0.002 CELO</Text>
           </View>
           <View style={styles.recapRow}>
-            <Text style={styles.recapLabel}>Frais DiasporaConnect</Text>
+            <Text style={styles.recapLabel}>{t('history.diasporaFee')}</Text>
             <Text style={styles.recapValueGold}>
               ${transferData.fee?.toFixed(2) || '0.00'}
             </Text>
@@ -150,7 +171,7 @@ export default function Step3Screen({ navigation }) {
           <View style={styles.recapSplitter} />
 
           <View style={styles.recapRowAmount}>
-            <Text style={styles.recapLabelBold}>Le bénéficiaire recevra</Text>
+            <Text style={styles.recapLabelBold}>{t('send.recipientWillReceive')}</Text>
             <View style={styles.recapAmountBlock}>
               <Text
                 style={styles.recapValueNewsreader}
@@ -169,7 +190,7 @@ export default function Step3Screen({ navigation }) {
 
         {/* Bénéficiaire + case à cocher obligatoire */}
         <View style={styles.recipientCard}>
-          <Text style={styles.recipientLabel}>Bénéficiaire vérifié</Text>
+          <Text style={styles.recipientLabel}>{t('send.verifiedRecipient')}</Text>
           <Text style={styles.recipientName} numberOfLines={1}>
             {verifiedName}
           </Text>
@@ -186,24 +207,22 @@ export default function Step3Screen({ navigation }) {
               {confirmed && <Ionicons name="checkmark" size={12} color="#FFF" />}
             </View>
             <Text style={styles.confirmCheckText}>
-              Je confirme envoyer à <Text style={{ fontFamily: fonts.title }}>{verifiedName}</Text>
+              {t('send.confirmTo', { name: verifiedName })}
             </Text>
           </TouchableOpacity>
         </View>
 
         {/* Info légale */}
         <View style={styles.infoBox}>
-          <Text style={styles.infoText}>
-            En confirmant, vous autorisez le transfert via The Private Ledger sur Celo Alfajores. L'argent sera instantanément disponible pour le retrait au Bénin.
-          </Text>
+          <Text style={styles.infoText}>{t('send.legalInfo')}</Text>
         </View>
 
         <View style={{ height: 120 }} />
       </ScrollView>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, { paddingBottom: bottomPad + spacing.md }]}>
         <GoldButton
-          title={loading ? 'Signature en cours...' : 'Confirmer et Envoyer'}
+          title={loading ? t('status.signing') : t('send.confirmAndSend')}
           onPress={handleConfirmPress}
           disabled={loading || !confirmed}
         />
@@ -347,12 +366,18 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(186,26,26,0.06)',
     borderLeftColor: colors.error,
   },
-  anomalyIcon: { fontSize: 20, flexShrink: 0 },
+  anomalyIcon: { marginTop: 2, flexShrink: 0 },
+  anomalyTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginBottom: 4,
+  },
+  anomalyTitleIcon: { marginTop: 1 },
   anomalyTitle: {
     fontFamily: fonts.title,
     fontSize: 12,
     color: colors.primary,
-    marginBottom: 4,
   },
   anomalyText: {
     fontFamily: fonts.body,

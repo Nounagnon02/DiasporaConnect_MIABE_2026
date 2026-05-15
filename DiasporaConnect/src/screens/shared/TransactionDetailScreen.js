@@ -4,9 +4,11 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing, radius, shadows } from '../../theme/theme';
 import Badge from '../../components/ui/Badge';
 import ArrowIcon from '../../components/ui/ArrowIcon';
+import { useTranslation } from 'react-i18next';
 
 const WU_FEE_PCT = 0.14;
 
@@ -26,13 +28,14 @@ function TimelineStep({ label, time, done, last }) {
 }
 
 export default function TransactionDetailScreen({ navigation, route }) {
+  const { t } = useTranslation();
   const { transaction } = route.params || {};
   const [copied, setCopied] = useState(false);
 
   if (!transaction) return null;
 
   const formatFCFA = (n) => new Intl.NumberFormat('fr-FR').format(Math.round(n || 0));
-  const formatDate = (d) => new Date(d).toLocaleDateString('fr-FR', {
+  const formatDate = (d) => new Date(d).toLocaleDateString(t('common.locale') || 'fr-FR', {
     day: '2-digit', month: '2-digit', year: 'numeric',
     hour: '2-digit', minute: '2-digit',
   });
@@ -56,10 +59,9 @@ export default function TransactionDetailScreen({ navigation, route }) {
       <StatusBar style="dark" />
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          {/* Flèche gauche en View pure */}
           <ArrowIcon direction="left" color={colors.primary} size={20} thickness={2} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Détails du transfert</Text>
+        <Text style={styles.headerTitle}>{t('history.details')}</Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -67,7 +69,7 @@ export default function TransactionDetailScreen({ navigation, route }) {
 
         {/* Montant hero */}
         <View style={styles.amountCard}>
-          <Text style={styles.amountLabel}>Montant envoyé</Text>
+          <Text style={styles.amountLabel}>{t('history.amountSentShort')}</Text>
           <Text
             style={styles.amountFCFA}
             adjustsFontSizeToFit
@@ -83,86 +85,89 @@ export default function TransactionDetailScreen({ navigation, route }) {
         {/* Détails */}
         <View style={styles.card}>
           <View style={styles.row}>
-            <Text style={styles.label}>Destinataire</Text>
+            <Text style={styles.label}>{t('send.recipient')}</Text>
             <Text style={styles.value} numberOfLines={1} ellipsizeMode="tail">
               {transaction.recipient || transaction.sender}
             </Text>
           </View>
           <View style={styles.sep} />
           <View style={styles.row}>
-            <Text style={styles.label}>Opérateur</Text>
+            <Text style={styles.label}>{t('send.operatorLabel')}</Text>
             <Text style={styles.valueLabel} numberOfLines={1}>{transaction.operator}</Text>
           </View>
           <View style={styles.sep} />
           <View style={styles.row}>
-            <Text style={styles.label}>Date</Text>
+            <Text style={styles.label}>{t('history.dateLabel')}</Text>
             <Text style={styles.valueLabel} numberOfLines={1}>{formatDate(transaction.date)}</Text>
           </View>
           <View style={styles.sep} />
           <View style={styles.row}>
-            <Text style={styles.label}>Frais DiasporaConnect</Text>
+            <Text style={styles.label}>{t('history.diasporaFee')}</Text>
             <Text style={styles.valueLabel}>{transaction.fee?.toFixed(3) || '0.008'} USD</Text>
           </View>
           <View style={styles.sep} />
           <View style={styles.row}>
-            <Text style={styles.label}>Économie vs WU</Text>
+            <Text style={styles.label}>{t('impact.savedVsWU_Short')}</Text>
             <Text style={styles.valueSavings}>+{savings.toFixed(2)} USD</Text>
           </View>
         </View>
 
         {/* Blockchain */}
         <View style={styles.blockCard}>
-          <Text style={styles.blockTitle}>Blockchain</Text>
+          <Text style={styles.blockTitle}>{t('history.blockchainTitle')}</Text>
           <View style={styles.row}>
-            <Text style={styles.label}>Réseau</Text>
+            <Text style={styles.label}>{t('profile.network')}</Text>
             <Text style={styles.valueLabel}>Celo Alfajores</Text>
           </View>
           <View style={styles.sep} />
           <View style={styles.row}>
-            <Text style={styles.label}>Hash TX</Text>
+            <Text style={styles.label}>{t('history.txHash')}</Text>
             <View style={styles.hashRow}>
               <Text style={styles.hashText} numberOfLines={1} ellipsizeMode="middle">
                 {(transaction.txHashFull || transaction.txHash || '').slice(0, 16)}…
               </Text>
               <TouchableOpacity onPress={handleCopy} style={styles.copyBtn}>
-                <Text style={styles.copyText}>{copied ? '✓' : 'Copier'}</Text>
+                {copied ? (
+                  <Ionicons name="checkmark" size={16} color={colors.primary} />
+                ) : (
+                  <Text style={styles.copyText}>{t('common.copy')}</Text>
+                )}
               </TouchableOpacity>
             </View>
           </View>
           <View style={styles.sep} />
           <View style={styles.row}>
-            <Text style={styles.label}>Confirmations</Text>
+            <Text style={styles.label}>{t('history.confirmations')}</Text>
             <Text style={styles.valueLabel}>{transaction.confirmations || 0}</Text>
           </View>
-          {/* Lien CeloScan — flèche en View pure */}
           <TouchableOpacity
             style={styles.explorerBtn}
             onPress={() => Linking.openURL(`https://alfajores.celoscan.io/tx/${transaction.txHashFull}`)}
           >
-            <Text style={styles.explorerText}>Voir sur CeloScan</Text>
+            <Text style={styles.explorerText}>{t('tracker.viewExplorer')}</Text>
             <ArrowIcon color={colors.primary} size={14} thickness={1.5} />
           </TouchableOpacity>
         </View>
 
         {/* Timeline */}
         <View style={styles.timelineCard}>
-          <Text style={styles.blockTitle}>Suivi du transfert</Text>
+          <Text style={styles.blockTitle}>{t('tracker.title')}</Text>
           <TimelineStep
-            label="Envoyé"
-            time={txDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            label={t('history.sent')}
+            time={txDate.toLocaleTimeString(t('common.locale') || 'fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
             done={true}
           />
           <TimelineStep
-            label="Confirmé sur Celo"
+            label={t('tracker.confirmed')}
             time={isCompleted || isPending
-              ? confirmDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+              ? confirmDate.toLocaleTimeString(t('common.locale') || 'fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
               : null}
             done={isCompleted || isPending}
           />
           <TimelineStep
-            label="Retrait Mobile Money"
+            label={t('tracker.withdrawn')}
             time={isCompleted
-              ? withdrawDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+              ? withdrawDate.toLocaleTimeString(t('common.locale') || 'fr-FR', { hour: '2-digit', minute: '2-digit' })
               : null}
             done={isCompleted}
             last

@@ -3,11 +3,14 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   RefreshControl, Animated, Dimensions,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { colors, fonts, spacing, radius } from '../../theme/theme';
 import useStore from '../../store/useStore';
 import TransactionItem from '../../components/ui/TransactionItem';
+import { useTranslation } from 'react-i18next';
+import { useTabBarHeight } from '../../hooks/useTabBarHeight';
 
 const { width } = Dimensions.get('window');
 
@@ -35,45 +38,47 @@ function SkeletonRow() {
   );
 }
 
-function groupByDate(transactions) {
-  const now = new Date();
-  const today = now.toDateString();
-  const weekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
-
-  const groups = {
-    "Aujourd'hui": [],
-    'Cette semaine': [],
-    'Ce mois': [],
-    'Plus ancien': [],
-  };
-
-  transactions.forEach(tx => {
-    const d = new Date(tx.date);
-    if (d.toDateString() === today) groups["Aujourd'hui"].push(tx);
-    else if (d >= weekAgo) groups['Cette semaine'].push(tx);
-    else if (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear())
-      groups['Ce mois'].push(tx);
-    else groups['Plus ancien'].push(tx);
-  });
-
-  return groups;
-}
-
-const FILTERS = [
-  ['ALL', 'Tous'],
-  ['SENT', 'Envoyés'],
-  ['RECEIVED', 'Reçus'],
-];
-
 export default function HistoryScreen({ navigation }) {
+  const { t } = useTranslation();
+  const tabBarHeight = useTabBarHeight();
   const { transactions } = useStore();
   const [filter, setFilter] = useState('ALL');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
+  function groupByDate(transactions) {
+    const now = new Date();
+    const today = now.toDateString();
+    const weekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
+
+    const groups = {
+      [t('history.groups.today')]: [],
+      [t('history.groups.thisWeek')]: [],
+      [t('history.groups.thisMonth')]: [],
+      [t('history.groups.older')]: [],
+    };
+
+    transactions.forEach(tx => {
+      const d = new Date(tx.date);
+      if (d.toDateString() === today) groups[t('history.groups.today')].push(tx);
+      else if (d >= weekAgo) groups[t('history.groups.thisWeek')].push(tx);
+      else if (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear())
+        groups[t('history.groups.thisMonth')].push(tx);
+      else groups[t('history.groups.older')].push(tx);
+    });
+
+    return groups;
+  }
+
+  const FILTERS = [
+    ['ALL', t('history.filters.all')],
+    ['SENT', t('history.filters.sent')],
+    ['RECEIVED', t('history.filters.received')],
+  ];
+
   useEffect(() => {
-    const t = setTimeout(() => setLoading(false), 1200);
-    return () => clearTimeout(t);
+    const t_id = setTimeout(() => setLoading(false), 1200);
+    return () => clearTimeout(t_id);
   }, []);
 
   const onRefresh = useCallback(() => {
@@ -95,7 +100,7 @@ export default function HistoryScreen({ navigation }) {
 
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Historique</Text>
+        <Text style={styles.headerTitle}>{t('history.title')}</Text>
       </View>
 
       {/* Filtres */}
@@ -129,10 +134,10 @@ export default function HistoryScreen({ navigation }) {
           Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)
         ) : filtered.length === 0 ? (
           <View style={styles.empty}>
-            <Text style={styles.emptyEmoji}>📭</Text>
-            <Text style={styles.emptyTitle}>Aucune transaction</Text>
+            <Ionicons name="mail-open-outline" size={48} color={colors.onSurfaceVariant} style={styles.emptyEmoji} />
+            <Text style={styles.emptyTitle}>{t('home.noTransactions')}</Text>
             <Text style={styles.emptyText}>
-              Vos transferts apparaîtront ici une fois effectués.
+              {t('history.emptyNote')}
             </Text>
           </View>
         ) : (
@@ -151,7 +156,7 @@ export default function HistoryScreen({ navigation }) {
             )
           )
         )}
-        <View style={{ height: 120 }} />
+        <View style={{ height: tabBarHeight + 16 }} />
       </ScrollView>
     </SafeAreaView>
   );

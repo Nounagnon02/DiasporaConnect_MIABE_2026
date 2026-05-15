@@ -2,15 +2,21 @@ import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing, radius, shadows } from '../../../theme/theme';
 import GoldButton from '../../../components/ui/GoldButton';
+import { useTranslation } from 'react-i18next';
+import { useTabBarHeight } from '../../../hooks/useTabBarHeight';
 
 const { width } = Dimensions.get('window');
 
 export default function OperatorScreen({ navigation }) {
+  const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
+  const tabBarHeight = useTabBarHeight();
+  const bottomPad = tabBarHeight + Math.max(insets.bottom, 0);
   const [operator, setOperator] = useState('MTN');
 
   return (
@@ -20,7 +26,7 @@ export default function OperatorScreen({ navigation }) {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={24} color={colors.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Retrait</Text>
+        <Text style={styles.headerTitle}>{t('recipient.withdraw')}</Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -28,12 +34,12 @@ export default function OperatorScreen({ navigation }) {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.instruction}>Où souhaitez-vous{'\n'}recevoir les fonds ?</Text>
+        <Text style={styles.instruction}>{t('recipient.withdrawInstruction')}</Text>
 
         <View style={styles.operatorRow}>
           {[
-            { id: 'MTN', label: 'MTN Money', color: '#FFCC00', textColor: '#1B1C1A' },
-            { id: 'Moov', label: 'Moov Money', color: '#005BBB', textColor: '#FFFFFF' },
+            { id: 'MTN', label: t('recipient.mtn'), color: '#FFCC00', textColor: '#1B1C1A' },
+            { id: 'Moov', label: t('recipient.moov'), color: '#005BBB', textColor: '#FFFFFF' },
           ].map((op) => (
             <TouchableOpacity
               key={op.id}
@@ -42,7 +48,7 @@ export default function OperatorScreen({ navigation }) {
             >
               {operator === op.id && (
                 <View style={styles.check}>
-                  <Text style={styles.checkText}>✓</Text>
+                  <Ionicons name="checkmark" size={14} color="#FFF" />
                 </View>
               )}
               <View style={[styles.logoPlaceholder, { backgroundColor: op.color }]}>
@@ -60,16 +66,16 @@ export default function OperatorScreen({ navigation }) {
 
         <View style={styles.infoBox}>
           <Text style={styles.infoText}>
-            Les retraits sont instantanés au Bénin. DiasporaConnect ne prélève aucun frais sur le retrait.
+            {t('recipient.withdrawInfo')}
           </Text>
         </View>
 
         <View style={{ height: spacing.xxl }} />
       </ScrollView>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, { paddingBottom: bottomPad + spacing.md }]}>
         <GoldButton
-          title="Continuer"
+          title={t('common.continue')}
           onPress={() => navigation.navigate('WithdrawConfirm', { operator })}
         />
       </View>

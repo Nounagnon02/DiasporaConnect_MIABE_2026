@@ -7,7 +7,10 @@
  * 5. Résumé IA de l'impact social
  */
 
-import { OPENAI_API_KEY } from '@env';
+import { OPENAI_API_KEY, GEMINI_API_KEY } from '@env';
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY || "");
 
 // ─────────────────────────────────────────────
 // 1. ASSISTANT CONVERSATIONNEL MULTILINGUE
@@ -32,36 +35,32 @@ Bló nǔ e nyɔ́ nú mɛ lɛ tɔn.`,
 
 export const askAssistant = async (message, language = 'fr', conversationHistory = []) => {
   // Fallback hors-ligne si pas de clé API
-  if (!OPENAI_API_KEY || OPENAI_API_KEY === '<your_openai_key>') {
+  if (!GEMINI_API_KEY || GEMINI_API_KEY.includes('your_') || GEMINI_API_KEY.includes('<')) {
     return getOfflineFallback(message, language);
   }
 
   try {
-    const messages = [
-      { role: 'system', content: SYSTEM_PROMPT[language] || SYSTEM_PROMPT.fr },
-      ...conversationHistory.slice(-6), // max 6 messages d'historique
-      { role: 'user', content: message },
-    ];
-
-    const res = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages,
-        max_tokens: 300,
-        temperature: 0.7,
-      }),
-      signal: AbortSignal.timeout(10000),
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      systemInstruction: SYSTEM_PROMPT[language] || SYSTEM_PROMPT.fr,
     });
 
-    if (!res.ok) throw new Error(`OpenAI ${res.status}`);
-    const data = await res.json();
-    return data.choices[0].message.content.trim();
-  } catch {
+    const chat = model.startChat({
+      history: conversationHistory.map(m => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: m.content }],
+      })),
+      generationConfig: {
+        maxOutputTokens: 500,
+        temperature: 0.7,
+      },
+    });
+
+    const result = await chat.sendMessage(message);
+    const response = await result.response;
+    return response.text().trim();
+  } catch (error) {
+    console.error("Gemini Error:", error);
     return getOfflineFallback(message, language);
   }
 };
@@ -72,38 +71,41 @@ const getOfflineFallback = (message, language) => {
   const isEn = language === 'en';
   const isFon = language === 'fon';
 
-  if (msg.includes('frais') || msg.includes('fee') || msg.includes('akwɛ')) {
+  if (msg.includes('frais') || msg.includes('fee') || msg.includes('akwɛ') || msg.includes('axɔ')) {
     if (isEn) return 'DiasporaConnect charges less than 1% per transfer. For example, sending $200 costs only $1.80 in fees — vs $28 with Western Union.';
-    if (isFon) return 'DiasporaConnect nɔ ɖó akwɛ kpɛví (< 1%) ɖò gbɛ̀ ɖokpo ɖokpo mɛ.';
+    if (isFon) return 'DiasporaConnect nɔ ɖó akwɛ kpɛví (< 1%) ɖò gbɛ̀ ɖokpo ɖokpo mɛ. É nyɔ́ hú Western Union tawun.';
     return 'DiasporaConnect prélève moins de 1% par transfert. Par exemple, envoyer 200 USD coûte seulement 1,80 USD de frais — contre 28 USD chez Western Union.';
   }
-  if (msg.includes('combien') || msg.includes('how much') || msg.includes('nɛ̌')) {
+  if (msg.includes('combien') || msg.includes('how much') || msg.includes('nɛ̌') || msg.includes('nabi')) {
     if (isEn) return 'Tell me the amount you want to send and I\'ll calculate exactly what your family will receive in FCFA!';
+    if (isFon) return 'Ɖɔ akwɛ nabi é a jló na sɛ́ ɔ nú mì, bo má lɛ́n nǔ é xwédo towe na yí ɔ nú we.';
     return 'Dites-moi le montant que vous souhaitez envoyer et je calcule exactement ce que votre famille recevra en FCFA !';
   }
-  if (msg.includes('temps') || msg.includes('time') || msg.includes('rapide') || msg.includes('fast')) {
+  if (msg.includes('temps') || msg.includes('time') || msg.includes('rapide') || msg.includes('fast') || msg.includes('yawu')) {
     if (isEn) return 'Transfers are confirmed in less than 60 seconds on the Celo blockchain. Mobile Money withdrawal is instant.';
+    if (isFon) return 'Gbɛ̀ ɔ nɔ yì yawu (mɛ́nici 1 mɛ) gbɔn blockchain Celo. Akwɛ yíyí nyí tɛntin.';
     return 'Les transferts sont confirmés en moins de 60 secondes sur la blockchain Celo. Le retrait Mobile Money est instantané.';
   }
-  if (msg.includes('sécur') || msg.includes('secure') || msg.includes('safe')) {
-    if (isEn) return 'Your funds are locked in an audited smart contract on Celo blockchain. They can only be released to the verified recipient — or refunded to you after 72h if unclaimed.';
-    return 'Vos fonds sont verrouillés dans un smart contract audité sur Celo. Ils ne peuvent être libérés qu\'au destinataire vérifié — ou remboursés après 72h si non réclamés.';
+  if (msg.includes('sécur') || msg.includes('secure') || msg.includes('safe') || msg.includes('vɛ')) {
+    if (isEn) return 'Your funds are locked in an audited smart contract on Celo blockchain. They can only be released to the verified recipient.';
+    if (isFon) return 'Akwɛ towe ɖò sísí mɛ ɖò smart contract Celo tɔn mɛ. Mɛ e a sɛ́ dó ɔ jɛ́n dán na yí.';
+    return 'Vos fonds sont verrouillés dans un smart contract audité sur Celo. Ils ne peuvent être libérés qu\'au destinataire vérifié.';
   }
   if (msg.includes('mtn') || msg.includes('moov')) {
-    return isEn
-      ? 'We support MTN Money and Moov Money in Benin. More operators coming soon!'
-      : 'Nous supportons MTN Money et Moov Money au Bénin. D\'autres opérateurs arrivent bientôt !';
+    if (isEn) return 'We support MTN Money and Moov Money in Benin. More operators coming soon!';
+    if (isFon) return 'Mǐ nɔ bɛ́ MTN Money kpo Moov Money kpo ɖò Bénin.';
+    return 'Nous supportons MTN Money et Moov Money au Bénin. D\'autres opérateurs arrivent bientôt !';
   }
   if (msg.includes('taux') || msg.includes('rate') || msg.includes('fcfa')) {
-    return isEn
-      ? 'The EUR/FCFA rate is fixed by the Bank of France at 655.957 FCFA per 1 EUR. We apply this official rate with no hidden markup.'
-      : 'Le taux EUR/FCFA est fixé par la Banque de France à 655,957 FCFA pour 1 EUR. Nous appliquons ce taux officiel sans marge cachée.';
+    if (isEn) return 'The EUR/FCFA rate is fixed at 655.957 FCFA. We applies this official rate with no hidden markup.';
+    if (isFon) return 'Taux EUR/FCFA ɔ nyí 655.957 FCFA. Mǐ nɔ wà azɔ̌ xá taux officiel ɔ.';
+    return 'Le taux EUR/FCFA est fixé à 655,957 FCFA. Nous appliquons ce taux officiel sans marge cachée.';
   }
 
   // Réponse générique
-  if (isEn) return 'I\'m Lumière, your DiasporaConnect assistant! I can help you with transfer fees, rates, security, and Mobile Money. What would you like to know?';
+  if (isEn) return 'I\'m Lumière, your DiasporaConnect assistant! I can help you with transfer fees, rates, and security. What would you like to know?';
   if (isFon) return 'Mì nyí Lumière! Mì sixu d\'akpɔ we ɖò akwɛ gbɛ̀ kpo taux kpo wu. Nɛ̌ mì ka sixu d\'alɔ we gbɔn?';
-  return 'Je suis Lumière, votre assistante DiasporaConnect ! Je peux vous aider sur les frais, les taux, la sécurité et Mobile Money. Que souhaitez-vous savoir ?';
+  return 'Je suis Lumière, votre assistante DiasporaConnect ! Je peux vous aider sur les frais, les taux et la sécurité. Que souhaitez-vous savoir ?';
 };
 
 // ─────────────────────────────────────────────
@@ -140,6 +142,7 @@ export const predictRateTrend = (ratesHistory = []) => {
       confidence: Math.min(0.85, 0.6 + volatility * 10),
       message: 'Le taux EUR/USD est en hausse 📈 — bon moment pour envoyer !',
       messageEn: 'EUR/USD rate is rising 📈 — great time to send!',
+      messageFon: 'Taux EUR/USD fannyí 📈 — é nyɔ́ tawun bɔ a na sɛ́ akwɛ!',
       bestTimeHours: 0,
     };
   }
@@ -149,6 +152,7 @@ export const predictRateTrend = (ratesHistory = []) => {
       confidence: Math.min(0.80, 0.55 + volatility * 10),
       message: 'Taux en baisse 📉 — attendez 2-4h pour un meilleur taux.',
       messageEn: 'Rate is falling 📉 — wait 2-4h for a better rate.',
+      messageFon: 'Taux ɔ ɖò we jɛ̀ wɛ́ 📉 — nɔ̀te mɛ́nici 2 abǐ 4 bonú taux ɔ ná nyɔ́.',
       bestTimeHours: 3,
     };
   }
@@ -157,6 +161,7 @@ export const predictRateTrend = (ratesHistory = []) => {
     confidence: 0.65,
     message: 'Taux stable aujourd\'hui — vous pouvez envoyer maintenant.',
     messageEn: 'Rate is stable today — you can send now.',
+    messageFon: 'Taux ɔ ɖò tɛ̀n égbé — a sixú sɛ́ akwɛ dìn.',
     bestTimeHours: 0,
   };
 };
@@ -195,6 +200,7 @@ export const detectAnomaly = (newTx, transactionHistory = []) => {
       level: 'high',
       reason: `Montant inhabituel (${newTx.amountUSD} USD) vers un nouveau destinataire. Vérifiez avant de confirmer.`,
       reasonEn: `Unusual amount ($${newTx.amountUSD}) to a new recipient. Please verify before confirming.`,
+      reasonFon: `Akwɛ nabi é nɔ sésɛ d'àyǐ ǎ (${newTx.amountUSD} USD) wɛ́ a jló na sɛ́ dó mɛ yɔyɔ́ ɖé. Kpɔ́n ganjí hwɛ̌.`,
     };
   }
   if (isLargeAmount && isNewRecipient) {
@@ -202,6 +208,7 @@ export const detectAnomaly = (newTx, transactionHistory = []) => {
       level: 'medium',
       reason: `Ce montant est 3× supérieur à votre moyenne (${avgAmount.toFixed(0)} USD) et le destinataire est nouveau.`,
       reasonEn: `This amount is 3× your average ($${avgAmount.toFixed(0)}) and the recipient is new.`,
+      reasonFon: `Akwɛ élɔ́ hú mɛ nabi é a nɔ sɛ́ dó ayǐ (${avgAmount.toFixed(0)} USD) azɔn atɔn, bɔ mɛ ɔ nyí mɛ yɔyɔ́.`,
     };
   }
   if (recentTxs.length >= 2) {
@@ -209,6 +216,7 @@ export const detectAnomaly = (newTx, transactionHistory = []) => {
       level: 'medium',
       reason: 'Plusieurs transferts détectés en peu de temps. Confirmez que c\'est bien vous.',
       reasonEn: 'Multiple transfers detected in a short time. Please confirm this is you.',
+      reasonFon: 'Kwɛ́ nabi ɖé wɛ́ a sɛ́ dó ɖò hwangbe kpɛví ɖé mɛ. Ðɔ nú mǐ nú é nyí hwi jɛ́n ɖò blóbló wɛ.',
     };
   }
   if (isLargeAmount) {
@@ -216,6 +224,7 @@ export const detectAnomaly = (newTx, transactionHistory = []) => {
       level: 'low',
       reason: `Montant plus élevé que d'habitude (moyenne : ${avgAmount.toFixed(0)} USD). Tout va bien ?`,
       reasonEn: `Amount higher than usual (average: $${avgAmount.toFixed(0)}). Everything OK?`,
+      reasonFon: `Akwɛ élɔ́ hú nǔ é a nɔ bló ɖò bɛ́mɛ (${avgAmount.toFixed(0)} USD). É ɖò ɖagbe à?`,
     };
   }
 
@@ -250,8 +259,10 @@ export const getSmartSuggestions = (transactionHistory = [], balanceUSD = 0) => 
         amount: parseFloat(mostFrequent[0]),
         label: 'Habituel',
         labelEn: 'Usual',
-        icon: '🔄',
+        labelFon: 'Nǔ é a nɔ bló',
+        icon: 'repeat',
         reason: `Votre montant le plus envoyé`,
+        reasonFon: 'Akwɛ nabi é a nɔ sɛ́ dó tawun é nɛ́',
       });
     }
 
@@ -263,8 +274,10 @@ export const getSmartSuggestions = (transactionHistory = [], balanceUSD = 0) => 
         amount: roundedAvg,
         label: 'Moyenne',
         labelEn: 'Average',
-        icon: '📊',
+        labelFon: 'Moyenne',
+        icon: 'stats-chart',
         reason: `Votre moyenne habituelle`,
+        reasonFon: 'Akwɛ nabi é a nɔ sɛ́ dó é bɛ́ bi',
       });
     }
   }
@@ -275,8 +288,10 @@ export const getSmartSuggestions = (transactionHistory = [], balanceUSD = 0) => 
       amount: 200,
       label: 'Fin de mois',
       labelEn: 'Month-end',
-      icon: '📅',
+      labelFon: 'Sùn sùpù',
+      icon: 'calendar',
       reason: 'Période de fin de mois — envoi courant',
+      reasonFon: 'Sùn vívɔ̀ sín hwangbe — akwɛ sɛ́sɛ́ nyɔ́',
     });
   }
 
@@ -286,8 +301,10 @@ export const getSmartSuggestions = (transactionHistory = [], balanceUSD = 0) => 
       amount: 300,
       label: 'Rentrée',
       labelEn: 'Back to school',
-      icon: '🎒',
+      labelFon: 'Azɔ̀mɛ́ yìyì',
+      icon: 'school',
       reason: 'Période de rentrée scolaire',
+      reasonFon: 'Azɔ̀mɛ́ yìyì sín hwangbe',
     });
   }
 
@@ -297,8 +314,10 @@ export const getSmartSuggestions = (transactionHistory = [], balanceUSD = 0) => 
       amount: 500,
       label: 'Fêtes',
       labelEn: 'Holidays',
-      icon: '🎉',
+      labelFon: 'Agɔnyìnyì',
+      icon: 'gift',
       reason: 'Période des fêtes',
+      reasonFon: 'Agɔnyìnyì sín hwangbe',
     });
   }
 
@@ -310,8 +329,10 @@ export const getSmartSuggestions = (transactionHistory = [], balanceUSD = 0) => 
         amount: halfBalance,
         label: 'Solde ×½',
         labelEn: 'Half balance',
-        icon: '💰',
+        labelFon: 'Solde ×½',
+        icon: 'wallet',
         reason: '50% de votre solde disponible',
+        reasonFon: 'Akwɛ towe sín vlɔ́ɖó',
       });
     }
   }
@@ -320,7 +341,14 @@ export const getSmartSuggestions = (transactionHistory = [], balanceUSD = 0) => 
   const standards = [50, 100, 200];
   standards.forEach(amt => {
     if (!suggestions.find(s => s.amount === amt) && amt <= balanceUSD) {
-      suggestions.push({ amount: amt, label: `${amt} USD`, labelEn: `$${amt}`, icon: '💵', reason: '' });
+      suggestions.push({
+        amount: amt,
+        label: `${amt} USD`,
+        labelEn: `$${amt}`,
+        labelFon: `USD ${amt}`,
+        icon: 'cash',
+        reason: '',
+      });
     }
   });
 
@@ -356,7 +384,13 @@ export const generateImpactNarrative = (impactScore, language = 'fr') => {
   }
 
   if (language === 'fon') {
-    return `Gbɛ̀ ${totalTransfers} mɛ, a ko hwlɛn akwɛ ${totalSavedUSD.toFixed(2)} USD — nǔ e nyɔ́ nú xwédo towe ɖò Bénin. 🌍`;
+    if (totalTransfers === 0) {
+      return 'Sɛ́ akwɛ nukɔntɔn ɔ dó bonú a ná mɔ nǔ e é nɔ bló nú xwédo towe ɖò Bénin é.';
+    }
+    if (totalTransfers < 5) {
+      return `Gbɛ̀ ${totalTransfers} mɛ, a ko hwlɛn akwɛ ${totalSavedUSD.toFixed(2)} USD — nǔ e nyɔ́ nú xwédo towe ɖò Bénin é. 🌍`;
+    }
+    return `Azɔn ${totalTransfers} wɛ́ a ko sɛ́ akwɛ dó, bɔ a hwlɛn $${totalSavedUSD.toFixed(2)} — é sɔ ágbà nú nǔɖuɖu azɔn ${mealsEquivalent} nú xwédo towe ɖò Cotonou. Mi ɖò azɔ̌ ɖagbe bló wɛ! 🌍`;
   }
 
   // Français — narratif riche

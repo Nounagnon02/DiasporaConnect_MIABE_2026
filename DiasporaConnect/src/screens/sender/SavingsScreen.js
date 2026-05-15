@@ -8,15 +8,17 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, fonts, spacing, radius, shadows } from '../../theme/theme';
 import useStore from '../../store/useStore';
+import { useTranslation } from 'react-i18next';
 
-const ROUND_UP_OPTIONS = [
-  { key: 'next_dollar', label: 'Arrondi au dollar supérieur', example: '198.40 → 199 USD (+0.60)' },
-  { key: 'next_5', label: 'Arrondi aux 5 USD supérieurs', example: '198.40 → 200 USD (+1.60)' },
-  { key: 'fixed_1', label: '1 USD fixe par transfert', example: 'Toujours +1.00 USD' },
+const ROUND_UP_OPTIONS = (t) => [
+  { key: 'next_dollar', label: t('savingsPage.option1'), example: t('savingsPage.option1Ex') },
+  { key: 'next_5',      label: t('savingsPage.option2'), example: t('savingsPage.option2Ex') },
+  { key: 'fixed_1',     label: t('savingsPage.option3'), example: t('savingsPage.option3Ex') },
 ];
 
 export default function SavingsScreen({ navigation }) {
-  const { savingsPool, addSavingsContribution } = useStore();
+  const { t } = useTranslation();
+  const { savingsPool, addSavingsContribution, language } = useStore();
   const [roundUpEnabled, setRoundUpEnabled] = useState(true);
   const [selectedOption, setSelectedOption] = useState('next_dollar');
 
@@ -29,18 +31,20 @@ export default function SavingsScreen({ navigation }) {
 
   const formatUSD = (n) => `${(n || 0).toFixed(2)} USD`;
   const formatDate = (iso) =>
-    new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+    new Date(iso).toLocaleDateString(language === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'short' });
 
   const handleWithdraw = () => {
     Alert.alert(
-      'Retrait épargne',
-      `Retirer ${formatUSD(savingsPool.balanceUSD)} vers votre wallet Celo ?`,
+      t('savingsPage.withdrawTitle'),
+      t('savingsPage.withdrawConfirm', { amount: formatUSD(savingsPool.balanceUSD) }),
       [
-        { text: 'Annuler', style: 'cancel' },
-        { text: 'Retirer', onPress: () => Alert.alert('✅ Retrait initié', 'Fonds disponibles dans 2-3 minutes.') },
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('common.confirm'), onPress: () => Alert.alert(t('savingsPage.withdrawSuccess'), t('savingsPage.withdrawSuccessDesc')) },
       ]
     );
   };
+
+  const options = ROUND_UP_OPTIONS(t);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -49,7 +53,7 @@ export default function SavingsScreen({ navigation }) {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={22} color={colors.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Micro-épargne</Text>
+        <Text style={styles.headerTitle}>{t('savingsPage.title')}</Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -57,32 +61,32 @@ export default function SavingsScreen({ navigation }) {
 
         {/* Solde hero */}
         <LinearGradient colors={['#1B1C1A', '#2D2E2B']} style={styles.balanceCard}>
-          <Text style={styles.balanceLabel}>Épargne accumulée</Text>
+          <Text style={styles.balanceLabel}>{t('savingsPage.accumulated')}</Text>
           <Text style={styles.balanceAmount}>{formatUSD(savingsPool.balanceUSD)}</Text>
           <View style={styles.yieldRow}>
             <View style={styles.yieldItem}>
               <Text style={styles.yieldValue}>+{formatUSD(totalYield)}</Text>
-              <Text style={styles.yieldLabel}>Intérêts générés</Text>
+              <Text style={styles.yieldLabel}>{t('savingsPage.yieldGenerated')}</Text>
             </View>
             <View style={styles.yieldDivider} />
             <View style={styles.yieldItem}>
               <Text style={styles.yieldValue}>{savingsPool.yieldPercent}% / an</Text>
-              <Text style={styles.yieldLabel}>Taux Celo DeFi</Text>
+              <Text style={styles.yieldLabel}>{t('savingsPage.celoYield')}</Text>
             </View>
             <View style={styles.yieldDivider} />
             <View style={styles.yieldItem}>
               <Text style={styles.yieldValue}>{formatUSD(projectedAnnual)}</Text>
-              <Text style={styles.yieldLabel}>Projection 1 an</Text>
+              <Text style={styles.yieldLabel}>{t('savingsPage.projection')}</Text>
             </View>
           </View>
           <TouchableOpacity style={styles.withdrawBtn} onPress={handleWithdraw}>
-            <Text style={styles.withdrawText}>Retirer l'épargne</Text>
+            <Text style={styles.withdrawText}>{t('savingsPage.withdrawBtn')}</Text>
           </TouchableOpacity>
         </LinearGradient>
 
         {/* Arrondi automatique */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Arrondi automatique</Text>
+          <Text style={styles.sectionTitle}>{t('savingsPage.autoRound')}</Text>
           <Switch
             value={roundUpEnabled}
             onValueChange={setRoundUpEnabled}
@@ -91,12 +95,12 @@ export default function SavingsScreen({ navigation }) {
           />
         </View>
         <Text style={styles.sectionDesc}>
-          À chaque transfert, la différence est automatiquement épargnée sur Celo et génère des intérêts.
+          {t('savingsPage.autoRoundDesc')}
         </Text>
 
         {roundUpEnabled && (
           <View style={styles.optionsCard}>
-            {ROUND_UP_OPTIONS.map(opt => (
+            {options.map(opt => (
               <TouchableOpacity
                 key={opt.key}
                 style={[styles.optionRow, selectedOption === opt.key && styles.optionRowActive]}
@@ -117,14 +121,14 @@ export default function SavingsScreen({ navigation }) {
         )}
 
         {/* Historique contributions */}
-        <Text style={[styles.sectionTitle, { marginTop: spacing.xl }]}>Historique des contributions</Text>
+        <Text style={[styles.sectionTitle, { marginTop: spacing.xl }]}>{t('savingsPage.history')}</Text>
         {savingsPool.contributions.map((c, i) => (
           <View key={i} style={styles.contribRow}>
             <View style={styles.contribIcon}>
               <Ionicons name="arrow-up" size={14} color={colors.primary} />
             </View>
             <View style={styles.contribInfo}>
-              <Text style={styles.contribTx} numberOfLines={1}>Arrondi · {c.txId}</Text>
+              <Text style={styles.contribTx} numberOfLines={1}>{t('savingsPage.roundUp')} · {c.txId}</Text>
               <Text style={styles.contribDate}>{formatDate(c.date)}</Text>
             </View>
             <Text style={styles.contribAmount}>+{c.amountUSD.toFixed(2)} USD</Text>
@@ -135,7 +139,7 @@ export default function SavingsScreen({ navigation }) {
         <View style={styles.infoBox}>
           <Ionicons name="information-circle-outline" size={16} color={colors.onSurfaceVariant} />
           <Text style={styles.infoText}>
-            Les fonds sont déposés sur le protocole Moola Market (Celo). Le taux de 4.2% est indicatif et peut varier selon les conditions du marché.
+            {t('savingsPage.defiNote')}
           </Text>
         </View>
 

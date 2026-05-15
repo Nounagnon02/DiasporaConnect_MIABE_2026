@@ -2,28 +2,44 @@ import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Dimensions,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing, radius, shadows } from '../../../theme/theme';
 import GoldButton from '../../../components/ui/GoldButton';
 import useStore from '../../../store/useStore';
+import { useTranslation } from 'react-i18next';
+import { useTabBarHeight } from '../../../hooks/useTabBarHeight';
+import BiometricGuard from '../../../components/ui/BiometricGuard';
 
-const { width } = Dimensions.get('window');
-const API_URL = 'https://api.diasporaconnect.app';
+import { API_URL } from '@env';
 
 export default function ConfirmScreen({ navigation, route }) {
+  const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
+  const tabBarHeight = useTabBarHeight();
+  const bottomPad = tabBarHeight + Math.max(insets.bottom, 0);
   const { operator } = route.params || { operator: 'MTN' };
   const { recipientUser, updateRecipientUser, token } = useStore();
   const availableFCFA = recipientUser?.availableFCFA || 131191;
   const [loading, setLoading] = useState(false);
+  const [showBiometric, setShowBiometric] = useState(false);
 
   const formatFCFA = (num) => new Intl.NumberFormat('fr-FR').format(Math.round(num || 0));
+
+  const handleWithdrawPress = () => {
+    setShowBiometric(true);
+  };
+
+  const handleBiometricSuccess = () => {
+    setShowBiometric(false);
+    handleWithdraw();
+  };
 
   const handleWithdraw = async () => {
     setLoading(true);
     try {
-      await fetch(`${API_URL}/recipient/withdraw`, {
+      const res = await fetch(`${API_URL}/recipient/withdraw`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -35,23 +51,35 @@ export default function ConfirmScreen({ navigation, route }) {
           amountFCFA: availableFCFA,
         }),
       });
-    } catch (e) {
-      // Fallback démo
-    } finally {
+
+      if (!res.ok) throw new Error('Withdrawal API failed');
+      
       updateRecipientUser({ availableFCFA: 0 });
-      setLoading(false);
       navigation.replace('WithdrawSuccess');
+    } catch (e) {
+      console.warn('Withdrawal error, falling back to demo success:', e.message);
+      // Pour le hackathon, on simule le succès même si l'API échoue
+      updateRecipientUser({ availableFCFA: 0 });
+      navigation.replace('WithdrawSuccess');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar style="dark" />
+      <BiometricGuard
+        visible={showBiometric}
+        onSuccess={handleBiometricSuccess}
+        onCancel={() => setShowBiometric(false)}
+        reason={t('send.authReason')}
+      />
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={24} color={colors.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Confirmation</Text>
+        <Text style={styles.headerTitle}>{t('send.confirmation')}</Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -61,21 +89,29 @@ export default function ConfirmScreen({ navigation, route }) {
       >
         <View style={styles.confirmCard}>
           <View style={styles.row}>
-            <Text style={styles.label}>Opérateur</Text>
-            <Text style={styles.value} numberOfLines={1}>
-              {operator === 'MTN' ? '🟡 MTN Money' : '🔵 Moov Money'}
-            </Text>
+            <Text style={styles.label}>{t('send.operatorLabel')}</Text>
+            <View style={styles.operatorLabel}>
+              <Ionicons
+                name="ellipse"
+                size={12}
+                color={operator === 'MTN' ? '#F7C500' : '#1B64C8'}
+                style={styles.operatorIcon}
+              />
+              <Text style={styles.operatorText} numberOfLines={1}>
+                {operator === 'MTN' ? t('recipient.mtn') : t('recipient.moov')}
+              </Text>
+            </View>
           </View>
           <View style={styles.separator} />
           <View style={styles.row}>
-            <Text style={styles.label}>Numéro de retrait</Text>
+            <Text style={styles.label}>{t('recipient.withdrawNumber')}</Text>
             <Text style={styles.valueLabel} numberOfLines={1}>
               {recipientUser?.phone || '+229 97 00 00 00'}
             </Text>
           </View>
           <View style={styles.separator} />
           <View style={styles.rowAmount}>
-            <Text style={styles.labelBig}>Montant à recevoir</Text>
+            <Text style={styles.labelBig}>{t('recipient.amountToReceive')}</Text>
             <Text
               style={styles.valueNewsreader}
               adjustsFontSizeToFit
@@ -89,17 +125,17 @@ export default function ConfirmScreen({ navigation, route }) {
 
         <View style={styles.securityBox}>
           <Text style={styles.securityText}>
-            🔒 Transaction sécurisée par The Private Ledger. Le montant sera versé sur votre compte mobile money sous 2 minutes.
+            {t('recipient.withdrawSecurityNote')}
           </Text>
         </View>
 
         <View style={{ height: spacing.xxl }} />
       </ScrollView>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, { paddingBottom: bottomPad + spacing.md }]}>
         <GoldButton
-          title={loading ? 'Traitement...' : 'Confirmer le retrait'}
-          onPress={handleWithdraw}
+          title={loading ? t('common.processing') : t('recipient.confirmWithdraw')}
+          onPress={handleWithdrawPress}
           disabled={loading}
         />
       </View>
@@ -159,6 +195,20 @@ const styles = StyleSheet.create({
     fontFamily: fonts.title,
     fontSize: 15,
     color: colors.onSurface,
+  },
+  operatorLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: spacing.xs,
+  },
+  operatorIcon: { marginBottom: 2 },
+  operatorText: {
+    fontFamily: fonts.title,
+    fontSize: 14,
+    color: colors.onSurface,
+    flexShrink: 1,
+    textAlign: 'right',
   },
   value: {
     fontFamily: fonts.title,

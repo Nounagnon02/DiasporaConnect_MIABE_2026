@@ -9,6 +9,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing, radius, shadows, letterSpacing } from '../../theme/theme';
 import useStore from '../../store/useStore';
+import { useTabBarHeight } from '../../hooks/useTabBarHeight';
 import { MOCK_TRANSACTIONS } from '../../services/mockData';
 import TransactionItem from '../../components/ui/TransactionItem';
 import { GlassCard } from '../../components/ui/GlassCard';
@@ -16,19 +17,25 @@ import ArrowIcon from '../../components/ui/ArrowIcon';
 import RatesAlertBanner from '../../components/ui/RatesAlertBanner';
 import RateChart from '../../components/ui/RateChart';
 import { predictRateTrend } from '../../services/aiService';
+import { getBalance } from '../../services/blockchainService';
 import SkeletonLoader from '../../components/ui/SkeletonLoader';
 import NetworkStatus from '../../components/ui/NetworkStatus';
+import { RefreshControl } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 const isSmall = width < 380;
 
 export default function HomeScreen({ navigation }) {
+  const { t } = useTranslation();
   const { senderUser, rates, rateAlert, refreshRates, dismissRateAlert, impactScore, transactions, language, isOfflineMode } = useStore();
   const userName = senderUser?.name || 'Kossi';
-  const balanceUSD = 1242.80;
+  const [balanceUSD, setBalanceUSD] = React.useState(1242.80);
   const balanceFCFA = balanceUSD * (rates?.USD_FCFA || 612.5);
   const isEn = language === 'en';
+  const isFon = language === 'fon';
   const [ratesLoading, setRatesLoading] = React.useState(true);
+  const [refreshing, setRefreshing] = React.useState(false);
 
   // Prédiction IA du taux (simulé avec historique mock)
   const ratesHistory = [
@@ -37,10 +44,30 @@ export default function HomeScreen({ navigation }) {
   ];
   const ratePrediction = predictRateTrend(ratesHistory);
 
+  const fetchBalance = async () => {
+    if (senderUser?.walletAddress) {
+      const bal = await getBalance(senderUser.walletAddress);
+      setBalanceUSD(bal);
+    }
+  };
+
   useEffect(() => {
-    refreshRates().finally(() => setRatesLoading(false));
+    Promise.all([
+      refreshRates(),
+      fetchBalance()
+    ]).finally(() => setRatesLoading(false));
   }, []);
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await Promise.all([
+      refreshRates(),
+      fetchBalance()
+    ]);
+    setRefreshing(false);
+  };
+
+  const tabBarHeight = useTabBarHeight();
   const scale = useRef(new Animated.Value(1)).current;
   const animatedStyle = { transform: [{ scale }] };
   const onPressIn = () => Animated.spring(scale, { toValue: 0.97, useNativeDriver: true }).start();
@@ -57,11 +84,14 @@ export default function HomeScreen({ navigation }) {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={colors.primary} />
+        }
       >
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <Text style={styles.greetingSmall}>Bonjour,</Text>
+            <Text style={styles.greetingSmall}>{t('home.greeting')},</Text>
             <Text style={styles.greeting} numberOfLines={1}>{userName}</Text>
           </View>
           <TouchableOpacity
@@ -75,24 +105,27 @@ export default function HomeScreen({ navigation }) {
         {/* Indicateur réseau */}
         <NetworkStatus />
 
-        {/* Bannière taux */}}
+        {/* Bannière taux */}
         {rateAlert ? (
           <RatesAlertBanner alert={rateAlert} onDismiss={dismissRateAlert} />
         ) : (
           <RatesAlertBanner rates={rates} />
         )}
 
-        {/* Prédiction IA du taux */}
+        {/* AI rate prediction */}
         {ratePrediction?.message && (
           <View style={styles.aiPredictionBanner}>
-            <Text style={styles.aiPredictionLabel}>✨ IA</Text>
+            <View style={styles.aiPredictionLabel}>
+              <Ionicons name="sparkles" size={14} color={colors.primary} style={styles.aiPredictionLabelIcon} />
+              <Text style={styles.aiPredictionLabelText}>IA</Text>
+            </View>
             <Text style={styles.aiPredictionText} numberOfLines={2}>
-              {isEn ? ratePrediction.messageEn : ratePrediction.message}
+              {language === 'en' ? ratePrediction.messageEn : ratePrediction.message}
             </Text>
             {ratePrediction.bestTimeHours > 0 && (
               <View style={styles.aiConfidenceBadge}>
                 <Text style={styles.aiConfidenceText}>
-                  {Math.round(ratePrediction.confidence * 100)}% confiance
+                  {Math.round(ratePrediction.confidence * 100)}% {t('home.confidence')}
                 </Text>
               </View>
             )}
@@ -104,7 +137,7 @@ export default function HomeScreen({ navigation }) {
           <SkeletonLoader variant="balance" />
         ) : (
           <View style={styles.heroSection}>
-            <Text style={styles.balanceLabel}>Votre solde</Text>
+            <Text style={styles.balanceLabel}>{t('home.balance')}</Text>
             <Text style={styles.balanceUSD} adjustsFontSizeToFit minimumFontScale={0.7} numberOfLines={1}>
               {formatAmount(balanceUSD)} USD
             </Text>
@@ -130,8 +163,8 @@ export default function HomeScreen({ navigation }) {
               style={styles.ctaCard}
             >
               <View style={styles.ctaTextContainer}>
-                <Text style={styles.ctaTitle} numberOfLines={1}>Faire un transfert</Text>
-                <Text style={styles.ctaSub} numberOfLines={1}>Frais {'<'} 1 % · Actif sur Celo</Text>
+                <Text style={styles.ctaTitle} numberOfLines={1}>{t('home.sendMoney')}</Text>
+                <Text style={styles.ctaSub} numberOfLines={1}>{t('home.sendSubtitle')}</Text>
               </View>
               <View style={styles.ctaArrowCircle}>
                 <ArrowIcon color="#FFFFFF" size={18} thickness={2} />
@@ -142,12 +175,12 @@ export default function HomeScreen({ navigation }) {
 
         {/* Économies + Score */}
         <GlassCard style={styles.savingsCard}>
-          <Text style={styles.savingsLabel}>Économies réalisées ce mois-ci</Text>
+          <Text style={styles.savingsLabel}>{t('home.savedLabel')}</Text>
           <Text style={styles.savingsAmount} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
             41.30 USD
           </Text>
           <Text style={styles.savingsSub} numberOfLines={2}>
-            Soit environ {formatFCFA(41.30 * (rates?.USD_FCFA || 612.5))} FCFA économisés
+            {t('home.savedFCFA', { amount: formatFCFA(41.30 * (rates?.USD_FCFA || 612.5)) })}
           </Text>
         </GlassCard>
 
@@ -155,23 +188,19 @@ export default function HomeScreen({ navigation }) {
         <View style={styles.shortcutsRow}>
           <TouchableOpacity style={styles.shortcut} onPress={() => navigation.navigate('Recurring')}>
             <Ionicons name="repeat" size={20} color={colors.primary} />
-            <Text style={styles.shortcutLabel}>Récurrent</Text>
+            <Text style={styles.shortcutLabel}>{t('home.recurring')}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.shortcut} onPress={() => navigation.navigate('Savings')}>
             <Ionicons name="wallet" size={20} color={colors.primary} />
-            <Text style={styles.shortcutLabel}>Épargne</Text>
+            <Text style={styles.shortcutLabel}>{t('home.savings')}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.shortcut} onPress={() => navigation.navigate('Referral')}>
             <Ionicons name="people" size={20} color={colors.primary} />
-            <Text style={styles.shortcutLabel}>Parrainage</Text>
+            <Text style={styles.shortcutLabel}>{t('home.referral')}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.shortcut} onPress={() => navigation.navigate('Impact')}>
             <Ionicons name="earth" size={20} color={colors.primary} />
-            <Text style={styles.shortcutLabel}>Impact</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.shortcut} onPress={() => navigation.navigate('Beneficiaries')}>
-            <Ionicons name="people" size={20} color={colors.primary} />
-            <Text style={styles.shortcutLabel}>Contacts</Text>
+            <Text style={styles.shortcutLabel}>{t('home.impact')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -181,12 +210,12 @@ export default function HomeScreen({ navigation }) {
         {/* Transactions récentes */}
         <View style={styles.transactionsSection}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Transferts récents</Text>
+            <Text style={styles.sectionTitle}>{t('home.recentTransfers')}</Text>
             <TouchableOpacity onPress={() => navigation.navigate('History')}>
-              <Text style={styles.seeAll}>Voir tout</Text>
+              <Text style={styles.seeAll}>{t('home.viewAll')}</Text>
             </TouchableOpacity>
           </View>
-          {MOCK_TRANSACTIONS.slice(0, 3).map((tx) => (
+          {transactions.slice(0, 3).map((tx) => (
             <TransactionItem
               key={tx.id}
               transaction={tx}
@@ -195,7 +224,7 @@ export default function HomeScreen({ navigation }) {
           ))}
         </View>
 
-        <View style={{ height: 120 }} />
+        <View style={{ height: tabBarHeight + 16 }} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -278,15 +307,22 @@ const styles = StyleSheet.create({
     borderLeftColor: colors.primaryContainer,
   },
   aiPredictionLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
     fontFamily: fonts.label,
-    fontSize: 10,
-    color: colors.onPrimary,
     backgroundColor: colors.primary,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: radius.round,
     overflow: 'hidden',
     flexShrink: 0,
+  },
+  aiPredictionLabelIcon: { marginTop: 1 },
+  aiPredictionLabelText: {
+    fontFamily: fonts.label,
+    fontSize: 10,
+    color: colors.onPrimary,
   },
   aiPredictionText: {
     flex: 1,

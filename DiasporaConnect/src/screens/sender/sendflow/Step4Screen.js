@@ -1,16 +1,23 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, Clipboard, TouchableOpacity, Animated, Dimensions } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { colors, fonts, spacing, radius, shadows } from '../../../theme/theme';
 import GoldButton from '../../../components/ui/GoldButton';
 import SecondaryButton from '../../../components/ui/SecondaryButton';
 import ConfettiEffect from '../../../components/ui/ConfettiEffect';
 import useStore from '../../../store/useStore';
+import { useTabBarHeight } from '../../../hooks/useTabBarHeight';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 
 export default function Step4Screen({ navigation }) {
+  const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
+  const tabBarHeight = useTabBarHeight();
+  const bottomPad = Math.max(insets.bottom, 16);
   const { transferData, resetTransferData } = useStore();
   const [confettiActive, setConfettiActive] = React.useState(false);
 
@@ -63,7 +70,7 @@ export default function Step4Screen({ navigation }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const recipientName = transferData.recipient?.name || 'Votre destinataire';
+  const recipientName = transferData.recipient?.name || t('send.yourRecipient');
   const recipientGets = transferData.recipientGets?.toFixed(2) || '198.00';
   const savings = transferData.savings?.toFixed(2) || '26.20';
 
@@ -77,48 +84,48 @@ export default function Step4Screen({ navigation }) {
       >
         {/* Checkmark animé */}
         <Animated.View style={[styles.checkWrapper, checkStyle]}>
-          <Text style={styles.checkText}>✓</Text>
+          <Ionicons name="checkmark" size={24} color="#FFF" />
         </Animated.View>
 
         <Animated.View style={[styles.contentBlock, contentStyle]}>
-          <Text style={styles.title}>Transfert envoyé !</Text>
+          <Text style={styles.title}>{t('send.transferSentSuccess')}</Text>
           <Text style={styles.subtitle} numberOfLines={3}>
             <Text style={styles.recipientName}>{recipientName}</Text>
-            {' '}recevra{' '}
+            {' '}{t('send.willReceive')}{' '}
             <Text style={styles.amountInline}>{recipientGets} USD</Text>
           </Text>
 
           {/* Card détails TX */}
           <View style={styles.card}>
             <View style={styles.row}>
-              <Text style={styles.rowLabel}>Réf. transaction</Text>
+              <Text style={styles.rowLabel}>{t('send.txRef')}</Text>
               <Text style={styles.rowValue} numberOfLines={1}>
                 TX-{new Date().getFullYear()}-{String(new Date().getMonth() + 1).padStart(2, '0')}-001
               </Text>
             </View>
             <View style={styles.separator} />
             <View style={styles.row}>
-              <Text style={styles.rowLabel}>Hash Celo</Text>
+              <Text style={styles.rowLabel}>{t('history.txHash')}</Text>
               <View style={styles.hashRow}>
                 <Text style={styles.hashText} numberOfLines={1} ellipsizeMode="middle">
                   {shortHash(transferData.txHash)}
                 </Text>
                 <TouchableOpacity onPress={handleCopy} style={styles.copyBtn}>
-                  <Text style={styles.copyText}>{copied ? '✓' : 'Copier'}</Text>
+                  <Text style={styles.copyText}>{copied ? t('common.copied') : t('common.copy')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
             <View style={styles.separator} />
             <View style={styles.row}>
-              <Text style={styles.rowLabel}>Statut</Text>
+              <Text style={styles.rowLabel}>{t('history.status')}</Text>
               <View style={styles.statusRow}>
                 <Animated.View style={[styles.statusDot, dotStyle]} />
-                <Text style={styles.statusText}>En confirmation</Text>
+                <Text style={styles.statusText}>{t('tracker.inProgress')}</Text>
               </View>
             </View>
             <View style={styles.separator} />
             <View style={styles.row}>
-              <Text style={styles.rowLabel}>Réseau</Text>
+              <Text style={styles.rowLabel}>{t('profile.network')}</Text>
               <Text style={styles.rowValue}>Celo Alfajores</Text>
             </View>
           </View>
@@ -126,8 +133,8 @@ export default function Step4Screen({ navigation }) {
           {/* Barre de progression */}
           <View style={styles.progressSection}>
             <View style={styles.progressHeader}>
-              <Text style={styles.progressLabel}>Confirmation Celo</Text>
-              <Text style={styles.progressSub}>~60 secondes</Text>
+              <Text style={styles.progressLabel}>{t('tracker.confirmed')}</Text>
+              <Text style={styles.progressSub}>~60 {t('common.seconds')}</Text>
             </View>
             <View style={styles.progressTrack}>
               <Animated.View style={[styles.progressFill, progressStyle]} />
@@ -137,19 +144,19 @@ export default function Step4Screen({ navigation }) {
           {/* Encart économie */}
           <View style={styles.savingsBox}>
             <Text style={styles.savingsText}>
-              Vous avez économisé{' '}
+              {t('send.youSaved')}{' '}
               <Text style={styles.savingsAmount}>{savings} USD</Text>
               {' '}vs. Western Union
             </Text>
           </View>
         </Animated.View>
 
-        <View style={{ height: 140 }} />
+        <View style={{ height: tabBarHeight + 16 }} />
       </ScrollView>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, { paddingBottom: bottomPad + spacing.md }]}>
         <GoldButton
-          title="Nouveau transfert"
+          title={t('send.newTransfer')}
           onPress={() => {
             resetTransferData();
             navigation.navigate('SenderApp', { screen: 'Calculator' });
@@ -158,12 +165,12 @@ export default function Step4Screen({ navigation }) {
         />
         <View style={{ height: spacing.md }} />
         <SecondaryButton
-          title="Suivre ce transfert"
+          title={t('tracker.title')}
           onPress={() => navigation.navigate('TransferTracker')}
         />
         <View style={{ height: spacing.md }} />
         <SecondaryButton
-          title="Voir l'historique"
+          title={t('history.title')}
           onPress={() => {
             resetTransferData();
             navigation.navigate('SenderApp', { screen: 'History' });

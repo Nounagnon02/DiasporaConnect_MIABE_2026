@@ -3,6 +3,7 @@
 // ============================================================
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { COLORS, RADIUS, SPACING, TYPOGRAPHY, SHADOWS } from '../theme/theme';
 import Badge from './Badge';
 
@@ -65,7 +66,7 @@ export const StepIndicator = ({ totalSteps = 4, currentStep = 1, labels = [] }) 
                 ]}
               >
                 {isCompleted ? (
-                  <Text style={styles.stepCheck}>✓</Text>
+                  <Ionicons name="checkmark" size={14} color={COLORS.onPrimary} />
                 ) : (
                   <Text
                     style={[

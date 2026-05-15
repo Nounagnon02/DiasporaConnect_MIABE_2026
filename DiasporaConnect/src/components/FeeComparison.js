@@ -3,6 +3,7 @@
 // ============================================================
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { COLORS, RADIUS, SPACING, TYPOGRAPHY, SHADOWS } from '../theme/theme';
 
 const formatCurrency = (n, currency = 'USD') => {
@@ -116,7 +117,8 @@ const FeeComparison = ({ calcResult, style }) => {
 
           {row.highlight && (
             <View style={styles.bestBadge}>
-              <Text style={styles.bestText}>✓ Meilleur</Text>
+              <Ionicons name="checkmark-circle-outline" size={14} color={COLORS.onPrimary} style={styles.bestIcon} />
+              <Text style={styles.bestText}>Meilleur</Text>
             </View>
           )}
         </View>
@@ -125,7 +127,7 @@ const FeeComparison = ({ calcResult, style }) => {
       {/* Savings Banner */}
       {savings > 0 && (
         <View style={styles.savingsBanner}>
-          <Text style={styles.savingsIcon}>💰</Text>
+          <Ionicons name="cash-outline" size={18} color={COLORS.onPrimary} style={styles.savingsIcon} />
           <Text style={styles.savingsText}>
             Vous économisez{' '}
             <Text style={styles.savingsAmount}>${savings.toFixed(2)}</Text>
@@ -226,12 +228,15 @@ const styles = StyleSheet.create({
   },
   rowGetsHighlight: { color: COLORS.accent, fontSize: TYPOGRAPHY.base },
   bestBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: COLORS.accent,
     borderRadius: RADIUS.full,
     paddingHorizontal: 6,
     paddingVertical: 2,
     marginLeft: SPACING.xs,
   },
+  bestIcon: { marginRight: 4 },
   bestText: { fontSize: 9, fontWeight: TYPOGRAPHY.bold, color: COLORS.textWhite },
   savingsBanner: {
     flexDirection: 'row',

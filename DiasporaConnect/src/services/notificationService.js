@@ -4,6 +4,7 @@
  */
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
+import i18n from '../i18n';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -21,7 +22,7 @@ export const requestNotificationPermission = async () => {
   return status === 'granted';
 };
 
-// Notification immédiate — ex: transfert reçu côté destinataire
+// Notification immédiate
 export const sendLocalNotification = async (title, body, data = {}) => {
   await Notifications.scheduleNotificationAsync({
     content: { title, body, data, sound: true },
@@ -48,48 +49,59 @@ export const cancelNotification = async (id) => {
   await Notifications.cancelScheduledNotificationAsync(id);
 };
 
-// Notifications prédéfinies de l'app
-export const notifyTransferSent = (recipientName, amountFCFA) =>
+// Notifications prédéfinies de l'app (Localisées)
+export const notifyTransferSent = (recipientName, amountFCFA) => {
+  const amountStr = new Intl.NumberFormat(i18n.language === 'en' ? 'en-US' : 'fr-FR').format(amountFCFA);
   sendLocalNotification(
-    '✅ Transfert envoyé',
-    `${recipientName} recevra ${new Intl.NumberFormat('fr-FR').format(amountFCFA)} FCFA`
+    i18n.t('notifications.transferSentTitle'),
+    i18n.t('notifications.transferSentBody', { name: recipientName, amount: amountStr })
   );
+};
 
-export const notifyTransferReceived = (senderName, amountFCFA) =>
+export const notifyTransferReceived = (senderName, amountFCFA) => {
+  const amountStr = new Intl.NumberFormat(i18n.language === 'en' ? 'en-US' : 'fr-FR').format(amountFCFA);
   sendLocalNotification(
-    '💰 Argent reçu !',
-    `${senderName} vous a envoyé ${new Intl.NumberFormat('fr-FR').format(amountFCFA)} FCFA`
+    i18n.t('notifications.transferReceivedTitle'),
+    i18n.t('notifications.transferReceivedBody', { name: senderName, amount: amountStr })
   );
+};
 
 export const notifyRateAlert = (message) =>
-  sendLocalNotification('📈 Alerte taux de change', message);
+  sendLocalNotification(i18n.t('notifications.rateAlertTitle'), message);
 
 export const notifyRecurringReminder = (recipientName, amountUSD) =>
   sendLocalNotification(
-    '🔄 Transfert récurrent',
-    `Rappel : envoyer ${amountUSD} USD à ${recipientName} ce mois-ci`
+    i18n.t('notifications.recurringTitle'),
+    i18n.t('notifications.recurringBody', { name: recipientName, amount: amountUSD })
   );
 
 // Notification intelligente taux favorable (IA)
 export const notifySmartRateAlert = (prediction) => {
-  if (!prediction?.message) return;
+  if (!prediction) return;
+  const lang = i18n.language;
+  const msg = lang === 'en' ? prediction.messageEn : lang === 'fon' ? (prediction.messageFon || prediction.message) : prediction.message;
+  if (!msg) return;
+
   const confidence = Math.round((prediction.confidence || 0.7) * 100);
   sendLocalNotification(
-    '✨ IA — Taux favorable détecté',
-    `${prediction.message} (Confiance : ${confidence}%)`
+    i18n.t('notifications.iaRateTitle'),
+    `${msg} (${i18n.t('common.confidence')}: ${confidence}%)`
   );
 };
 
 // Notification rapport hebdomadaire
 export const notifyWeeklyReport = (totalSavedUSD, totalTransfers) =>
   sendLocalNotification(
-    '📊 Votre rapport de la semaine',
-    `${totalTransfers} transfert(s) · ${totalSavedUSD.toFixed(2)} USD économisés en frais cette semaine.`
+    i18n.t('notifications.weeklyReportTitle'),
+    i18n.t('notifications.weeklyReportBody', { transfers: totalTransfers, savings: totalSavedUSD.toFixed(2) })
   );
 
 // Notification sécurité (anomalie IA)
-export const notifySecurityAlert = (reason) =>
+export const notifySecurityAlert = (reason, reasonEn, reasonFon) => {
+  const lang = i18n.language;
+  const finalReason = lang === 'en' ? reasonEn : lang === 'fon' ? (reasonFon || reason) : reason;
   sendLocalNotification(
-    '🚨 Alerte sécurité DiasporaConnect',
-    reason
+    i18n.t('notifications.securityAlertTitle'),
+    finalReason
   );
+};

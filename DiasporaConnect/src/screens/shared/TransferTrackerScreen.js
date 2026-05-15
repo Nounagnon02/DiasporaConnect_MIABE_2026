@@ -11,6 +11,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing, radius, shadows } from '../../theme/theme';
 import useStore from '../../store/useStore';
+import { useTranslation } from 'react-i18next';
 
 const STEPS = [
   { key: 'signed',    icon: 'pencil',           label: 'Transaction signée',         sub: 'Wallet Celo autorisé' },
@@ -20,8 +21,16 @@ const STEPS = [
 ];
 
 export default function TransferTrackerScreen({ navigation, route }) {
+  const { t } = useTranslation();
   const { transaction } = route.params || {};
   const { transactions } = useStore();
+
+  const STEPS = [
+    { key: 'signed',    icon: 'pencil',           label: t('tracker.signed'),         sub: t('tracker.signedSub') },
+    { key: 'confirmed', icon: 'cube',              label: t('tracker.confirmed'),      sub: t('tracker.confirmedSub') },
+    { key: 'notified',  icon: 'notifications',     label: t('tracker.notified'),       sub: t('tracker.notifiedSub') },
+    { key: 'withdrawn', icon: 'phone-portrait',    label: t('tracker.withdrawn'),      sub: t('tracker.withdrawnSub') },
+  ];
 
   // Retrouver la tx la plus récente si pas passée en param
   const tx = transaction || transactions[0];
@@ -92,7 +101,7 @@ export default function TransferTrackerScreen({ navigation, route }) {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={24} color={colors.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Suivi du transfert</Text>
+        <Text style={styles.headerTitle}>{t('tracker.title')}</Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -101,13 +110,13 @@ export default function TransferTrackerScreen({ navigation, route }) {
         {/* Statut global */}
         <View style={styles.statusCard}>
           <Text style={styles.statusLabel}>
-            {currentStep < 3 ? 'En cours de traitement' : 'Transfert complété ✓'}
+            {currentStep < 3 ? t('tracker.inProgress') : t('tracker.completedFull')}
           </Text>
           <Text style={styles.statusAmount} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
             {tx?.amountUSD?.toFixed(2) || '0.00'} USD
           </Text>
           <Text style={styles.statusRecipient} numberOfLines={1}>
-            → {tx?.recipient || 'Destinataire'}
+            → {tx?.recipient || t('send.recipient')}
           </Text>
 
           {/* Barre de progression globale */}
@@ -115,7 +124,7 @@ export default function TransferTrackerScreen({ navigation, route }) {
             <Animated.View style={[styles.progressFill, { width: progressWidth }]} />
           </View>
           <Text style={styles.progressLabel}>
-            Étape {Math.min(currentStep + 1, STEPS.length)} / {STEPS.length}
+            {t('tracker.stepOf', { current: Math.min(currentStep + 1, STEPS.length), total: STEPS.length })}
           </Text>
         </View>
 
@@ -123,13 +132,13 @@ export default function TransferTrackerScreen({ navigation, route }) {
         {currentStep < 3 && (
           <View style={styles.chronoRow}>
             <Ionicons name="time-outline" size={16} color={colors.onSurfaceVariant} />
-            <Text style={styles.chronoText}>Temps écoulé : {formatTime(elapsed)}</Text>
-            <Text style={styles.chronoSub}>· Cible : &lt; 60s</Text>
+            <Text style={styles.chronoText}>{t('tracker.elapsedTime')}: {formatTime(elapsed)}</Text>
+            <Text style={styles.chronoSub}>· {t('tracker.targetTime')}: &lt; 60s</Text>
           </View>
         )}
 
         {/* Étapes */}
-        <Text style={styles.sectionTitle}>Étapes de confirmation</Text>
+        <Text style={styles.sectionTitle}>{t('tracker.confSteps')}</Text>
         {STEPS.map((step, index) => {
           const isDone    = index < currentStep;
           const isActive  = index === currentStep;
@@ -165,11 +174,11 @@ export default function TransferTrackerScreen({ navigation, route }) {
                 <Text style={styles.stepSub}>{step.sub}</Text>
                 {isActive && (
                   <View style={styles.activeChip}>
-                    <Text style={styles.activeChipText}>En cours...</Text>
+                    <Text style={styles.activeChipText}>{t('status.processing')}...</Text>
                   </View>
                 )}
                 {isDone && (
-                  <Text style={styles.doneText}>✓ Complété</Text>
+                  <Text style={styles.doneText}>✓ {t('status.completed')}</Text>
                 )}
               </View>
             </View>
@@ -177,34 +186,34 @@ export default function TransferTrackerScreen({ navigation, route }) {
         })}
 
         {/* Infos transaction */}
-        <Text style={styles.sectionTitle}>Détails blockchain</Text>
+        <Text style={styles.sectionTitle}>{t('tracker.blockDetails')}</Text>
         <View style={styles.detailCard}>
           <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Réseau</Text>
+            <Text style={styles.detailLabel}>{t('profile.network')}</Text>
             <Text style={styles.detailValue}>Celo Alfajores</Text>
           </View>
           <View style={styles.detailDivider} />
           <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Hash TX</Text>
+            <Text style={styles.detailLabel}>{t('history.txHash')}</Text>
             <Text style={styles.detailValue} numberOfLines={1} ellipsizeMode="middle">
               {tx?.txHash || '0x...'}
             </Text>
           </View>
           <View style={styles.detailDivider} />
           <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Frais gas</Text>
+            <Text style={styles.detailLabel}>{t('tracker.gasFee')}</Text>
             <Text style={styles.detailValue}>{tx?.gasFeeCELO || '0.003'} CELO</Text>
           </View>
           <View style={styles.detailDivider} />
           <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Confirmations</Text>
+            <Text style={styles.detailLabel}>{t('tracker.confirmations')}</Text>
             <Text style={styles.detailValue}>{tx?.confirmations || 0}</Text>
           </View>
         </View>
 
         <TouchableOpacity style={styles.explorerBtn} onPress={openExplorer}>
           <Ionicons name="open-outline" size={16} color={colors.primary} />
-          <Text style={styles.explorerBtnText}>Voir sur CeloScan</Text>
+          <Text style={styles.explorerBtnText}>{t('tracker.viewExplorer')}</Text>
         </TouchableOpacity>
 
         <View style={{ height: 120 }} />

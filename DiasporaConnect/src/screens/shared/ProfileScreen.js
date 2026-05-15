@@ -7,8 +7,9 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing, radius, shadows } from '../../theme/theme';
 import useStore from '../../store/useStore';
-import i18n from '../../i18n';
+import { useTabBarHeight } from '../../hooks/useTabBarHeight';
 import ArrowIcon from '../../components/ui/ArrowIcon';
+import { useTranslation } from 'react-i18next';
 
 const LANGUAGES = [
   { code: 'fr', label: 'Français', flag: '🇫🇷' },
@@ -17,9 +18,11 @@ const LANGUAGES = [
 ];
 
 export default function ProfileScreen({ navigation }) {
+  const { t, i18n } = useTranslation();
   const { senderUser, recipientUser, logout, language, setLanguage } = useStore();
   const user = senderUser || recipientUser;
   const isSender = !!senderUser;
+  const tabBarHeight = useTabBarHeight();
   const [copied, setCopied] = useState(false);
 
   const shortHash = (h) => h ? h.slice(0, 8) + '...' + h.slice(-6) : '0x742d...3E1f';
@@ -37,10 +40,10 @@ export default function ProfileScreen({ navigation }) {
   };
 
   const handleLogout = () => {
-    Alert.alert('Déconnexion', 'Voulez-vous vous déconnecter ?', [
-      { text: 'Annuler', style: 'cancel' },
+    Alert.alert(t('profile.logoutTitle'), t('profile.logoutConfirm'), [
+      { text: t('common.cancel'), style: 'cancel' },
       {
-        text: 'Déconnecter',
+        text: t('profile.logoutBtn'),
         style: 'destructive',
         onPress: () => {
           logout();
@@ -64,7 +67,7 @@ export default function ProfileScreen({ navigation }) {
     <SafeAreaView style={styles.safe}>
       <StatusBar style="dark" />
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Profil</Text>
+        <Text style={styles.headerTitle}>{t('profile.header')}</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
@@ -78,7 +81,7 @@ export default function ProfileScreen({ navigation }) {
           <View style={styles.walletRow}>
             <View style={styles.walletInfo}>
               <Text style={styles.walletLabel}>
-                {isSender ? 'Portefeuille Celo' : 'Mobile Money'}
+                {isSender ? t('profile.celoWallet') : t('profile.mobileMoney')}
               </Text>
               <Text style={styles.walletAddress} numberOfLines={1} ellipsizeMode="middle">
                 {isSender ? shortHash(user?.walletAddress) : (user?.phone || '+229 97 00 00 00')}
@@ -86,14 +89,18 @@ export default function ProfileScreen({ navigation }) {
             </View>
             {isSender && (
               <TouchableOpacity style={styles.copyBtn} onPress={handleCopy}>
-                <Text style={styles.copyText}>{copied ? '✓' : 'Copier'}</Text>
-              </TouchableOpacity>
+              {copied ? (
+                <Ionicons name="checkmark" size={16} color={colors.primary} style={styles.copyIcon} />
+              ) : (
+                <Text style={styles.copyText}>{t('common.copy')}</Text>
+              )}
+            </TouchableOpacity>
             )}
           </View>
         </View>
 
         {/* Langue */}
-        <Text style={styles.sectionTitle}>Langue</Text>
+        <Text style={styles.sectionTitle}>{t('profile.language')}</Text>
         <View style={styles.langCard}>
           {LANGUAGES.map((lang) => (
             <TouchableOpacity
@@ -101,14 +108,12 @@ export default function ProfileScreen({ navigation }) {
               style={[styles.langRow, language === lang.code && styles.langRowActive]}
               onPress={() => handleLanguage(lang.code)}
             >
-              {/* Drapeaux gardés — ce sont des emojis de pays, pas des icônes UI */}
               <Text style={styles.langFlag}>{lang.flag}</Text>
               <Text style={[styles.langLabel, language === lang.code && styles.langLabelActive]}>
                 {lang.label}
               </Text>
               {language === lang.code && (
                 <View style={styles.langCheck}>
-                  {/* Ionicons checkmark au lieu de ✓ texte */}
                   <Ionicons name="checkmark" size={14} color="#FFF" />
                 </View>
               )}
@@ -117,26 +122,25 @@ export default function ProfileScreen({ navigation }) {
         </View>
 
         {/* Sécurité */}
-        <Text style={styles.sectionTitle}>Sécurité</Text>
+        <Text style={styles.sectionTitle}>{t('profile.security')}</Text>
         <View style={styles.settingCard}>
           <View style={styles.settingRow}>
             <View style={styles.settingLabelRow}>
               <Ionicons name="finger-print" size={16} color={colors.onSurfaceVariant} />
               <Text style={styles.settingLabel} numberOfLines={2}>
-                Authentification biométrique
+                {t('profile.biometricAuth')}
               </Text>
             </View>
-            <Text style={styles.settingValue}>Activée</Text>
+            <Text style={styles.settingValue}>{t('common.enabled')}</Text>
           </View>
         </View>
 
-        {/* Impact — Ionicons earth au lieu de 🌍 */}
         <TouchableOpacity
           style={styles.impactBtn}
           onPress={() => navigation.navigate('Impact')}
         >
           <Ionicons name="earth" size={18} color={colors.primary} />
-          <Text style={styles.impactBtnText} numberOfLines={1}>Voir notre impact ODD</Text>
+          <Text style={styles.impactBtnText} numberOfLines={1}>{t('profile.viewImpact')}</Text>
           <ArrowIcon color={colors.primary} size={18} thickness={2} />
         </TouchableOpacity>
 
@@ -145,7 +149,7 @@ export default function ProfileScreen({ navigation }) {
           onPress={() => navigation.navigate('NotificationSettings')}
         >
           <Ionicons name="notifications-outline" size={18} color={colors.primary} />
-          <Text style={styles.impactBtnText} numberOfLines={1}>Préférences notifications</Text>
+          <Text style={styles.impactBtnText} numberOfLines={1}>{t('profile.notifications')}</Text>
           <ArrowIcon color={colors.primary} size={18} thickness={2} />
         </TouchableOpacity>
 
@@ -155,7 +159,7 @@ export default function ProfileScreen({ navigation }) {
             onPress={() => navigation.navigate('Beneficiaries')}
           >
             <Ionicons name="people-outline" size={18} color={colors.primary} />
-            <Text style={styles.impactBtnText} numberOfLines={1}>Gérer les bénéficiaires</Text>
+            <Text style={styles.impactBtnText} numberOfLines={1}>{t('profile.beneficiaries')}</Text>
             <ArrowIcon color={colors.primary} size={18} thickness={2} />
           </TouchableOpacity>
         )}
@@ -166,7 +170,7 @@ export default function ProfileScreen({ navigation }) {
             onPress={() => navigation.navigate('KYC')}
           >
             <Ionicons name="shield-checkmark-outline" size={18} color={colors.primary} />
-            <Text style={styles.impactBtnText} numberOfLines={1}>Vérification d’identité (KYC)</Text>
+            <Text style={styles.impactBtnText} numberOfLines={1}>{t('profile.kyc')}</Text>
             <ArrowIcon color={colors.primary} size={18} thickness={2} />
           </TouchableOpacity>
         )}
@@ -176,19 +180,19 @@ export default function ProfileScreen({ navigation }) {
           onPress={() => navigation.navigate('Contact')}
         >
           <Ionicons name="chatbubble-ellipses-outline" size={18} color={colors.primary} />
-          <Text style={styles.impactBtnText} numberOfLines={1}>Support & Contact</Text>
+          <Text style={styles.impactBtnText} numberOfLines={1}>{t('profile.support')}</Text>
           <ArrowIcon color={colors.primary} size={18} thickness={2} />
         </TouchableOpacity>
 
         {/* À propos */}
-        <Text style={styles.sectionTitle}>À propos</Text>
+        <Text style={styles.sectionTitle}>{t('profile.about')}</Text>
         <View style={styles.settingCard}>
           <View style={styles.settingRow}>
-            <Text style={styles.settingLabel}>Version</Text>
+            <Text style={styles.settingLabel}>{t('profile.version')}</Text>
             <Text style={styles.settingValueLabel} numberOfLines={1}>1.0.0 — MIABE 2026</Text>
           </View>
           <View style={[styles.settingRow, styles.settingRowBorder]}>
-            <Text style={styles.settingLabel}>Réseau</Text>
+            <Text style={styles.settingLabel}>{t('profile.network')}</Text>
             <Text style={styles.settingValueLabel}>Celo Alfajores</Text>
           </View>
         </View>
@@ -197,10 +201,10 @@ export default function ProfileScreen({ navigation }) {
 
         <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
           <Ionicons name="log-out-outline" size={16} color={colors.onSurface} style={{ marginRight: 6 }} />
-          <Text style={styles.logoutText}>Déconnecter le wallet</Text>
+          <Text style={styles.logoutText}>{t('profile.logoutBtn')}</Text>
         </TouchableOpacity>
 
-        <View style={{ height: 120 }} />
+        <View style={{ height: tabBarHeight + 16 }} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -237,6 +241,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(117,91,0,0.1)', borderRadius: 4, flexShrink: 0,
   },
   copyText: { fontFamily: fonts.label, fontSize: 12, color: colors.primary },
+  copyIcon: { marginVertical: 2 },
   sectionTitle: {
     fontFamily: fonts.title, fontSize: 13, color: colors.onSurfaceVariant,
     textTransform: 'uppercase', letterSpacing: 0.5,

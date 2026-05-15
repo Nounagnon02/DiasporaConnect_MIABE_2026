@@ -10,48 +10,50 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing, radius, shadows } from '../../theme/theme';
 import useStore from '../../store/useStore';
-
-const NOTIF_SETTINGS = [
-  {
-    key: 'rateAlert',
-    icon: 'trending-up',
-    title: 'Alertes taux favorables',
-    sub: 'Notifié quand le taux EUR/FCFA est au plus haut',
-  },
-  {
-    key: 'transferSent',
-    icon: 'send',
-    title: 'Transfert envoyé',
-    sub: 'Confirmation après chaque envoi',
-  },
-  {
-    key: 'transferReceived',
-    icon: 'wallet',
-    title: 'Argent reçu',
-    sub: 'Quand le destinataire retire les fonds',
-  },
-  {
-    key: 'recurringReminder',
-    icon: 'repeat',
-    title: 'Rappels récurrents',
-    sub: '24h avant un transfert programmé',
-  },
-  {
-    key: 'securityAlert',
-    icon: 'shield-checkmark',
-    title: 'Alertes sécurité',
-    sub: 'Transactions inhabituelles détectées par l\'IA',
-  },
-  {
-    key: 'weeklyReport',
-    icon: 'bar-chart',
-    title: 'Rapport hebdomadaire',
-    sub: 'Résumé de vos transferts chaque lundi',
-  },
-];
+import { useTranslation } from 'react-i18next';
 
 export default function NotificationSettingsScreen({ navigation }) {
+  const { t } = useTranslation();
   const { notifSettings, updateNotifSettings } = useStore();
+
+  const NOTIF_SETTINGS = [
+    {
+      key: 'rateAlert',
+      icon: 'trending-up',
+      title: t('notifications.rateAlert'),
+      sub: t('notifications.rateAlertDesc'),
+    },
+    {
+      key: 'transferSent',
+      icon: 'send',
+      title: t('notifications.transferSent'),
+      sub: t('notifications.transferSentDesc'),
+    },
+    {
+      key: 'transferReceived',
+      icon: 'wallet',
+      title: t('notifications.transferReceived'),
+      sub: t('notifications.transferReceivedDesc'),
+    },
+    {
+      key: 'recurringReminder',
+      icon: 'repeat',
+      title: t('notifications.recurringReminder'),
+      sub: t('notifications.recurringReminderDesc'),
+    },
+    {
+      key: 'securityAlert',
+      icon: 'shield-checkmark',
+      title: t('notifications.securityAlert'),
+      sub: t('notifications.securityAlertDesc'),
+    },
+    {
+      key: 'weeklyReport',
+      icon: 'bar-chart',
+      title: t('notifications.weeklyReport'),
+      sub: t('notifications.weeklyReportDesc'),
+    },
+  ];
 
   const toggle = (key) => {
     updateNotifSettings({ [key]: !notifSettings?.[key] });
@@ -66,13 +68,13 @@ export default function NotificationSettingsScreen({ navigation }) {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={24} color={colors.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Notifications</Text>
+        <Text style={styles.headerTitle}>{t('notifications.title')}</Text>
         <View style={{ width: 40 }} />
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <Text style={styles.heroText}>
-          Choisissez les alertes que vous souhaitez recevoir.
+          {t('notifications.hero')}
         </Text>
 
         <View style={styles.card}>
@@ -101,7 +103,7 @@ export default function NotificationSettingsScreen({ navigation }) {
         <View style={styles.infoBox}>
           <Ionicons name="information-circle-outline" size={16} color={colors.onSurfaceVariant} />
           <Text style={styles.infoText}>
-            Les alertes de taux sont générées par notre IA et envoyées uniquement quand le taux dépasse votre seuil habituel.
+            {t('notifications.infoBox')}
           </Text>
         </View>
 

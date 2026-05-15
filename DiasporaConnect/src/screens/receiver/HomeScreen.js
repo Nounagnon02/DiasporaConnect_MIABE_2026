@@ -8,9 +8,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing, radius, shadows, letterSpacing } from '../../theme/theme';
 import useStore from '../../store/useStore';
+import { useTabBarHeight } from '../../hooks/useTabBarHeight';
 import { MOCK_RECIPIENT_TRANSACTIONS } from '../../services/mockData';
 import TransactionItem from '../../components/ui/TransactionItem';
 import ArrowIcon from '../../components/ui/ArrowIcon';
+import { RefreshControl } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 const isSmall = width < 380;
@@ -23,19 +26,46 @@ const INFO_ITEMS = [
 ];
 
 export default function ReceiverHomeScreen({ navigation }) {
-  const { recipientUser } = useStore();
+  const { t } = useTranslation();
+  const { recipientUser, transactions, fetchUserTransactions, language } = useStore();
+  const tabBarHeight = useTabBarHeight();
+  const [refreshing, setRefreshing] = React.useState(false);
   const userName = recipientUser?.firstName || 'Adjoua';
-  const availableFCFA = recipientUser?.availableFCFA || 131191;
+  const availableFCFA = recipientUser?.availableFCFA || 0;
+
+  const INFO_ITEMS = [
+    { icon: 'flash',        label: t('common.instant') },
+    { icon: 'lock-closed',  label: t('common.secure') },
+    { icon: 'cash',         label: t('common.noFees') },
+  ];
+
+  React.useEffect(() => {
+    fetchUserTransactions();
+  }, []);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchUserTransactions();
+    setRefreshing(false);
+  };
+
+  const displayTransactions = transactions.filter(tx => tx.role === 'recipient' || tx.type === 'receive').slice(0, 5);
 
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar style="dark" />
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scroll}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={colors.primary} />
+        }
+      >
 
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <Text style={styles.greetingSmall}>Bonjour,</Text>
+            <Text style={styles.greetingSmall}>{t('home.greeting')},</Text>
             <Text style={styles.userName} numberOfLines={1}>{userName}</Text>
           </View>
           <TouchableOpacity
@@ -48,7 +78,7 @@ export default function ReceiverHomeScreen({ navigation }) {
 
         {/* Hero solde */}
         <View style={styles.heroSection}>
-          <Text style={styles.balanceLabel}>Disponible à retirer</Text>
+          <Text style={styles.balanceLabel}>{t('recipient.available')}</Text>
           <Text
             style={styles.balanceFCFA}
             adjustsFontSizeToFit
@@ -72,8 +102,8 @@ export default function ReceiverHomeScreen({ navigation }) {
             style={styles.ctaCard}
           >
             <View style={styles.ctaTextContainer}>
-              <Text style={styles.ctaTitle} numberOfLines={1}>Retirer maintenant</Text>
-              <Text style={styles.ctaSub} numberOfLines={1}>Vers MTN ou Moov Money</Text>
+              <Text style={styles.ctaTitle} numberOfLines={1}>{t('recipient.withdraw')}</Text>
+              <Text style={styles.ctaSub} numberOfLines={1}>{t('recipient.withdrawSubtitle')}</Text>
             </View>
             <View style={styles.ctaArrowCircle}>
               <ArrowIcon color="#FFFFFF" size={18} thickness={2} />
@@ -94,21 +124,25 @@ export default function ReceiverHomeScreen({ navigation }) {
         {/* Transactions reçues */}
         <View style={styles.transactionsSection}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Transferts reçus</Text>
+            <Text style={styles.sectionTitle}>{t('recipient.receivedTransfers')}</Text>
             <TouchableOpacity onPress={() => navigation.navigate('History')}>
-              <Text style={styles.seeAll}>Voir tout</Text>
+              <Text style={styles.seeAll}>{t('home.viewAll')}</Text>
             </TouchableOpacity>
           </View>
-          {MOCK_RECIPIENT_TRANSACTIONS.map(tx => (
-            <TransactionItem
-              key={tx.id}
-              transaction={tx}
-              onPress={() => navigation.navigate('TransactionDetail', { transaction: tx })}
-            />
-          ))}
+          {displayTransactions.length > 0 ? (
+            displayTransactions.map(tx => (
+              <TransactionItem
+                key={tx.id}
+                transaction={tx}
+                onPress={() => navigation.navigate('TransactionDetail', { transaction: tx })}
+              />
+            ))
+          ) : (
+            <Text style={styles.emptyText}>{t('home.noTransactions')}</Text>
+          )}
         </View>
 
-        <View style={{ height: 120 }} />
+        <View style={{ height: tabBarHeight + 16 }} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -164,4 +198,5 @@ const styles = StyleSheet.create({
   },
   sectionTitle: { fontFamily: fonts.title, fontSize: 17, color: colors.onSurface },
   seeAll: { fontFamily: fonts.label, fontSize: 12, color: colors.primary },
+  emptyText: { fontFamily: fonts.body, fontSize: 14, color: colors.onSurfaceVariant, textAlign: 'center', marginTop: spacing.md },
 });

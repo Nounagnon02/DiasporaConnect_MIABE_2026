@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { colors, fonts, spacing, radius, shadows, letterSpacing } from '../../theme/theme';
@@ -11,12 +12,14 @@ import FeeComparator from '../../components/ui/FeeComparator';
 import SmartAmountSuggestion from '../../components/ui/SmartAmountSuggestion';
 import { calculateTransfer } from '../../services/blockchainService';
 import useStore from '../../store/useStore';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 const isSmall = width < 380;
 
 export default function CalculatorScreen({ navigation }) {
-  const { updateTransferData } = useStore();
+  const { t } = useTranslation();
+  const { updateTransferData, language } = useStore();
   const [amount, setAmount] = useState('200');
   const [currency, setCurrency] = useState('EUR');
   const insets = useSafeAreaInsets();
@@ -42,13 +45,14 @@ export default function CalculatorScreen({ navigation }) {
     navigation.navigate('SendFlow', { screen: 'SendStep2' });
   };
 
-  const ctaBottom = insets.bottom + 16;
+  const TAB_BAR_HEIGHT = 64;
+  const ctaBottom = insets.bottom + TAB_BAR_HEIGHT;
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="dark" />
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Estimer un transfert</Text>
+        <Text style={styles.headerTitle}>{t('calculator.title')}</Text>
       </View>
 
       <ScrollView
@@ -74,7 +78,7 @@ export default function CalculatorScreen({ navigation }) {
           </View>
 
           <LedgerInput
-            label="Montant de l'expédition"
+            label={t('calculator.youSend')}
             value={amount}
             onChangeText={setAmount}
             keyboardType="decimal-pad"
@@ -84,7 +88,7 @@ export default function CalculatorScreen({ navigation }) {
           <SmartAmountSuggestion onSelect={(amt) => setAmount(String(amt))} />
 
           <View style={styles.resultContainer}>
-            <Text style={styles.resultLabel}>Le bénéficiaire reçoit environ</Text>
+            <Text style={styles.resultLabel}>{t('calculator.recipientGets')}</Text>
             <Text
               style={styles.resultAmount}
               adjustsFontSizeToFit
@@ -102,13 +106,13 @@ export default function CalculatorScreen({ navigation }) {
             <FeeComparator calcResult={calcResult} style={styles.feeComp} />
 
             <View style={styles.savingsBanner}>
-              <Text style={styles.savingsIcon}>✨</Text>
+              <Ionicons name="sparkles" size={18} color={colors.primary} style={styles.savingsIcon} />
               <Text style={styles.savingsText}>
-                En envoyant avec DiasporaConnect, vous conservez{' '}
+                {t('calculator.savingsNote1')}{' '}
                 <Text style={styles.savingsBold}>
                   ${calcResult.savings.toFixed(2)} USD
                 </Text>{' '}
-                dans la famille vs. le marché.
+                {t('calculator.savingsNote2')}
               </Text>
             </View>
           </>
@@ -118,7 +122,7 @@ export default function CalculatorScreen({ navigation }) {
       {/* CTA flottant */}
       <View style={[styles.bottomCta, { paddingBottom: ctaBottom + spacing.md }]}>
         <GoldButton
-          title="Continuer le transfert"
+          title={t('calculator.sendThisAmount')}
           onPress={handleNext}
           disabled={!calcResult || calcResult.amountUSD <= 0}
         />

@@ -4,13 +4,17 @@
  */
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { colors, fonts, spacing, radius } from '../../theme/theme';
 import { getSmartSuggestions } from '../../services/aiService';
 import useStore from '../../store/useStore';
 
 export default function SmartAmountSuggestion({ onSelect }) {
+  const { t } = useTranslation();
   const { transactions, language } = useStore();
   const isEn = language === 'en';
+  const isFon = language === 'fon';
 
   const suggestions = getSmartSuggestions(transactions, 1242.80);
   if (suggestions.length === 0) return null;
@@ -18,10 +22,11 @@ export default function SmartAmountSuggestion({ onSelect }) {
   return (
     <View style={styles.container}>
       <View style={styles.labelRow}>
-        <Text style={styles.aiLabel}>✨ IA</Text>
-        <Text style={styles.label}>
-          {isEn ? 'Smart suggestions' : 'Suggestions intelligentes'}
-        </Text>
+        <View style={styles.aiLabel}>
+          <Ionicons name="sparkles" size={12} color={colors.onPrimary} />
+          <Text style={styles.aiLabelText}>IA</Text>
+        </View>
+        <Text style={styles.label}>{t('calculator.smartSuggestions')}</Text>
       </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
         {suggestions.map((s, i) => (
@@ -31,10 +36,10 @@ export default function SmartAmountSuggestion({ onSelect }) {
             onPress={() => onSelect(s.amount)}
             activeOpacity={0.75}
           >
-            <Text style={styles.chipIcon}>{s.icon}</Text>
+            <Ionicons name={s.icon} size={18} color={colors.primary} />
             <Text style={styles.chipAmount}>{s.amount} USD</Text>
             <Text style={styles.chipLabel} numberOfLines={1}>
-              {isEn ? s.labelEn : s.label}
+              {isFon ? s.labelFon : isEn ? s.labelEn : s.label}
             </Text>
           </TouchableOpacity>
         ))}
@@ -52,14 +57,20 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   aiLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
     fontFamily: fonts.label,
-    fontSize: 10,
-    color: colors.onPrimary,
     backgroundColor: colors.primary,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: radius.round,
     overflow: 'hidden',
+  },
+  aiLabelText: {
+    fontFamily: fonts.label,
+    fontSize: 10,
+    color: colors.onPrimary,
   },
   label: {
     fontFamily: fonts.label,
@@ -75,8 +86,8 @@ const styles = StyleSheet.create({
     minWidth: 80,
     borderWidth: 1,
     borderColor: 'rgba(117,91,0,0.12)',
+    gap: 4,
   },
-  chipIcon: { fontSize: 18, marginBottom: 4 },
   chipAmount: {
     fontFamily: fonts.label,
     fontSize: 13,

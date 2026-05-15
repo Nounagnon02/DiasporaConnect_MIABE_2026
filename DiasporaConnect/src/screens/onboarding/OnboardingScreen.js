@@ -8,12 +8,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing, radius } from '../../theme/theme';
 import GoldButton from '../../components/ui/GoldButton';
 import ConnectionAnim from '../../components/animations/ConnectionAnim';
+import { useTranslation } from 'react-i18next';
 
 const { width, height } = Dimensions.get('window');
 const isSmall = height < 700;
 
 // ─── Slide 1 : simulateur interactif ────────────────────────────────────────
 function SimulatorIllustration() {
+  const { t } = useTranslation();
   const [amount, setAmount] = React.useState('100');
   const EUR_USD = 1.08;
   const USD_FCFA = 612.5;
@@ -26,7 +28,7 @@ function SimulatorIllustration() {
   return (
     <View style={styles.simContainer}>
       <View style={styles.simInputRow}>
-        <Text style={styles.simLabel}>Vous envoyez</Text>
+        <Text style={styles.simLabel}>{t('calculator.youSend')}</Text>
         <View style={styles.simInputWrap}>
           <TextInput
             style={styles.simInput}
@@ -43,12 +45,15 @@ function SimulatorIllustration() {
         <Ionicons name="arrow-down" size={20} color={colors.primary} />
       </View>
       <View style={styles.simResultCard}>
-        <Text style={styles.simResultLabel}>Votre famille reçoit</Text>
+        <Text style={styles.simResultLabel}>{t('calculator.recipientGets')}</Text>
         <Text style={styles.simResultAmount} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
           {formatFCFA(received)} FCFA
         </Text>
         {savings > 0 && (
-          <Text style={styles.simSavings}>✨ +{formatFCFA(savings)} FCFA vs Western Union</Text>
+          <View style={styles.simSavingsRow}>
+            <Ionicons name="sparkles" size={12} color={colors.primary} style={styles.simSavingsIcon} />
+            <Text style={styles.simSavings}>+{formatFCFA(savings)} FCFA {t('onboarding.vsWU')}</Text>
+          </View>
         )}
       </View>
     </View>
@@ -57,6 +62,7 @@ function SimulatorIllustration() {
 
 // ─── Slide 2 : graphique comparaison frais ───────────────────────────────────
 function FeeIllustration() {
+  const { t } = useTranslation();
   const barAnim = useRef(new Animated.Value(0)).current;
   React.useEffect(() => {
     Animated.timing(barAnim, {
@@ -103,7 +109,7 @@ function FeeIllustration() {
         })}
       </View>
       <View style={styles.feeBadge}>
-        <Text style={styles.feeBadgeText}>{'< 1 %'} de frais</Text>
+        <Text style={styles.feeBadgeText}>{'< 1 %'} {t('calculator.fee').toLowerCase()}</Text>
       </View>
     </View>
   );
@@ -111,16 +117,16 @@ function FeeIllustration() {
 
 // ─── Slide 3 : sécurité — STATIQUE, pas d'animation ─────────────────────────
 function SecurityIllustration() {
+  const { t } = useTranslation();
   const S = isSmall ? 110 : 130;
   const pills = [
-    { icon: 'shield-checkmark-outline', label: 'Blockchain Celo' },
-    { icon: 'lock-closed-outline',      label: 'Chiffrement E2E' },
-    { icon: 'people-outline',           label: 'Zéro intermédiaire' },
+    { icon: 'shield-checkmark-outline', label: t('onboarding.security.pill1') },
+    { icon: 'lock-closed-outline',      label: t('onboarding.security.pill2') },
+    { icon: 'people-outline',           label: t('onboarding.security.pill3') },
   ];
 
   return (
     <View style={{ alignItems: 'center' }}>
-      {/* Cadenas statique — aucune animation */}
       <View style={[styles.shieldOuter, { width: S, height: S }]}>
         <View style={[styles.shieldInner, { width: S * 0.65, height: S * 0.65 }]}>
           <Ionicons
@@ -131,7 +137,6 @@ function SecurityIllustration() {
         </View>
       </View>
 
-      {/* Pills avec vraies icônes Ionicons */}
       <View style={styles.securityPills}>
         {pills.map((p) => (
           <View key={p.label} style={styles.securityPill}>
@@ -144,31 +149,32 @@ function SecurityIllustration() {
   );
 }
 
-const SLIDES = [
-  {
-    id: '1',
-    title: 'Calculez avant\nde vous inscrire.',
-    description: 'Essayez maintenant — sans compte requis.',
-    illustration: <SimulatorIllustration />,
-  },
-  {
-    id: '2',
-    title: 'Moins de frais.\nPlus pour eux.',
-    description: "Les frais d'envoi internationaux sont de 7 à 15 %. Avec le Private Ledger, ils passent sous 1 %.",
-    illustration: <FeeIllustration />,
-  },
-  {
-    id: '3',
-    title: 'Entrez dans le\nPrivate Ledger.',
-    description: 'Une plateforme humaine, sécurisée de bout en bout, et enracinée dans notre culture.',
-    illustration: <SecurityIllustration />,
-  },
-];
-
 export default function OnboardingScreen({ navigation }) {
+  const { t } = useTranslation();
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollX = useRef(new Animated.Value(0)).current;
   const slidesRef = useRef(null);
+
+  const SLIDES = [
+    {
+      id: '1',
+      title: t('onboarding.slide1.title') + '\n' + t('onboarding.slide1.titleAccent'),
+      description: t('onboarding.slide1.subtitle'),
+      illustration: <SimulatorIllustration />,
+    },
+    {
+      id: '2',
+      title: t('onboarding.slide2.title') + '\n' + t('onboarding.slide2.titleAccent'),
+      description: t('onboarding.slide2.subtitle'),
+      illustration: <FeeIllustration />,
+    },
+    {
+      id: '3',
+      title: t('onboarding.slide3.title') + '\n' + t('onboarding.slide3.titleAccent'),
+      description: t('onboarding.slide3.subtitle'),
+      illustration: <SecurityIllustration />,
+    },
+  ];
 
   const viewableItemsChanged = useRef(({ viewableItems }) => {
     if (viewableItems?.length > 0) setCurrentIndex(viewableItems[0].index);
@@ -195,7 +201,7 @@ export default function OnboardingScreen({ navigation }) {
           onPress={() => navigation.navigate('RoleSelect')}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <Text style={styles.skip}>Passer</Text>
+          <Text style={styles.skip}>{t('onboarding.skip')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -244,7 +250,7 @@ export default function OnboardingScreen({ navigation }) {
           })}
         </View>
         <GoldButton
-          title={currentIndex === SLIDES.length - 1 ? 'Commencer' : 'Suivant'}
+          title={currentIndex === SLIDES.length - 1 ? t('onboarding.getStarted') : t('onboarding.next')}
           onPress={scrollToNext}
           style={styles.btn}
         />
@@ -333,6 +339,12 @@ const styles = StyleSheet.create({
   },
   simResultLabel: { fontFamily: fonts.body, fontSize: 12, color: colors.onSurfaceVariant, marginBottom: 4 },
   simResultAmount: { fontFamily: fonts.display, fontSize: isSmall ? 22 : 26, color: colors.onSurface, letterSpacing: -0.52, marginBottom: 4 },
+  simSavingsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  simSavingsIcon: { marginTop: 1 },
   simSavings: { fontFamily: fonts.label, fontSize: 12, color: colors.primary },
 
   // SecurityIllustration — STATIQUE

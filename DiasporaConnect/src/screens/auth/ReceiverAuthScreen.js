@@ -10,8 +10,12 @@ import { colors, fonts, spacing, radius, shadows } from '../../theme/theme';
 import GoldButton from '../../components/ui/GoldButton';
 import LedgerInput from '../../components/ui/LedgerInput';
 import useStore from '../../store/useStore';
+import { sendOTP, verifyOTP } from '../../services/apiService';
+import { Alert } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 export default function ReceiverAuthScreen({ navigation }) {
+  const { t } = useTranslation();
   const [phone, setPhone] = useState('');
   const [step, setStep] = useState(1);
   const [otp, setOtp] = useState(['', '', '', '']);
@@ -19,14 +23,22 @@ export default function ReceiverAuthScreen({ navigation }) {
   const { loginRecipient } = useStore();
   const inputRefs = [useRef(), useRef(), useRef(), useRef()];
 
-  const handleSendOTP = () => {
+  const handleSendOTP = async () => {
     if (phone.length < 8) return;
     setLoading(true);
-    setTimeout(() => {
+    try {
+      const res = await sendOTP(phone);
       setLoading(false);
-      setStep(2);
-      setTimeout(() => inputRefs[0].current?.focus(), 100);
-    }, 1000);
+      if (res.success) {
+        setStep(2);
+        setTimeout(() => inputRefs[0].current?.focus(), 100);
+      } else {
+        Alert.alert(t('common.error'), res.message || t('auth.loginError'));
+      }
+    } catch (e) {
+      setLoading(false);
+      Alert.alert(t('common.error'), t('common.error'));
+    }
   };
 
   const handleOtpChange = (val, index) => {
@@ -38,22 +50,23 @@ export default function ReceiverAuthScreen({ navigation }) {
     if (!cleaned && index > 0) inputRefs[index - 1].current?.focus();
   };
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     const code = otp.join('');
     if (code.length < 4) return;
     setLoading(true);
-    setTimeout(() => {
+    try {
+      const res = await verifyOTP(phone, code);
       setLoading(false);
-      loginRecipient({
-        id: 'receiver_001',
-        firstName: 'Fatou',
-        lastName: 'Traoré',
-        phone,
-        mtnNumber: phone,
-        availableFCFA: 119909,
-      });
-      navigation.replace('ReceiverApp');
-    }, 1000);
+      if (res.success) {
+        loginRecipient(res.user, res.token);
+        navigation.replace('ReceiverApp');
+      } else {
+        Alert.alert(t('common.error'), res.message || t('auth.invalidCode'));
+      }
+    } catch (e) {
+      setLoading(false);
+      Alert.alert(t('common.error'), t('common.error'));
+    }
   };
 
   const handleDemoLogin = () => {
@@ -92,13 +105,11 @@ export default function ReceiverAuthScreen({ navigation }) {
         >
           {step === 1 ? (
             <>
-              <Text style={styles.title}>Votre numéro</Text>
-              <Text style={styles.subtitle}>
-                Saisissez votre numéro Mobile Money actif au Bénin.
-              </Text>
+              <Text style={styles.title}>{t('auth.recipient.title')}</Text>
+              <Text style={styles.subtitle}>{t('auth.recipient.subtitle')}</Text>
 
               <LedgerInput
-                label="Numéro MTN ou Moov (+229...)"
+                label={t('auth.recipient.phoneLabel')}
                 value={phone}
                 onChangeText={setPhone}
                 keyboardType="phone-pad"
@@ -107,22 +118,25 @@ export default function ReceiverAuthScreen({ navigation }) {
 
               <View style={styles.actionsBlock}>
                 <GoldButton
-                  title={loading ? 'Envoi...' : 'Recevoir mon code SMS'}
+                  title={loading ? t('auth.processing') : t('auth.recipient.sendCode')}
                   onPress={handleSendOTP}
                   disabled={loading || phone.length < 8}
                   style={styles.btnFull}
                 />
                 <TouchableOpacity style={styles.demoBtn} onPress={handleDemoLogin}>
-                  <Text style={styles.demoBtnText}>🚀 Continuer en mode démo</Text>
+                  <View style={styles.demoBtnContent}>
+                    <Ionicons name="rocket-outline" size={16} color={colors.primary} />
+                    <Text style={styles.demoBtnText}>{t('auth.continueDemo')}</Text>
+                  </View>
                 </TouchableOpacity>
               </View>
             </>
           ) : (
             <>
-              <Text style={styles.title}>Code de vérification</Text>
+              <Text style={styles.title}>{t('auth.verifyTitle')}</Text>
               <Text style={styles.subtitle}>
-                Code envoyé au {phone}.{'\n'}
-                <Text style={styles.hint}>Code démo : 4242</Text>
+                {t('auth.codeSent')} {phone}.{'\n'}
+                <Text style={styles.hint}>{t('auth.demoCode')}: 4242</Text>
               </Text>
 
               <View style={styles.otpRow}>
@@ -143,7 +157,7 @@ export default function ReceiverAuthScreen({ navigation }) {
 
               <View style={styles.actionsBlock}>
                 <GoldButton
-                  title={loading ? 'Vérification...' : 'Valider et continuer'}
+                  title={loading ? t('auth.processing') : t('auth.verifyBtn')}
                   onPress={handleVerify}
                   disabled={loading || otp.join('').length < 4}
                   style={styles.btnFull}
@@ -156,7 +170,6 @@ export default function ReceiverAuthScreen({ navigation }) {
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.surface },
   flex: { flex: 1 },
@@ -224,6 +237,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: colors.surfaceContainerLow,
     borderRadius: radius.md,
+  },
+  demoBtnContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
   },
   demoBtnText: {
     fontFamily: fonts.title,

@@ -87,7 +87,7 @@ export default function BiometricGuard({ visible, onSuccess, onCancel, reason })
           </View>
 
           <Text style={styles.title}>
-            {status === 'success'     ? (isEn ? 'Verified ✓' : 'Vérifié ✓')
+            {status === 'success'     ? (isEn ? 'Verified' : 'Vérifié')
             : status === 'failed'     ? (isEn ? 'Failed' : 'Échec')
             : status === 'unavailable'? (isEn ? 'Biometrics unavailable' : 'Biométrie indisponible')
             : biometricType === 'face'? (isEn ? 'Face ID' : 'Face ID')

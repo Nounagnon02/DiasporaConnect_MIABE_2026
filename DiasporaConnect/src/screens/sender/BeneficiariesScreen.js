@@ -12,6 +12,8 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing, radius, shadows } from '../../theme/theme';
 import useStore from '../../store/useStore';
+import { useTranslation } from 'react-i18next';
+import { useTabBarHeight } from '../../hooks/useTabBarHeight';
 import LedgerInput from '../../components/ui/LedgerInput';
 import GoldButton from '../../components/ui/GoldButton';
 
@@ -19,6 +21,8 @@ const OPERATORS = ['MTN', 'Moov'];
 const AVATAR_COLORS = ['#C75B39', '#2D5A4A', '#D4A574', '#A04428', '#1B4A3A', '#755B00'];
 
 export default function BeneficiariesScreen({ navigation }) {
+  const { t } = useTranslation();
+  const tabBarHeight = useTabBarHeight();
   const { beneficiaries, addBeneficiary, updateBeneficiary, deleteBeneficiary } = useStore();
   const [modalVisible, setModalVisible] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -38,7 +42,7 @@ export default function BeneficiariesScreen({ navigation }) {
 
   const handleSave = () => {
     if (!form.name.trim() || !form.phone.trim()) {
-      Alert.alert('Champs requis', 'Nom et numéro sont obligatoires.');
+      Alert.alert(t('common.attention'), t('beneficiaries.requiredFields'));
       return;
     }
     if (editing) {
@@ -53,11 +57,11 @@ export default function BeneficiariesScreen({ navigation }) {
 
   const handleDelete = (b) => {
     Alert.alert(
-      'Supprimer',
-      `Supprimer ${b.name} de vos bénéficiaires ?`,
+      t('beneficiaries.delete'),
+      t('beneficiaries.deleteConfirm', { name: b.name }),
       [
-        { text: 'Annuler', style: 'cancel' },
-        { text: 'Supprimer', style: 'destructive', onPress: () => deleteBeneficiary(b.id) },
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('beneficiaries.delete'), style: 'destructive', onPress: () => deleteBeneficiary(b.id) },
       ]
     );
   };
@@ -71,7 +75,7 @@ export default function BeneficiariesScreen({ navigation }) {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={24} color={colors.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Bénéficiaires</Text>
+        <Text style={styles.headerTitle}>{t('beneficiaries.title')}</Text>
         <TouchableOpacity onPress={openAdd} style={styles.addBtn}>
           <Ionicons name="add" size={24} color={colors.primary} />
         </TouchableOpacity>
@@ -80,13 +84,13 @@ export default function BeneficiariesScreen({ navigation }) {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {list.length === 0 ? (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}>👥</Text>
-            <Text style={styles.emptyTitle}>Aucun bénéficiaire</Text>
+            <Ionicons name="people-outline" size={48} color={colors.onSurfaceVariant} style={styles.emptyIcon} />
+            <Text style={styles.emptyTitle}>{t('beneficiaries.empty')}</Text>
             <Text style={styles.emptyText}>
-              Ajoutez vos proches pour envoyer de l'argent plus rapidement.
+              {t('beneficiaries.emptyDesc')}
             </Text>
             <TouchableOpacity style={styles.emptyBtn} onPress={openAdd}>
-              <Text style={styles.emptyBtnText}>Ajouter un bénéficiaire</Text>
+              <Text style={styles.emptyBtnText}>{t('beneficiaries.addBtn')}</Text>
             </TouchableOpacity>
           </View>
         ) : (
@@ -113,7 +117,7 @@ export default function BeneficiariesScreen({ navigation }) {
             </View>
           ))
         )}
-        <View style={{ height: 120 }} />
+        <View style={{ height: tabBarHeight + 16 }} />
       </ScrollView>
 
       {/* Modal ajout / édition */}
@@ -125,7 +129,7 @@ export default function BeneficiariesScreen({ navigation }) {
           <View style={styles.modalSheet}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>
-                {editing ? 'Modifier' : 'Nouveau bénéficiaire'}
+                {editing ? t('beneficiaries.edit') : t('beneficiaries.modalTitleAdd')}
               </Text>
               <TouchableOpacity onPress={() => setModalVisible(false)}>
                 <Ionicons name="close" size={22} color={colors.onSurfaceVariant} />
@@ -134,14 +138,14 @@ export default function BeneficiariesScreen({ navigation }) {
 
             <ScrollView keyboardShouldPersistTaps="handled">
               <LedgerInput
-                label="Nom complet"
+                label={t('beneficiaries.nameLabel')}
                 value={form.name}
                 onChangeText={v => setForm(f => ({ ...f, name: v }))}
-                placeholder="Ex: Adjoua Adjovi"
+                placeholder={t('beneficiaries.namePlaceholder')}
               />
               <View style={{ height: spacing.md }} />
               <LedgerInput
-                label="Numéro Mobile Money"
+                label={t('beneficiaries.phoneLabel')}
                 value={form.phone}
                 onChangeText={v => setForm(f => ({ ...f, phone: v }))}
                 keyboardType="phone-pad"
@@ -149,14 +153,14 @@ export default function BeneficiariesScreen({ navigation }) {
               />
               <View style={{ height: spacing.md }} />
               <LedgerInput
-                label="Ville (optionnel)"
+                label={t('beneficiaries.cityLabel')}
                 value={form.city}
                 onChangeText={v => setForm(f => ({ ...f, city: v }))}
-                placeholder="Ex: Cotonou"
+                placeholder={t('beneficiaries.cityPlaceholder')}
               />
 
               {/* Opérateur */}
-              <Text style={styles.operatorLabel}>Opérateur</Text>
+              <Text style={styles.operatorLabel}>{t('beneficiaries.operatorLabel')}</Text>
               <View style={styles.operatorRow}>
                 {OPERATORS.map(op => (
                   <TouchableOpacity
@@ -172,7 +176,7 @@ export default function BeneficiariesScreen({ navigation }) {
               </View>
 
               <GoldButton
-                title={editing ? 'Enregistrer' : 'Ajouter'}
+                title={editing ? t('common.confirm') : t('beneficiaries.add')}
                 onPress={handleSave}
                 style={{ marginTop: spacing.xl }}
               />

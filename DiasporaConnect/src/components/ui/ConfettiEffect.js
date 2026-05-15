@@ -12,7 +12,7 @@ const PARTICLE_COUNT = 28;
 function randomBetween(a, b) { return a + Math.random() * (b - a); }
 
 function Particle({ delay }) {
-  const x     = useRef(new Animated.Value(randomBetween(0.1, 0.9) * W)).current;
+  const startX = randomBetween(0.1, 0.9) * W;
   const y     = useRef(new Animated.Value(-20)).current;
   const rot   = useRef(new Animated.Value(0)).current;
   const opacity = useRef(new Animated.Value(1)).current;
@@ -44,8 +44,7 @@ function Particle({ delay }) {
       style={[
         styles.particle,
         {
-          left: x,
-          transform: [{ translateY: y }, { rotate }],
+          transform: [{ translateX: startX }, { translateY: y }, { rotate }],
           opacity,
           width: isRect ? size : size,
           height: isRect ? size * 0.5 : size,

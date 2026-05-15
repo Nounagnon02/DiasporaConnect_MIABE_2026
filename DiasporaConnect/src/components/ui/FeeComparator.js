@@ -1,16 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated, Dimensions } from 'react-native';
 import { colors, fonts, spacing, radius } from '../../theme/theme';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 const isSmall = width < 380;
-
-const OPERATORS = [
-  { name: 'Western Union', feePct: 0.14, delay: 0 },
-  { name: 'MoneyGram',     feePct: 0.11, delay: 120 },
-  { name: 'WorldRemit',    feePct: 0.07, delay: 240 },
-  { name: 'Banque SWIFT',  feePct: 0.18, delay: 360 },
-];
 
 function OperatorRow({ name, fee, received, delay }) {
   const opacity = useRef(new Animated.Value(0)).current;
@@ -33,7 +27,15 @@ function OperatorRow({ name, fee, received, delay }) {
 }
 
 export default function FeeComparator({ calcResult, style }) {
+  const { t } = useTranslation();
   if (!calcResult || calcResult.amountUSD <= 0) return null;
+
+  const OPERATORS = [
+    { name: 'Western Union', feePct: 0.14, delay: 0 },
+    { name: 'MoneyGram',     feePct: 0.11, delay: 120 },
+    { name: 'WorldRemit',    feePct: 0.07, delay: 240 },
+    { name: t('calculator.swiftBank'),  feePct: 0.18, delay: 360 },
+  ];
 
   const { amountUSD, diasporaFee, recipientGets } = calcResult;
 
@@ -51,9 +53,9 @@ export default function FeeComparator({ calcResult, style }) {
     <View style={[styles.container, style]}>
       {/* En-tête colonnes */}
       <View style={styles.headerRow}>
-        <Text style={[styles.headerLabel, styles.colName]}>Opérateur</Text>
-        <Text style={[styles.headerLabel, styles.colFee]}>Frais</Text>
-        <Text style={[styles.headerLabel, styles.colReceived]}>Reçu (USD)</Text>
+        <Text style={[styles.headerLabel, styles.colName]}>{t('calculator.operatorCol')}</Text>
+        <Text style={[styles.headerLabel, styles.colFee]}>{t('calculator.feeCol')}</Text>
+        <Text style={[styles.headerLabel, styles.colReceived]}>{t('calculator.receivedCol')}</Text>
       </View>
 
       {OPERATORS.map((op) => (

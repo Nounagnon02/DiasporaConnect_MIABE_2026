@@ -3,7 +3,7 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   Alert, Modal, ActivityIndicator, Animated,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing, radius, shadows } from '../../../theme/theme';
@@ -13,50 +13,23 @@ import GoldButton from '../../../components/ui/GoldButton';
 import SecondaryButton from '../../../components/ui/SecondaryButton';
 import { MOCK_CONTACTS } from '../../../services/mockData';
 import useStore from '../../../store/useStore';
+import { useTabBarHeight } from '../../../hooks/useTabBarHeight';
+import { useTranslation } from 'react-i18next';
+import { nameEnquiry } from '../../../services/apiService';
 
-const STEP_LABELS = ['Montant', 'Destinataire', 'Confirmation', 'Succès'];
-
-const OPERATORS = [
-  { id: 'MTN', label: 'MTN Money', color: '#FFCC00', textColor: '#1B1C1A' },
-  { id: 'MOOV', label: 'Moov Money', color: '#005BBB', textColor: '#FFFFFF' },
-];
-
-// ─── Name Enquiry ─────────────────────────────────────────────────────────────
-// En production : appel réel à MTN MoMo Open API
-// GET /v1_0/accountholder/msisdn/{phone}/basicuserinfo
-// En démo : mock avec délai simulé
-
-const MOCK_NAME_ENQUIRY = {
-  '+22997451287': { name: 'ADJOVI Adjoua', exists: true },
-  '+22996234567': { name: 'KOFFI Papa', exists: true },
-  '+22997890123': { name: 'AFI Maman', exists: true },
-  '+22996567890': { name: 'SEKOU Oncle', exists: true },
-  '+22997345678': { name: 'ROSINE Tante', exists: true },
-};
-
-const normalizePhone = (phone) => phone.replace(/[\s\-().+]/g, '').replace(/^00/, '');
-
-const nameEnquiry = async (phone, operator) => {
-  // Simuler latence réseau
-  await new Promise(r => setTimeout(r, 1500));
-
-  const normalized = '+' + normalizePhone(phone);
-  const result = MOCK_NAME_ENQUIRY[normalized];
-
-  if (result) return { success: true, name: result.name };
-
-  // Numéro inconnu → simuler réponse opérateur
-  const digits = normalizePhone(phone);
-  if (digits.length < 8) return { success: false, error: 'invalid' };
-
-  // En prod : si l'API répond 404 → compte inexistant
-  return { success: false, error: 'not_found' };
-};
-
-// ─── Composant ────────────────────────────────────────────────────────────────
+const normalizePhone = (p) => p.replace(/[^0-9]/g, '');
 
 export default function Step2Screen({ navigation }) {
+  const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
+  const tabBarHeight = useTabBarHeight();
+  const bottomPad = tabBarHeight + Math.max(insets.bottom, 0);
   const { transferData, updateTransferData } = useStore();
+  const STEP_LABELS = [t('send.step1'), t('send.step2'), t('send.step3'), t('send.step4')];
+  const OPERATORS = [
+    { id: 'MTN', label: 'MTN Money', color: '#FFCC00', textColor: '#1B1C1A' },
+    { id: 'MOOV', label: 'Moov Money', color: '#005BBB', textColor: '#FFFFFF' },
+  ];
 
   const [operator, setOperator] = useState(transferData.operator || null);
   const [phone, setPhone] = useState(transferData.recipient?.phone || '');
@@ -64,8 +37,7 @@ export default function Step2Screen({ navigation }) {
     transferData.recipient?.id ? transferData.recipient : null
   );
 
-  // Name Enquiry state
-  const [enquiryState, setEnquiryState] = useState('idle'); // idle | loading | success | error | warning
+  const [enquiryState, setEnquiryState] = useState('idle');
   const [enquiryName, setEnquiryName] = useState(null);
   const [enquiryError, setEnquiryError] = useState(null);
   const [forceConfirmed, setForceConfirmed] = useState(false);
@@ -78,7 +50,6 @@ export default function Step2Screen({ navigation }) {
 
   const fadeIn = () => Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }).start();
 
-  // Déclencher Name Enquiry après 600ms de pause dans la saisie
   const handlePhoneChange = (text) => {
     setPhone(text);
     setSelected(null);
@@ -87,25 +58,19 @@ export default function Step2Screen({ navigation }) {
     setEnquiryError(null);
     setForceConfirmed(false);
     fadeAnim.setValue(0);
-
     if (enquiryTimer.current) clearTimeout(enquiryTimer.current);
-
     const digits = normalizePhone(text);
     if (!operator) return;
     if (digits.length < 8) return;
-
     enquiryTimer.current = setTimeout(() => triggerEnquiry(text), 600);
   };
 
   const triggerEnquiry = async (phoneValue) => {
     if (!operator) {
-      Alert.alert('Opérateur requis', 'Sélectionnez MTN ou Moov avant de saisir le numéro.');
+      Alert.alert(t('common.attention'), t('send.operatorRequired'));
       return;
     }
     setEnquiryState('loading');
-    setEnquiryName(null);
-    setEnquiryError(null);
-
     const result = await nameEnquiry(phoneValue, operator);
 
     if (result.success) {
@@ -113,13 +78,13 @@ export default function Step2Screen({ navigation }) {
       setEnquiryName(result.name);
     } else if (result.error === 'not_found') {
       setEnquiryState('error');
-      setEnquiryError(`Ce numéro n'est pas enregistré sur ${operator} Money. Vérifiez le numéro et l'opérateur.`);
+      setEnquiryError(t('send.errorNotFound', { operator }));
     } else if (result.error === 'api_failure') {
       setEnquiryState('warning');
-      setEnquiryError('Impossible de vérifier le nom. Vous confirmez envoyer à ce numéro à vos risques ?');
+      setEnquiryError(t('send.errorApiFailure'));
     } else {
       setEnquiryState('error');
-      setEnquiryError('Numéro invalide. Vérifiez le format (+229 XX XX XX XX).');
+      setEnquiryError(t('send.errorInvalidNum'));
     }
     fadeIn();
   };
@@ -131,7 +96,6 @@ export default function Step2Screen({ navigation }) {
     setEnquiryError(null);
     setForceConfirmed(false);
     fadeAnim.setValue(0);
-    // Re-déclencher enquiry si numéro déjà saisi
     if (phone && normalizePhone(phone).length >= 8) {
       setTimeout(() => triggerEnquiry(phone), 300);
     }
@@ -147,7 +111,6 @@ export default function Step2Screen({ navigation }) {
     setForceConfirmed(false);
     fadeAnim.setValue(0);
     updateTransferData({ recipient: contact, operator: contact.operator });
-    // Déclencher enquiry pour le contact sélectionné
     setTimeout(() => triggerEnquiry(contact.phone), 300);
   };
 
@@ -156,7 +119,8 @@ export default function Step2Screen({ navigation }) {
     setQRScanning(true);
     setTimeout(() => {
       const mockPhone = '+229 97 45 12 87';
-      const mockContact = { phone: mockPhone, operator: 'MTN', name: 'Adjoua Adjovi' };
+      const mockName = 'Adjoua Adjovi';
+      const mockContact = { phone: mockPhone, operator: 'MTN', name: mockName };
       setPhone(mockPhone);
       setOperator('MTN');
       setSelected(mockContact);
@@ -176,12 +140,7 @@ export default function Step2Screen({ navigation }) {
   };
 
   const handleNext = () => {
-    const recipient = {
-      ...(selected || {}),
-      phone,
-      operator,
-      name: enquiryName || selected?.name || 'Destinataire',
-    };
+    const recipient = { ...(selected || {}), phone, operator, name: enquiryName || selected?.name || t('send.recipient') };
     updateTransferData({ recipient, operator, verifiedName: enquiryName });
     navigation.navigate('SendStep3');
   };
@@ -200,7 +159,7 @@ export default function Step2Screen({ navigation }) {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={24} color={colors.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Destinataire</Text>
+        <Text style={styles.headerTitle}>{t('send.recipientHeader')}</Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -211,8 +170,7 @@ export default function Step2Screen({ navigation }) {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* ── Sélection opérateur ── */}
-        <Text style={styles.sectionLabel}>Opérateur Mobile Money</Text>
+        <Text style={styles.sectionLabel}>{t('send.operatorLabel')}</Text>
         <View style={styles.operatorRow}>
           {OPERATORS.map(op => (
             <TouchableOpacity
@@ -236,7 +194,7 @@ export default function Step2Screen({ navigation }) {
         {/* ── Saisie numéro ── */}
         <View style={styles.card}>
           <LedgerInput
-            label="Numéro Mobile Money (+229)"
+            label={t('send.phoneLabel')}
             value={phone}
             onChangeText={handlePhoneChange}
             keyboardType="phone-pad"
@@ -244,14 +202,14 @@ export default function Step2Screen({ navigation }) {
             editable={!!operator}
           />
           {!operator && (
-            <Text style={styles.hintText}>Sélectionnez d'abord l'opérateur</Text>
+            <Text style={styles.hintText}>{t('send.selectOperatorFirst')}</Text>
           )}
 
           {/* ── Résultat Name Enquiry ── */}
           {enquiryState === 'loading' && (
             <View style={styles.enquiryRow}>
               <ActivityIndicator size="small" color={colors.primary} />
-              <Text style={styles.enquiryLoadingText}>Vérification du compte {operator} Money...</Text>
+              <Text style={styles.enquiryLoadingText}>{t('send.verifyingAccount', { operator })}</Text>
             </View>
           )}
 
@@ -261,7 +219,7 @@ export default function Step2Screen({ navigation }) {
               <View style={{ flex: 1, marginLeft: spacing.sm }}>
                 <Text style={styles.enquirySuccessName}>{enquiryName}</Text>
                 <Text style={styles.enquirySuccessPhone}>
-                  Ce numéro appartient à <Text style={{ fontFamily: fonts.title }}>{enquiryName}</Text> — est-ce le bon destinataire ?
+                  {t('send.belongsTo', { name: enquiryName })}
                 </Text>
               </View>
             </Animated.View>
@@ -290,7 +248,7 @@ export default function Step2Screen({ navigation }) {
                     {forceConfirmed && <Ionicons name="checkmark" size={12} color="#FFF" />}
                   </View>
                   <Text style={styles.forceConfirmText}>
-                    Je confirme envoyer à ce numéro à mes risques
+                    {t('send.forceConfirmText')}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -298,14 +256,14 @@ export default function Step2Screen({ navigation }) {
           )}
 
           <SecondaryButton
-            title="Scanner QR Code"
+            title={t('send.scanQR')}
             onPress={handleQRScan}
             style={{ marginTop: spacing.md }}
           />
         </View>
 
         {/* ── Contacts récents ── */}
-        <Text style={styles.sectionLabel}>Destinataires récents</Text>
+        <Text style={styles.sectionLabel}>{t('send.recentRecipients')}</Text>
 
         {MOCK_CONTACTS.slice(0, 3).map(c => (
           <TouchableOpacity
@@ -325,18 +283,18 @@ export default function Step2Screen({ navigation }) {
             </View>
             {selected?.id === c.id && (
               <View style={styles.selectedBadge}>
-                <Text style={styles.selectedBadgeText}>✓</Text>
+                <Ionicons name="checkmark" size={14} color="#FFF" />
               </View>
             )}
           </TouchableOpacity>
         ))}
 
-        <View style={{ height: 120 }} />
+        <View style={{ height: tabBarHeight + 16 }} />
       </ScrollView>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, { paddingBottom: bottomPad + spacing.md }]}>
         <GoldButton
-          title={enquiryState === 'loading' ? 'Vérification...' : 'Continuer'}
+          title={enquiryState === 'loading' ? t('auth.processing') : t('common.continue')}
           onPress={handleNext}
           disabled={!canProceed()}
         />
@@ -357,13 +315,13 @@ export default function Step2Screen({ navigation }) {
               <View style={[styles.qrCorner, styles.qrCornerBR]} />
             </View>
             <Text style={styles.qrHint}>
-              {qrScanning ? 'Lecture du QR code...' : 'Pointez vers le QR code du destinataire'}
+              {qrScanning ? t('send.qrReading') : t('send.qrPoint')}
             </Text>
             <TouchableOpacity
               style={styles.qrCancelBtn}
               onPress={() => { setShowQRScanner(false); setQRScanning(false); }}
             >
-              <Text style={styles.qrCancelText}>Annuler</Text>
+              <Text style={styles.qrCancelText}>{t('common.cancel')}</Text>
             </TouchableOpacity>
           </View>
         </View>

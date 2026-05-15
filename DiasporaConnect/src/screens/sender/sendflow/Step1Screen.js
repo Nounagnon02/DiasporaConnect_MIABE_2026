@@ -5,14 +5,14 @@ import { StatusBar } from 'expo-status-bar';
 import { colors, fonts, spacing } from '../../../theme/theme';
 import useStore from '../../../store/useStore';
 import StepIndicator from '../../../components/ui/StepIndicator';
-
-const STEP_LABELS = ['Montant', 'Destinataire', 'Confirmation', 'Succès'];
+import { useTranslation } from 'react-i18next';
 
 export default function Step1Screen({ navigation }) {
+  const { t } = useTranslation();
   const { transferData } = useStore();
+  const STEP_LABELS = [t('send.step1'), t('send.step2'), t('send.step3'), t('send.step4')];
 
   useEffect(() => {
-    // If user comes from Calculator, amount is already set
     if (transferData.amountUSD > 0) {
       const timer = setTimeout(() => {
         navigation.replace('SendStep2');
@@ -27,12 +27,12 @@ export default function Step1Screen({ navigation }) {
     <SafeAreaView style={styles.safe}>
       <StatusBar style="dark" />
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Initialisation</Text>
+        <Text style={styles.headerTitle}>{t('send.initializing')}</Text>
       </View>
       <StepIndicator totalSteps={4} currentStep={1} labels={STEP_LABELS} />
       <View style={styles.container}>
         <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={styles.text}>Préparation de l'envoi...</Text>
+        <Text style={styles.text}>{t('send.preparing')}</Text>
       </View>
     </SafeAreaView>
   );

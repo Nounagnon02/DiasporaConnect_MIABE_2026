@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing } from '../../theme/theme';
 
 const { width } = Dimensions.get('window');
@@ -20,7 +21,7 @@ export default function StepIndicator({ currentStep, totalSteps = 4, labels = []
                 styles.dot,
                 isPast ? styles.dotPast : isActive ? styles.dotActive : styles.dotInactive,
               ]}>
-                {isPast && <Text style={styles.dotCheck}>✓</Text>}
+                {isPast && <Ionicons name="checkmark" size={12} color="#FFF" />}
                 {isActive && <View style={styles.dotInnerActive} />}
               </View>
               {index < totalSteps - 1 && (

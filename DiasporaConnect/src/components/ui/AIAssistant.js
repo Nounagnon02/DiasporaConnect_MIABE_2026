@@ -6,7 +6,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, TextInput,
   FlatList, KeyboardAvoidingView, Platform, Animated,
-  ActivityIndicator, Modal,
+  ActivityIndicator, Modal, Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing, radius, shadows } from '../../theme/theme';
@@ -29,10 +29,10 @@ export default function AIAssistant() {
       id: '0',
       role: 'assistant',
       text: lang === 'en'
-        ? 'Hello! I\'m Lumière ✨ How can I help you today?'
+        ? 'Hello! I\'m Lumière. How can I help you today?'
         : lang === 'fon'
-        ? 'Ah kɛ́kɛ́! Mì nyí Lumière ✨ Nɛ̌ mì ka sixu d\'alɔ we?'
-        : 'Bonjour ! Je suis Lumière ✨ Comment puis-je vous aider ?',
+        ? 'Ah kɛ́kɛ́! Mì nyí Lumière. Nɛ̌ mì ka sixu d\'alɔ we?'
+        : 'Bonjour ! Je suis Lumière. Comment puis-je vous aider ?',
     },
   ]);
   const [input, setInput] = useState('');
@@ -78,7 +78,12 @@ export default function AIAssistant() {
     const isUser = item.role === 'user';
     return (
       <View style={[styles.bubble, isUser ? styles.bubbleUser : styles.bubbleAssistant]}>
-        {!isUser && <Text style={styles.assistantName}>Lumière ✨</Text>}
+        {!isUser && (
+          <View style={styles.assistantNameRow}>
+            <Ionicons name="sparkles" size={14} color={colors.primary} />
+            <Text style={styles.assistantName}>Lumière</Text>
+          </View>
+        )}
         <Text style={[styles.bubbleText, isUser && styles.bubbleTextUser]}>{item.text}</Text>
       </View>
     );
@@ -89,7 +94,7 @@ export default function AIAssistant() {
       {/* Bouton flottant */}
       <Animated.View style={[styles.fab, { transform: [{ scale: pulseAnim }] }]}>
         <TouchableOpacity onPress={() => setVisible(true)} style={styles.fabInner} activeOpacity={0.85}>
-          <Text style={styles.fabEmoji}>✨</Text>
+          <Image source={require('../../../assets/icon.png')} style={styles.fabLogo} />
         </TouchableOpacity>
       </Animated.View>
 
@@ -104,7 +109,7 @@ export default function AIAssistant() {
             <View style={styles.sheetHeader}>
               <View style={styles.headerLeft}>
                 <View style={styles.avatarCircle}>
-                  <Text style={styles.avatarEmoji}>✨</Text>
+                  <Image source={require('../../../assets/icon.png')} style={styles.avatarLogo} />
                 </View>
                 <View>
                   <Text style={styles.headerName}>Lumière</Text>
@@ -192,7 +197,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     ...shadows.diffuse,
   },
-  fabEmoji: { fontSize: 24 },
+  fabLogo: { width: 36, height: 36, borderRadius: 18 },
 
   overlay: {
     flex: 1,
@@ -223,7 +228,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarEmoji: { fontSize: 20 },
+  avatarLogo: { width: 28, height: 28, borderRadius: 14 },
   headerName: { fontFamily: fonts.title, fontSize: 15, color: colors.onSurface },
   headerSub: { fontFamily: fonts.body, fontSize: 11, color: colors.onSurfaceVariant },
   closeBtn: { padding: spacing.xs },
@@ -244,11 +249,16 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     alignSelf: 'flex-end',
   },
+  assistantNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginBottom: 4,
+  },
   assistantName: {
     fontFamily: fonts.label,
     fontSize: 10,
     color: colors.primary,
-    marginBottom: 4,
   },
   bubbleText: {
     fontFamily: fonts.body,

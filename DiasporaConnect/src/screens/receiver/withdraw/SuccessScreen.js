@@ -5,19 +5,21 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing, radius, shadows } from '../../../theme/theme';
 import GoldButton from '../../../components/ui/GoldButton';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 const isSmall = width < 380;
 
-const TRUST_ITEMS = [
-  { icon: 'flash',       label: 'Instantané' },
-  { icon: 'lock-closed', label: 'Sécurisé'   },
-  { icon: 'cash',        label: 'Sans frais'  },
-];
-
 export default function SuccessScreen({ navigation }) {
+  const { t } = useTranslation();
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim  = useRef(new Animated.Value(0)).current;
+
+  const TRUST_ITEMS = [
+    { icon: 'flash',       label: t('common.instant') },
+    { icon: 'lock-closed', label: t('common.secure')   },
+    { icon: 'cash',        label: t('common.noFees')  },
+  ];
 
   useEffect(() => {
     Vibration.vibrate(200);
@@ -42,12 +44,16 @@ export default function SuccessScreen({ navigation }) {
         </Animated.View>
 
         <Animated.View style={[styles.textBlock, { opacity: fadeAnim }]}>
-          <Text style={styles.successTitle} numberOfLines={2}>Retrait en cours</Text>
-          <Text style={styles.successStatus}>Délai estimé : moins de 2 minutes</Text>
+          <Text style={styles.successTitle} numberOfLines={2}>
+            {t('recipient.withdrawSuccess')}
+          </Text>
+          <Text style={styles.successStatus}>
+            {t('recipient.estimatedDelay', { time: '2' })}
+          </Text>
 
           <View style={styles.box}>
             <Text style={styles.boxText}>
-              Votre compte Mobile Money sera crédité dès que le réseau aura validé la sortie des fonds du Private Ledger.
+              {t('recipient.withdrawSuccessLong')}
             </Text>
           </View>
 
@@ -67,7 +73,7 @@ export default function SuccessScreen({ navigation }) {
 
       <View style={styles.footer}>
         <GoldButton
-          title="Retour à l'accueil"
+          title={t('common.backToHome')}
           onPress={() => navigation.navigate('ReceiverApp', { screen: 'Home' })}
         />
       </View>

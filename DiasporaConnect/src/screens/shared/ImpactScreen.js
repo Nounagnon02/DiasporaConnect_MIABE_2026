@@ -7,55 +7,39 @@ import { colors, fonts, spacing, radius, shadows } from '../../theme/theme';
 import useStore from '../../store/useStore';
 import ConnectionAnim from '../../components/animations/ConnectionAnim';
 import { generateImpactNarrative } from '../../services/aiService';
+import { useTranslation } from 'react-i18next';
+import { useTabBarHeight } from '../../hooks/useTabBarHeight';
 
 const { width } = Dimensions.get('window');
 const isSmall = width < 380;
 
-const ALL_BADGES = [
-  { key: 'first_transfer', icon: '🚀', label: 'Premier envoi', desc: 'Votre 1er transfert' },
-  { key: 'saver_100', icon: '💰', label: 'Économiseur', desc: '100 USD économisés' },
-  { key: 'saver_500', icon: '🏆', label: 'Champion', desc: '500 USD économisés' },
-  { key: 'loyal_5', icon: '⭐', label: 'Fidèle', desc: '5 transferts effectués' },
-  { key: 'loyal_10', icon: '💎', label: 'Diamant', desc: '10 transferts effectués' },
-  { key: 'referral_1', icon: '🤝', label: 'Ambassadeur', desc: '1 ami parrainé' },
-];
-
-const ODDS = [
-  { num: '1', title: 'ODD 1 — Fin de la pauvreté', desc: 'Réduction des frais pour les familles les plus vulnérables.' },
-  { num: '8', title: 'ODD 8 — Travail décent', desc: "Nous soutenons l'économie béninoise en ramenant plus d'argent dans les ménages." },
-  { num: '10', title: 'ODD 10 — Inégalités réduites', desc: 'Démocratisation des services financiers pour tous, y compris en zones rurales.' },
-];
-
-const SCENARIOS = [
-  { name: 'Kofi (Paris)', amount: 200, savings: 26.20 },
-  { name: 'Adjoa (Bruxelles)', amount: 100, savings: 13.10 },
-  { name: 'Séraphin (Lyon)', amount: 500, savings: 65.50 },
-];
-
-function CounterDisplay({ target, suffix, prefix, style }) {
-  const [displayed, setDisplayed] = useState(0);
-  useEffect(() => {
-    const steps = 60;
-    const increment = target / steps;
-    let current = 0;
-    const interval = setInterval(() => {
-      current += increment;
-      if (current >= target) { setDisplayed(target); clearInterval(interval); }
-      else setDisplayed(Math.floor(current));
-    }, 1800 / steps);
-    return () => clearInterval(interval);
-  }, [target]);
-  return (
-    <Text style={style} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.7}>
-      {prefix}{displayed.toLocaleString('fr-FR')}{suffix}
-    </Text>
-  );
-}
-
 export default function ImpactScreen({ navigation }) {
+  const { t } = useTranslation();
+  const tabBarHeight = useTabBarHeight();
   const { impactScore, language } = useStore();
   const earnedBadges = impactScore?.badges || [];
   const narrative = generateImpactNarrative(impactScore, language);
+
+  const ALL_BADGES = [
+    { key: 'first_transfer', icon: 'rocket-outline', label: t('impact.badges.firstTransfer'), desc: t('impact.badges.firstTransferDesc') },
+    { key: 'saver_100', icon: 'cash-outline', label: t('impact.badges.saver100'), desc: t('impact.badges.saver100Desc') },
+    { key: 'saver_500', icon: 'trophy-outline', label: t('impact.badges.saver500'), desc: t('impact.badges.saver500Desc') },
+    { key: 'loyal_5', icon: 'star-outline', label: t('impact.badges.loyal5'), desc: t('impact.badges.loyal5Desc') },
+    { key: 'loyal_10', icon: 'diamond-outline', label: t('impact.badges.loyal10'), desc: t('impact.badges.loyal10Desc') },
+    { key: 'referral_1', icon: 'hand-left-outline', label: t('impact.badges.ambassador'), desc: t('impact.badges.ambassadorDesc') },
+  ];
+
+  const ODDS = [
+    { num: '1', title: t('impact.odd1'), desc: t('impact.odd1Desc') },
+    { num: '8', title: t('impact.odd8'), desc: t('impact.odd8Desc') },
+    { num: '10', title: t('impact.odd10'), desc: t('impact.odd10Desc') },
+  ];
+
+  const SCENARIOS = [
+    { name: 'Kofi (Paris)', amount: 200, savings: 26.20 },
+    { name: 'Adjoa (Bruxelles)', amount: 100, savings: 13.10 },
+    { name: 'Séraphin (Lyon)', amount: 500, savings: 65.50 },
+  ];
 
   const formatUSD = (n) => `${(n || 0).toFixed(2)} USD`;
 
@@ -66,18 +50,21 @@ export default function ImpactScreen({ navigation }) {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={24} color={colors.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Impact</Text>
+        <Text style={styles.headerTitle}>{t('impact.title')}</Text>
         <View style={{ width: 40 }} />
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Text style={styles.heroTitle}>Notre impact{'\n'}ensemble</Text>
+        <Text style={styles.heroTitle}>{t('impact.title')}{'\n'}{t('impact.together')}</Text>
 
         {/* Résumé IA narratif */}
         <View style={styles.aiNarrativeCard}>
           <View style={styles.aiNarrativeHeader}>
-            <Text style={styles.aiLabel}>✨ IA</Text>
-            <Text style={styles.aiNarrativeTitle}>Votre impact en mots</Text>
+            <View style={styles.aiBadge}>
+              <Ionicons name="sparkles" size={12} color={colors.onPrimary} />
+              <Text style={styles.aiBadgeText}>IA</Text>
+            </View>
+            <Text style={styles.aiNarrativeTitle}>{t('impact.aiNarrativeTitle')}</Text>
           </View>
           <Text style={styles.aiNarrativeText}>{narrative}</Text>
         </View>
@@ -88,33 +75,35 @@ export default function ImpactScreen({ navigation }) {
 
         {/* Score personnel */}
         <View style={styles.personalCard}>
-          <Text style={styles.personalTitle}>Votre impact personnel</Text>
+          <Text style={styles.personalTitle}>{t('impact.personalImpact')}</Text>
           <View style={styles.personalStats}>
             <View style={styles.personalStat}>
               <Text style={styles.personalValue}>{formatUSD(impactScore?.totalSavedUSD)}</Text>
-              <Text style={styles.personalLabel}>Économisés vs WU</Text>
+              <Text style={styles.personalLabel}>{t('impact.savedVsWU')}</Text>
             </View>
             <View style={styles.personalDivider} />
             <View style={styles.personalStat}>
               <Text style={styles.personalValue}>{impactScore?.totalTransfers || 0}</Text>
-              <Text style={styles.personalLabel}>Transferts</Text>
+              <Text style={styles.personalLabel}>{t('impact.transfersCount')}</Text>
             </View>
             <View style={styles.personalDivider} />
             <View style={styles.personalStat}>
               <Text style={styles.personalValue}>{impactScore?.co2SavedKg || 0} kg</Text>
-              <Text style={styles.personalLabel}>CO₂ évité</Text>
+              <Text style={styles.personalLabel}>CO₂ {t('impact.co2Avoided')}</Text>
             </View>
           </View>
         </View>
 
         {/* Badges */}
-        <Text style={styles.sectionTitle}>Vos badges</Text>
+        <Text style={styles.sectionTitle}>{t('impact.yourBadges')}</Text>
         <View style={styles.badgesGrid}>
           {ALL_BADGES.map(badge => {
             const earned = earnedBadges.includes(badge.key);
             return (
               <View key={badge.key} style={[styles.badgeCard, !earned && styles.badgeCardLocked]}>
-                <Text style={[styles.badgeIcon, !earned && styles.badgeIconLocked]}>{badge.icon}</Text>
+                <View style={[styles.badgeIconWrapper, !earned && styles.badgeIconLocked]}>
+                  <Ionicons name={badge.icon} size={22} color={earned ? colors.primary : colors.onSurfaceVariant} />
+                </View>
                 <Text style={[styles.badgeLabel, !earned && styles.badgeLabelLocked]} numberOfLines={1}>
                   {badge.label}
                 </Text>
@@ -130,24 +119,24 @@ export default function ImpactScreen({ navigation }) {
         </View>
 
         {/* Compteurs globaux */}
-        <Text style={styles.sectionTitle}>Impact global DiasporaConnect</Text>
+        <Text style={styles.sectionTitle}>{t('impact.globalImpactTitle')}</Text>
         <View style={styles.countersRow}>
           <View style={styles.counterCard}>
             <CounterDisplay target={1247} suffix="" prefix="" style={styles.counterValue} />
-            <Text style={styles.counterLabel} numberOfLines={2}>familles aidées</Text>
+            <Text style={styles.counterLabel} numberOfLines={2}>{t('impact.familiesHelped')}</Text>
           </View>
           <View style={styles.counterCard}>
             <CounterDisplay target={18653} suffix=" $" prefix="" style={styles.counterValue} />
-            <Text style={styles.counterLabel} numberOfLines={2}>économisés en frais</Text>
+            <Text style={styles.counterLabel} numberOfLines={2}>{t('impact.totalSavedGlobal')}</Text>
           </View>
         </View>
         <View style={[styles.counterCard, styles.counterCardFull]}>
           <Text style={styles.counterValueLarge}>{'< 1 %'}</Text>
-          <Text style={styles.counterLabel}>de frais moyens par transfert</Text>
+          <Text style={styles.counterLabel}>{t('impact.averageFee')}</Text>
         </View>
 
         {/* ODD */}
-        <Text style={styles.sectionTitle}>Objectifs de Développement Durable</Text>
+        <Text style={styles.sectionTitle}>{t('impact.sdgTitle')}</Text>
         {ODDS.map(odd => (
           <View key={odd.num} style={styles.oddCard}>
             <View style={styles.oddBadge}><Text style={styles.oddNum}>{odd.num}</Text></View>
@@ -159,21 +148,21 @@ export default function ImpactScreen({ navigation }) {
         ))}
 
         {/* Scénarios */}
-        <Text style={styles.sectionTitle}>Scénarios concrets</Text>
+        <Text style={styles.sectionTitle}>{t('impact.scenariosTitle')}</Text>
         {SCENARIOS.map(s => (
           <View key={s.name} style={styles.scenarioCard}>
             <View style={styles.scenarioLeft}>
               <Text style={styles.scenarioName} numberOfLines={1}>{s.name}</Text>
-              <Text style={styles.scenarioAmount}>{s.amount} USD envoyés</Text>
+              <Text style={styles.scenarioAmount}>{s.amount} USD {t('impact.sentLabel')}</Text>
             </View>
             <View style={styles.scenarioRight}>
-              <Text style={styles.scenarioSavingsLabel}>Économie vs WU</Text>
+              <Text style={styles.scenarioSavingsLabel}>{t('impact.savedVsWU_Short')}</Text>
               <Text style={styles.scenarioSavings}>+{s.savings.toFixed(2)} USD</Text>
             </View>
           </View>
         ))}
 
-        <View style={{ height: 120 }} />
+        <View style={{ height: tabBarHeight + 16 }} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -208,15 +197,19 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
     marginBottom: spacing.sm,
   },
-  aiLabel: {
-    fontFamily: fonts.label,
-    fontSize: 10,
-    color: colors.onPrimary,
+  aiBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
     backgroundColor: colors.primary,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: radius.round,
-    overflow: 'hidden',
+  },
+  aiBadgeText: {
+    fontFamily: fonts.label,
+    fontSize: 10,
+    color: colors.onPrimary,
   },
   aiNarrativeTitle: {
     fontFamily: fonts.title,
@@ -256,7 +249,15 @@ const styles = StyleSheet.create({
     padding: spacing.sm, alignItems: 'center', ...shadows.diffuse, position: 'relative',
   },
   badgeCardLocked: { opacity: 0.45 },
-  badgeIcon: { fontSize: 28, marginBottom: 4 },
+  badgeIconWrapper: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(117,91,0,0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
   badgeIconLocked: { opacity: 0.5 },
   badgeLabel: { fontFamily: fonts.title, fontSize: 11, color: colors.onSurface, textAlign: 'center' },
   badgeLabelLocked: { color: colors.onSurfaceVariant },

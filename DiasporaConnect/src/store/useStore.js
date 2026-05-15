@@ -6,6 +6,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MOCK_TRANSACTIONS } from '../services/mockData';
 import { fetchLiveRates, getRateAlert } from '../services/ratesService';
+import { fetchTransactions } from '../services/apiService';
 
 const useStore = create(
   persist(
@@ -137,7 +138,10 @@ const useStore = create(
         });
       },
 
-      setLanguage: (lang) => set({ language: lang }),
+      setLanguage: (lang) => {
+        set({ language: lang });
+        import('../i18n').then(i18n => i18n.default.changeLanguage(lang));
+      },
 
       setLoading: (val) => set({ isLoading: val }),
 
@@ -151,6 +155,22 @@ const useStore = create(
       },
 
       dismissRateAlert: () => set({ rateAlert: null }),
+
+      fetchUserTransactions: async () => {
+        const { token, userRole } = get();
+        if (!token) return;
+        set({ isLoading: true });
+        try {
+          const txs = await fetchTransactions(token, userRole);
+          if (txs && txs.length > 0) {
+            set({ transactions: txs });
+          }
+        } catch (e) {
+          console.error('Error fetching transactions:', e);
+        } finally {
+          set({ isLoading: false });
+        }
+      },
 
       // ---- Impact Actions ----
       updateImpactScore: (savedUSD) =>

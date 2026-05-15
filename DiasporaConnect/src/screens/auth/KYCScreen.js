@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, fonts, spacing, radius, shadows } from '../../theme/theme';
 import useStore from '../../store/useStore';
+import { useTranslation } from 'react-i18next';
 import GoldButton from '../../components/ui/GoldButton';
 
 const STEPS = ['intro', 'selfie', 'document', 'verifying', 'success'];
@@ -31,8 +32,8 @@ const DOCS = [
 ];
 
 export default function KYCScreen({ navigation }) {
-  const { setKYCStatus, language } = useStore();
-  const isEn = language === 'en';
+  const { t } = useTranslation();
+  const { setKYCStatus } = useStore();
   const [step, setStep] = useState('intro');
   const [selectedDoc, setSelectedDoc] = useState('id');
   const [selfieCapturing, setSelfieCapturing] = useState(false);
@@ -41,6 +42,18 @@ export default function KYCScreen({ navigation }) {
   const [docOk, setDocOk] = useState(false);
   const [verifyProgress, setVerifyProgress] = useState(0);
 
+  const REQUIREMENTS = [
+    { icon: 'sunny-outline',      text: t('kyc.reqLight') },
+    { icon: 'eye-outline',        text: t('kyc.reqVisible') },
+    { icon: 'glasses-outline',    text: t('kyc.reqGlasses') },
+    { icon: 'phone-portrait',     text: t('kyc.reqHand') },
+  ];
+
+  const DOCS = [
+    { id: 'passport',  icon: 'book-outline',       label: t('kyc.passport') },
+    { id: 'id',        icon: 'card-outline',        label: t('kyc.idCard') },
+    { id: 'residence', icon: 'home-outline',        label: t('kyc.residence') },
+  ];
   const progressAnim = useRef(new Animated.Value(0)).current;
   const checkAnim    = useRef(new Animated.Value(0)).current;
   const faceAnim     = useRef(new Animated.Value(1)).current;
@@ -111,7 +124,7 @@ export default function KYCScreen({ navigation }) {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={24} color={colors.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{isEn ? 'Identity Verification' : 'Vérification d\'identité'}</Text>
+        <Text style={styles.headerTitle}>{t('kyc.title')}</Text>
         <View style={{ width: 40 }} />
       </View>
       <ScrollView contentContainerStyle={styles.scroll}>
@@ -119,17 +132,11 @@ export default function KYCScreen({ navigation }) {
           <View style={styles.kycHeroIcon}>
             <Ionicons name="shield-checkmark" size={48} color={colors.primary} />
           </View>
-          <Text style={styles.kycTitle}>
-            {isEn ? 'Verify your identity' : 'Vérifiez votre identité'}
-          </Text>
-          <Text style={styles.kycSub}>
-            {isEn
-              ? 'Required to send more than $500 per month. Takes less than 2 minutes.'
-              : 'Requis pour envoyer plus de 500 USD/mois. Moins de 2 minutes.'}
-          </Text>
+          <Text style={styles.kycTitle}>{t('kyc.title')}</Text>
+          <Text style={styles.kycSub}>{t('kyc.subtitle')}</Text>
         </View>
 
-        <Text style={styles.sectionTitle}>{isEn ? 'What you\'ll need' : 'Ce dont vous aurez besoin'}</Text>
+        <Text style={styles.sectionTitle}>{t('kyc.whatYouNeed')}</Text>
         <View style={styles.requirementsCard}>
           {REQUIREMENTS.map((r, i) => (
             <View key={i} style={[styles.reqRow, i < REQUIREMENTS.length - 1 && styles.reqRowBorder]}>
@@ -143,15 +150,11 @@ export default function KYCScreen({ navigation }) {
 
         <View style={styles.privacyBox}>
           <Ionicons name="lock-closed-outline" size={16} color={colors.onSurfaceVariant} />
-          <Text style={styles.privacyText}>
-            {isEn
-              ? 'Your data is encrypted and never shared with third parties.'
-              : 'Vos données sont chiffrées et jamais partagées avec des tiers.'}
-          </Text>
+          <Text style={styles.privacyText}>{t('kyc.privacyNote')}</Text>
         </View>
 
         <GoldButton
-          title={isEn ? 'Start verification' : 'Commencer la vérification'}
+          title={t('kyc.start')}
           onPress={() => setStep('selfie')}
           style={{ marginTop: spacing.xl }}
         />
@@ -168,7 +171,7 @@ export default function KYCScreen({ navigation }) {
         <TouchableOpacity onPress={() => setStep('intro')} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={24} color={colors.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{isEn ? 'Selfie' : 'Selfie'}</Text>
+        <Text style={styles.headerTitle}>{t('kyc.selfie')}</Text>
         <Text style={styles.stepCounter}>1 / 2</Text>
       </View>
 
@@ -184,10 +187,10 @@ export default function KYCScreen({ navigation }) {
         </Animated.View>
         <Text style={styles.cameraHint}>
           {selfieOk
-            ? (isEn ? 'Perfect! ✓' : 'Parfait ! ✓')
+            ? t('kyc.statusPerfect')
             : selfieCapturing
-            ? (isEn ? 'Analyzing...' : 'Analyse en cours...')
-            : (isEn ? 'Center your face in the frame' : 'Centrez votre visage dans le cadre')}
+            ? t('kyc.statusAnalyzing')
+            : t('kyc.hintFace')}
         </Text>
       </View>
 
@@ -202,7 +205,7 @@ export default function KYCScreen({ navigation }) {
           </TouchableOpacity>
         ) : (
           <GoldButton
-            title={isEn ? 'Continue' : 'Continuer'}
+            title={t('common.continue')}
             onPress={() => setStep('document')}
           />
         )}
@@ -218,12 +221,12 @@ export default function KYCScreen({ navigation }) {
         <TouchableOpacity onPress={() => setStep('selfie')} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={24} color={colors.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{isEn ? 'Document' : 'Document'}</Text>
+        <Text style={styles.headerTitle}>{t('kyc.document')}</Text>
         <Text style={styles.stepCounter}>2 / 2</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={styles.docTitle}>{isEn ? 'Choose your document' : 'Choisissez votre document'}</Text>
+        <Text style={styles.docTitle}>{t('kyc.chooseDoc')}</Text>
         <View style={styles.docTypes}>
           {DOCS.map(doc => (
             <TouchableOpacity
@@ -256,8 +259,8 @@ export default function KYCScreen({ navigation }) {
           </Animated.View>
           <Text style={styles.cameraHint}>
             {docOk
-              ? (isEn ? 'Document captured ✓' : 'Document capturé ✓')
-              : (isEn ? 'Place your document in the frame' : 'Placez votre document dans le cadre')}
+              ? t('kyc.statusDocPerfect')
+              : t('kyc.hintDoc')}
           </Text>
         </View>
 
@@ -271,7 +274,7 @@ export default function KYCScreen({ navigation }) {
           </TouchableOpacity>
         ) : (
           <GoldButton
-            title={isEn ? 'Verify my identity' : 'Vérifier mon identité'}
+            title={t('kyc.verifyBtn')}
             onPress={startVerification}
             style={{ marginTop: spacing.xl }}
           />
@@ -287,12 +290,8 @@ export default function KYCScreen({ navigation }) {
       <StatusBar style="dark" />
       <View style={styles.verifyingContainer}>
         <ActivityIndicator size="large" color={colors.primary} style={{ marginBottom: spacing.xl }} />
-        <Text style={styles.verifyingTitle}>
-          {isEn ? 'Verifying your identity...' : 'Vérification en cours...'}
-        </Text>
-        <Text style={styles.verifyingSub}>
-          {isEn ? 'Our AI is analyzing your documents' : 'Notre IA analyse vos documents'}
-        </Text>
+        <Text style={styles.verifyingTitle}>{t('kyc.verifying')}</Text>
+        <Text style={styles.verifyingSub}>{t('kyc.verifyingAI')}</Text>
         <View style={styles.verifyProgressTrack}>
           <Animated.View style={[styles.verifyProgressFill, { width: progressWidth }]} />
         </View>
@@ -300,9 +299,9 @@ export default function KYCScreen({ navigation }) {
 
         <View style={styles.verifySteps}>
           {[
-            isEn ? 'Face detection' : 'Détection du visage',
-            isEn ? 'Document reading' : 'Lecture du document',
-            isEn ? 'Identity matching' : 'Correspondance identité',
+            t('kyc.stepFace'),
+            t('kyc.stepReading'),
+            t('kyc.stepMatching'),
           ].map((s, i) => (
             <View key={i} style={styles.verifyStep}>
               <Ionicons
@@ -328,20 +327,14 @@ export default function KYCScreen({ navigation }) {
             <Ionicons name="shield-checkmark" size={48} color={colors.onPrimary} />
           </LinearGradient>
         </Animated.View>
-        <Text style={styles.successTitle}>
-          {isEn ? 'Identity verified!' : 'Identité vérifiée !'}
-        </Text>
-        <Text style={styles.successSub}>
-          {isEn
-            ? 'You can now send up to $2,000 per transfer. Your account is fully activated.'
-            : 'Vous pouvez maintenant envoyer jusqu\'à 2 000 USD par transfert. Votre compte est entièrement activé.'}
-        </Text>
+        <Text style={styles.successTitle}>{t('kyc.success')}</Text>
+        <Text style={styles.successSub}>{t('kyc.successDesc')}</Text>
         <View style={styles.successBadge}>
           <Ionicons name="checkmark-circle" size={16} color={colors.primary} />
-          <Text style={styles.successBadgeText}>KYC Niveau 2 — Vérifié</Text>
+          <Text style={styles.successBadgeText}>{t('kyc.successBadge')}</Text>
         </View>
         <GoldButton
-          title={isEn ? 'Back to home' : 'Retour à l\'accueil'}
+          title={t('common.backToHome')}
           onPress={() => navigation.navigate('SenderApp')}
           style={{ marginTop: spacing.xxl, width: '100%' }}
         />

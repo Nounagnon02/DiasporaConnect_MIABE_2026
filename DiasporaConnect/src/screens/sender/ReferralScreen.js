@@ -9,14 +9,16 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Rect, G } from 'react-native-svg';
 import { colors, fonts, spacing, radius, shadows } from '../../theme/theme';
 import useStore from '../../store/useStore';
+import { useTranslation } from 'react-i18next';
 
-const HOW_IT_WORKS = [
-  { step: '1', text: 'Partagez votre code unique avec un ami de la diaspora' },
-  { step: '2', text: 'Il s\'inscrit et effectue son premier transfert' },
-  { step: '3', text: 'Vous recevez 0.50 USD en cUSD sur votre wallet Celo' },
+const HOW_IT_WORKS = (t) => [
+  { step: '1', text: t('referralPage.step1') },
+  { step: '2', text: t('referralPage.step2') },
+  { step: '3', text: t('referralPage.step3') },
 ];
 
 export default function ReferralScreen({ navigation }) {
+  const { t } = useTranslation();
   const { referral, senderUser } = useStore();
   const [copied, setCopied] = useState(false);
   const code = referral?.code || `${(senderUser?.name || 'USER').toUpperCase().slice(0, 4)}2026`;
@@ -30,8 +32,8 @@ export default function ReferralScreen({ navigation }) {
   const handleShare = async () => {
     try {
       await Share.share({
-        message: `Rejoins DiasporaConnect et envoie de l'argent au Bénin avec moins de 1% de frais ! Utilise mon code ${code} pour ton premier transfert. 🌍`,
-        title: 'DiasporaConnect — Transfert sans frais',
+        message: t('referralPage.shareMessage', { code }),
+        title: t('referralPage.shareTitle'),
       });
     } catch {}
   };
@@ -64,7 +66,7 @@ export default function ReferralScreen({ navigation }) {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={22} color={colors.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Parrainage</Text>
+        <Text style={styles.headerTitle}>{t('referralPage.title')}</Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -72,39 +74,39 @@ export default function ReferralScreen({ navigation }) {
 
         {/* Hero */}
         <LinearGradient colors={['#755B00', '#C9A84C']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.heroCard}>
-          <Text style={styles.heroTitle}>Invitez, gagnez</Text>
-          <Text style={styles.heroSub}>0.50 USD par ami parrainé{'\n'}directement sur votre wallet Celo</Text>
+          <Text style={styles.heroTitle}>{t('referralPage.heroTitle')}</Text>
+          <Text style={styles.heroSub}>{t('referralPage.heroSub')}</Text>
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{referral?.referredCount || 0}</Text>
-              <Text style={styles.statLabel}>Amis parrainés</Text>
+              <Text style={styles.statLabel}>{t('referralPage.friendsReferred')}</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{formatUSD(referral?.earnedUSD)}</Text>
-              <Text style={styles.statLabel}>Gains totaux</Text>
+              <Text style={styles.statLabel}>{t('referralPage.totalEarnings')}</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{formatUSD(referral?.pendingUSD)}</Text>
-              <Text style={styles.statLabel}>En attente</Text>
+              <Text style={styles.statLabel}>{t('referralPage.pending')}</Text>
             </View>
           </View>
         </LinearGradient>
 
         {/* Code */}
-        <Text style={styles.sectionTitle}>Votre code unique</Text>
+        <Text style={styles.sectionTitle}>{t('referralPage.yourCode')}</Text>
         <View style={styles.codeCard}>
           <Text style={styles.codeText}>{code}</Text>
           <TouchableOpacity style={styles.copyBtn} onPress={handleCopy}>
             <Ionicons name={copied ? 'checkmark' : 'copy-outline'} size={18} color={colors.primary} />
-            <Text style={styles.copyText}>{copied ? 'Copié !' : 'Copier'}</Text>
+            <Text style={styles.copyText}>{copied ? t('common.copied') : t('common.copy')}</Text>
           </TouchableOpacity>
         </View>
 
         {/* QR Code */}
         <View style={styles.qrCard}>
-          <Text style={styles.qrLabel}>QR Code partageable</Text>
+          <Text style={styles.qrLabel}>{t('referralPage.qrTitle')}</Text>
           <Svg width={cellSize * 9 + 24} height={cellSize * 9 + 24}>
             <Rect width={cellSize * 9 + 24} height={cellSize * 9 + 24} fill={colors.surfaceContainerLowest} rx={8} />
             <G transform="translate(12, 12)">
@@ -121,17 +123,17 @@ export default function ReferralScreen({ navigation }) {
               ))}
             </G>
           </Svg>
-          <Text style={styles.qrSub}>Scannez pour rejoindre DiasporaConnect</Text>
+          <Text style={styles.qrSub}>{t('referralPage.qrSubtitle')}</Text>
         </View>
 
         <TouchableOpacity style={styles.shareBtn} onPress={handleShare}>
           <Ionicons name="share-social-outline" size={18} color="#FFF" />
-          <Text style={styles.shareBtnText}>Partager mon code</Text>
+          <Text style={styles.shareBtnText}>{t('referralPage.shareBtn')}</Text>
         </TouchableOpacity>
 
         {/* Comment ça marche */}
-        <Text style={styles.sectionTitle}>Comment ça marche</Text>
-        {HOW_IT_WORKS.map(item => (
+        <Text style={styles.sectionTitle}>{t('referralPage.howItWorks')}</Text>
+        {HOW_IT_WORKS(t).map(item => (
           <View key={item.step} style={styles.stepRow}>
             <View style={styles.stepBadge}>
               <Text style={styles.stepNum}>{item.step}</Text>
@@ -143,7 +145,7 @@ export default function ReferralScreen({ navigation }) {
         {/* Info légale */}
         <View style={styles.legalBox}>
           <Text style={styles.legalText}>
-            Les récompenses sont créditées en cUSD sur Celo Alfajores après la confirmation du premier transfert de votre filleul (minimum 50 USD).
+            {t('referralPage.legalNote')}
           </Text>
         </View>
 

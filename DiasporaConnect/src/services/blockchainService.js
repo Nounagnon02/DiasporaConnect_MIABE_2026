@@ -4,11 +4,13 @@
  */
 import { ethers } from 'ethers';
 import { DIASPORA_CONNECT_ABI } from './abi';
+import { RPC_URL as ENV_RPC_URL, CONTRACT_ADDRESS as ENV_CONTRACT_ADDRESS, PRIVATE_KEY as ENV_PRIVATE_KEY } from '@env';
 
 // Config réseau — fallback si .env absent
-const RPC_URL = 'https://celo-sepolia.g.alchemy.com/v2/I1xh_Goyq-cWc8zodzOBv';
-const CONTRACT_ADDRESS = '0xc7e7a393A3621EAEd1502196a2cF389AeA01CFCB';
-const CUSD_ADDRESS = '0x765DE816845861e75A25fCA122bb6898B8B1282a';
+const RPC_URL = ENV_RPC_URL || 'https://celo-sepolia.g.alchemy.com/v2/I1xh_Goyq-cWc8zodzOBv';
+const CONTRACT_ADDRESS = ENV_CONTRACT_ADDRESS || '0xc7e7a393A3621EAEd1502196a2cF389AeA01CFCB';
+const CUSD_ADDRESS = '0x765DE816845861e75A25fCA122bb6898B8B1282a'; // Celo Sepolia cUSD
+const PRIVATE_KEY = ENV_PRIVATE_KEY;
 const USD_FCFA = 612.5;
 const EUR_USD = 1.08;
 
@@ -97,37 +99,37 @@ export const executeTransfer = async (amountUSD, recipientPhone, operator, signe
   try {
     onProgress?.('Préparation de la transaction...');
     const provider = new ethers.JsonRpcProvider(RPC_URL);
-    const contract = new ethers.Contract(CONTRACT_ADDRESS, DIASPORA_CONNECT_ABI, signer);
+    
+    // Autoconnect signer if missing (for Hackathon Demo)
+    let activeSigner = signer;
+    if (!activeSigner && PRIVATE_KEY) {
+      activeSigner = new ethers.Wallet(PRIVATE_KEY, provider);
+    }
+    
+    if (!activeSigner) throw new Error('No signer available');
 
-    // 1. Approve cUSD spend
-    const CUSD_ADDRESS = '0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1';
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, DIASPORA_CONNECT_ABI, activeSigner);
+
+    onProgress?.('Approbation cUSD en cours...');
     const cusd = new ethers.Contract(
       CUSD_ADDRESS,
       ['function approve(address spender, uint256 amount) external returns (bool)'],
-      signer
+      activeSigner
     );
-    const amountInWei = ethers.parseEther(amountUSD.toString());
+    const amountInWei = ethers.parseUnits(amountUSD.toFixed(18), 18);
 
-    onProgress?.('Approbation cUSD en cours...');
     const approveTx = await cusd.approve(CONTRACT_ADDRESS, amountInWei);
     await approveTx.wait();
 
-    // 2. Deposit
     onProgress?.('Signature Web3 en attente...');
     const tx = await contract.deposit(recipientPhone, operator, amountInWei);
 
-    onProgress?.('Confirmation sur Celo Sepolia...');
+    onProgress?.('Confirmation sur le réseau...');
     const receipt = await tx.wait();
 
-    // Extract transferId from event
-    const event = receipt.logs.find(log => {
-      try { return contract.interface.parseLog(log)?.name === 'TransferCreated'; } catch { return false; }
-    });
-    const transferId = event ? contract.interface.parseLog(event).args.transferId : null;
-
-    return { success: true, txHash: receipt.hash, transferId };
+    return { success: true, txHash: receipt.hash };
   } catch (error) {
-    console.warn('Blockchain unavailable, switching to demo mode:', error.message);
+    console.warn('Real blockchain execution failed:', error.message);
     return executeTransferDemo(amountUSD, recipientPhone, onProgress);
   }
 };

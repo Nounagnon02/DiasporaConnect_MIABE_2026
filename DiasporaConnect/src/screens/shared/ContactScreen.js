@@ -8,57 +8,92 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing, radius, shadows } from '../../theme/theme';
 import LedgerInput from '../../components/ui/LedgerInput';
 import GoldButton from '../../components/ui/GoldButton';
+import { useTranslation } from 'react-i18next';
+import { useTabBarHeight } from '../../hooks/useTabBarHeight';
 
-const CONTACTS = [
+const CONTACTS = (t) => [
   {
     icon: 'chatbubble-ellipses-outline',
-    label: 'WhatsApp Support',
+    label: t('support.whatsapp'),
     value: '+229 97 00 00 00',
     action: () => Linking.openURL('https://wa.me/22997000000'),
   },
   {
     icon: 'mail-outline',
-    label: 'Email',
+    label: t('support.email'),
     value: 'support@diasporaconnect.app',
     action: () => Linking.openURL('mailto:support@diasporaconnect.app'),
   },
   {
     icon: 'globe-outline',
-    label: 'Site web',
+    label: t('support.web'),
     value: 'diasporaconnect.app',
     action: () => Linking.openURL('https://diasporaconnect.app'),
   },
 ];
 
-const FAQ = [
+const FAQ = (t) => [
   {
-    q: 'Combien de temps prend un transfert ?',
-    a: 'Moins de 60 secondes sur Celo Alfajores. Le retrait Mobile Money est disponible immédiatement.',
+    q: t('support.faq1Q'),
+    a: t('support.faq1A'),
   },
   {
-    q: 'Quels sont les frais exacts ?',
-    a: 'DiasporaConnect prélève 0,8 % du montant envoyé. Les frais de gas Celo sont inférieurs à 0,01 USD.',
+    q: t('support.faq2Q'),
+    a: t('support.faq2A'),
   },
   {
-    q: 'Mon argent est-il sécurisé ?',
-    a: 'Oui. Les fonds sont verrouillés dans un smart contract audité sur la blockchain Celo jusqu\'au retrait.',
+    q: t('support.faq3Q'),
+    a: t('support.faq3A'),
   },
   {
-    q: 'Quels opérateurs Mobile Money sont supportés ?',
-    a: 'MTN Money et Moov Money au Bénin. D\'autres pays arrivent prochainement.',
+    q: t('support.faq4Q'),
+    a: t('support.faq4A'),
   },
 ];
 
 export default function ContactScreen({ navigation }) {
+  const { t } = useTranslation();
+  const tabBarHeight = useTabBarHeight();
   const [openFaq, setOpenFaq] = useState(null);
   const [message, setMessage] = useState('');
   const [sent, setSent] = useState(false);
+
+  const contacts = CONTACTS(t);
+  const faq = FAQ(t);
+
+  const CONTACTS = [
+    {
+      icon: 'chatbubble-ellipses-outline',
+      label: t('support.whatsapp'),
+      value: '+229 97 00 00 00',
+      action: () => Linking.openURL('https://wa.me/22997000000'),
+    },
+    {
+      icon: 'mail-outline',
+      label: t('support.email'),
+      value: 'support@diasporaconnect.app',
+      action: () => Linking.openURL('mailto:support@diasporaconnect.app'),
+    },
+    {
+      icon: 'globe-outline',
+      label: t('support.web'),
+      value: 'diasporaconnect.app',
+      action: () => Linking.openURL('https://diasporaconnect.app'),
+    },
+  ];
+
+  const FAQ = [
+    { q: t('support.faq1Q'), a: t('support.faq1A') },
+    { q: t('support.faq2Q'), a: t('support.faq2A') },
+    { q: t('support.faq3Q'), a: t('support.faq3A') },
+    { q: t('support.faq4Q'), a: t('support.faq4A') },
+  ];
 
   const handleSend = () => {
     if (!message.trim()) return;
     setSent(true);
     setMessage('');
-    Alert.alert('Message envoyé', 'Notre équipe vous répondra sous 24h.');
+    Alert.alert(t('support.alertTitle'), t('support.alertBody'));
     setTimeout(() => setSent(false), 3000);
   };
 
@@ -69,19 +104,19 @@ export default function ContactScreen({ navigation }) {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={24} color={colors.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Support</Text>
+        <Text style={styles.headerTitle}>{t('support.header')}</Text>
         <View style={{ width: 40 }} />
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Text style={styles.heroTitle}>Comment pouvons-nous{'\n'}vous aider ?</Text>
+        <Text style={styles.heroTitle}>{t('support.hero')}</Text>
 
         {/* Canaux de contact */}
         <View style={styles.contactsCard}>
-          {CONTACTS.map((c, i) => (
+          {contacts.map((c, i) => (
             <TouchableOpacity
-              key={c.label}
-              style={[styles.contactRow, i < CONTACTS.length - 1 && styles.contactRowBorder]}
+              key={i}
+              style={[styles.contactRow, i < contacts.length - 1 && styles.contactRowBorder]}
               onPress={c.action}
               activeOpacity={0.8}
             >
@@ -98,8 +133,8 @@ export default function ContactScreen({ navigation }) {
         </View>
 
         {/* FAQ */}
-        <Text style={styles.sectionTitle}>Questions fréquentes</Text>
-        {FAQ.map((item, i) => (
+        <Text style={styles.sectionTitle}>{t('support.faqTitle')}</Text>
+        {faq.map((item, i) => (
           <TouchableOpacity
             key={i}
             style={styles.faqCard}
@@ -124,25 +159,25 @@ export default function ContactScreen({ navigation }) {
         ))}
 
         {/* Formulaire message */}
-        <Text style={styles.sectionTitle}>Envoyer un message</Text>
+        <Text style={styles.sectionTitle}>{t('support.messageTitle')}</Text>
         <View style={styles.formCard}>
           <LedgerInput
-            label="Votre message"
+            label={t('support.messageLabel')}
             value={message}
             onChangeText={setMessage}
-            placeholder="Décrivez votre problème..."
+            placeholder={t('support.messagePlaceholder')}
             multiline
             numberOfLines={4}
           />
           <GoldButton
-            title={sent ? 'Message envoyé ✓' : 'Envoyer'}
+            title={sent ? t('support.messageSent') : t('support.send')}
             onPress={handleSend}
             disabled={!message.trim() || sent}
             style={{ marginTop: spacing.md }}
           />
         </View>
 
-        <View style={{ height: 120 }} />
+        <View style={{ height: tabBarHeight + 16 }} />
       </ScrollView>
     </SafeAreaView>
   );

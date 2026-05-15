@@ -10,15 +10,17 @@ import useStore from '../../store/useStore';
 import GoldButton from '../../components/ui/GoldButton';
 import { MOCK_CONTACTS } from '../../services/mockData';
 import { scheduleRecurringNotification, cancelNotification } from '../../services/notificationService';
+import { useTranslation } from 'react-i18next';
 
 const DAYS = Array.from({ length: 28 }, (_, i) => i + 1);
-const FREQUENCIES = [
-  { key: 'monthly', label: 'Mensuel' },
-  { key: 'bimonthly', label: 'Bi-mensuel' },
+const FREQUENCIES = (t) => [
+  { key: 'monthly', label: t('recurring.monthly') },
+  { key: 'bimonthly', label: t('recurring.bimonthly') },
 ];
 
 export default function RecurringScreen({ navigation }) {
-  const { recurringTransfers, addRecurringTransfer, toggleRecurring, deleteRecurring } = useStore();
+  const { t } = useTranslation();
+  const { recurringTransfers, addRecurringTransfer, toggleRecurring, deleteRecurring, language } = useStore();
   const [showForm, setShowForm] = useState(false);
   const [amount, setAmount] = useState('200');
   const [selectedContact, setSelectedContact] = useState(MOCK_CONTACTS[0]);
@@ -27,12 +29,12 @@ export default function RecurringScreen({ navigation }) {
 
   const handleAdd = async () => {
     if (!amount || parseFloat(amount) <= 0) {
-      Alert.alert('Montant invalide', 'Entrez un montant valide.');
+      Alert.alert(t('recurring.amountInvalid'), t('recurring.amountInvalidDesc'));
       return;
     }
     const notifId = await scheduleRecurringNotification(
-      '🔄 Transfert récurrent',
-      `Rappel : envoyer ${amount} USD à ${selectedContact.name}`,
+      t('recurring.title'),
+      `${t('recurring.nextTransfer')} : ${amount} USD -> ${selectedContact.name}`,
       dayOfMonth
     );
     addRecurringTransfer({
@@ -45,14 +47,14 @@ export default function RecurringScreen({ navigation }) {
       nextDate: getNextDate(dayOfMonth),
     });
     setShowForm(false);
-    Alert.alert('✅ Programmé', `Transfert de ${amount} USD vers ${selectedContact.name} le ${dayOfMonth} de chaque mois.`);
+    Alert.alert(t('recurring.scheduledTitle'), t('recurring.scheduledDesc', { amount, name: selectedContact.name, day: dayOfMonth }));
   };
 
   const handleDelete = async (rec) => {
-    Alert.alert('Supprimer', `Supprimer le transfert vers ${rec.contact.name} ?`, [
-      { text: 'Annuler', style: 'cancel' },
+    Alert.alert(t('recurring.deleteTitle'), t('recurring.deleteConfirm', { name: rec.contact.name }), [
+      { text: t('common.cancel'), style: 'cancel' },
       {
-        text: 'Supprimer',
+        text: t('recurring.deleteTitle'),
         style: 'destructive',
         onPress: async () => {
           if (rec.notifId) await cancelNotification(rec.notifId);
@@ -66,10 +68,12 @@ export default function RecurringScreen({ navigation }) {
     const now = new Date();
     const next = new Date(now.getFullYear(), now.getMonth(), day);
     if (next <= now) next.setMonth(next.getMonth() + 1);
-    return next.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+    return next.toLocaleDateString(language === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'long' });
   };
 
-  const formatAmount = (num) => new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 0 }).format(num);
+  const formatAmount = (num) => new Intl.NumberFormat(language === 'en' ? 'en-US' : 'fr-FR', { minimumFractionDigits: 0 }).format(num);
+
+  const frequencies = FREQUENCIES(t);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -78,7 +82,7 @@ export default function RecurringScreen({ navigation }) {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={22} color={colors.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Transferts récurrents</Text>
+        <Text style={styles.headerTitle}>{t('recurring.title')}</Text>
         <TouchableOpacity onPress={() => setShowForm(!showForm)} style={styles.addBtn}>
           <Ionicons name={showForm ? 'close' : 'add'} size={22} color={colors.primary} />
         </TouchableOpacity>
@@ -89,10 +93,10 @@ export default function RecurringScreen({ navigation }) {
         {/* Formulaire */}
         {showForm && (
           <View style={styles.formCard}>
-            <Text style={styles.formTitle}>Nouveau transfert programmé</Text>
+            <Text style={styles.formTitle}>{t('recurring.newTitle')}</Text>
 
             {/* Montant */}
-            <Text style={styles.fieldLabel}>Montant (USD)</Text>
+            <Text style={styles.fieldLabel}>{t('recurring.amountLabel')}</Text>
             <View style={styles.inputRow}>
               <TextInput
                 style={styles.input}
@@ -106,7 +110,7 @@ export default function RecurringScreen({ navigation }) {
             </View>
 
             {/* Contact */}
-            <Text style={styles.fieldLabel}>Bénéficiaire</Text>
+            <Text style={styles.fieldLabel}>{t('recurring.beneficiaryLabel')}</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.contactsRow}>
               {MOCK_CONTACTS.map(c => (
                 <TouchableOpacity
@@ -125,9 +129,9 @@ export default function RecurringScreen({ navigation }) {
             </ScrollView>
 
             {/* Fréquence */}
-            <Text style={styles.fieldLabel}>Fréquence</Text>
+            <Text style={styles.fieldLabel}>{t('recurring.frequencyLabel')}</Text>
             <View style={styles.freqRow}>
-              {FREQUENCIES.map(f => (
+              {frequencies.map(f => (
                 <TouchableOpacity
                   key={f.key}
                   style={[styles.freqBtn, frequency === f.key && styles.freqBtnActive]}
@@ -139,7 +143,7 @@ export default function RecurringScreen({ navigation }) {
             </View>
 
             {/* Jour du mois */}
-            <Text style={styles.fieldLabel}>Jour du mois : <Text style={styles.daySelected}>{dayOfMonth}</Text></Text>
+            <Text style={styles.fieldLabel}>{t('recurring.dayLabel')} : <Text style={styles.daySelected}>{dayOfMonth}</Text></Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.daysRow}>
               {DAYS.map(d => (
                 <TouchableOpacity
@@ -154,12 +158,12 @@ export default function RecurringScreen({ navigation }) {
 
             <View style={styles.previewBox}>
               <Text style={styles.previewText}>
-                Prochain transfert : <Text style={styles.previewBold}>{getNextDate(dayOfMonth)}</Text>
+                {t('recurring.nextTransfer')} : <Text style={styles.previewBold}>{getNextDate(dayOfMonth)}</Text>
                 {'\n'}{formatAmount(parseFloat(amount) || 0)} USD → {selectedContact.name}
               </Text>
             </View>
 
-            <GoldButton title="Programmer ce transfert" onPress={handleAdd} />
+            <GoldButton title={t('recurring.scheduleBtn')} onPress={handleAdd} />
           </View>
         )}
 
@@ -167,9 +171,9 @@ export default function RecurringScreen({ navigation }) {
         {recurringTransfers.length === 0 && !showForm ? (
           <View style={styles.emptyState}>
             <Ionicons name="repeat" size={48} color={colors.outlineVariant} />
-            <Text style={styles.emptyTitle}>Aucun transfert programmé</Text>
+            <Text style={styles.emptyTitle}>{t('recurring.emptyTitle')}</Text>
             <Text style={styles.emptyDesc}>
-              Automatisez vos envois mensuels. Appuyez sur + pour commencer.
+              {t('recurring.emptyDesc')}
             </Text>
           </View>
         ) : (
@@ -182,9 +186,9 @@ export default function RecurringScreen({ navigation }) {
                 <View style={styles.recInfo}>
                   <Text style={styles.recName} numberOfLines={1}>{rec.contact.name}</Text>
                   <Text style={styles.recDetails}>
-                    {rec.amount} USD · le {rec.dayOfMonth} du mois
+                    {rec.amount} USD · {t('recurring.dayOfMonth', { day: rec.dayOfMonth })}
                   </Text>
-                  <Text style={styles.recNext}>Prochain : {rec.nextDate}</Text>
+                  <Text style={styles.recNext}>{t('recurring.next')} : {rec.nextDate}</Text>
                 </View>
               </View>
               <View style={styles.recRight}>

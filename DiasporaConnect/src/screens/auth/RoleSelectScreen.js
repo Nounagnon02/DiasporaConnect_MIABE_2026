@@ -8,10 +8,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, spacing, radius, shadows } from '../../theme/theme';
 import ArrowIcon from '../../components/ui/ArrowIcon';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 
 export default function RoleSelectScreen({ navigation }) {
+  const { t } = useTranslation();
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="dark" />
@@ -45,7 +47,7 @@ export default function RoleSelectScreen({ navigation }) {
             <View style={styles.heroIconsRow}>
               <View style={styles.heroNode}>
                 <Text style={styles.heroEmoji}>🌍</Text>
-                <Text style={styles.heroNodeLabel}>Diaspora</Text>
+                <Text style={styles.heroNodeLabel}>{t('roles.diasporaLabel')}</Text>
               </View>
 
               <View style={styles.heroArrowTrack}>
@@ -56,29 +58,26 @@ export default function RoleSelectScreen({ navigation }) {
 
               <View style={styles.heroNode}>
                 <Text style={styles.heroEmoji}>🇧🇯</Text>
-                <Text style={styles.heroNodeLabel}>Bénin</Text>
+                <Text style={styles.heroNodeLabel}>{t('roles.beninLabel')}</Text>
               </View>
             </View>
 
-            {/* Caption sur une seule ligne — adjustsFontSizeToFit évite le retour à la ligne */}
             <Text
               style={styles.heroCaption}
               numberOfLines={1}
               adjustsFontSizeToFit
               minimumFontScale={0.75}
             >
-              Transferts instantanés · Frais {'<'} 1 %
+              {t('roles.heroCaption')}
             </Text>
           </LinearGradient>
         </View>
 
         {/* Titre */}
-        <Text style={styles.title}>Quel est votre{'\n'}rôle ?</Text>
-        <Text style={styles.subtitle}>
-          Sélectionnez votre profil pour continuer l'inscription ou la connexion.
-        </Text>
+        <Text style={styles.title}>{t('roles.title')}</Text>
+        <Text style={styles.subtitle}>{t('roles.subtitle')}</Text>
 
-        {/* Card Expéditeur — emoji 🌍 conservé */}
+        {/* Card Expéditeur */}
         <TouchableOpacity
           style={styles.card}
           activeOpacity={0.88}
@@ -88,15 +87,13 @@ export default function RoleSelectScreen({ navigation }) {
             <Text style={styles.cardEmoji}>🌍</Text>
           </View>
           <View style={styles.cardText}>
-            <Text style={styles.cardTitle}>Expéditeur (Diaspora)</Text>
-            <Text style={styles.cardDesc}>
-              J'envoie de l'argent vers le Bénin depuis l'étranger.
-            </Text>
+            <Text style={styles.cardTitle}>{t('roles.sender.title')}</Text>
+            <Text style={styles.cardDesc}>{t('roles.sender.desc')}</Text>
           </View>
           <ArrowIcon direction="right" color={colors.primary} size={20} thickness={2} />
         </TouchableOpacity>
 
-        {/* Card Destinataire — emoji 🇧🇯 conservé */}
+        {/* Card Destinataire */}
         <TouchableOpacity
           style={styles.cardSecondary}
           activeOpacity={0.88}
@@ -106,10 +103,8 @@ export default function RoleSelectScreen({ navigation }) {
             <Text style={styles.cardEmoji}>🇧🇯</Text>
           </View>
           <View style={styles.cardText}>
-            <Text style={styles.cardTitle}>Destinataire (Bénin)</Text>
-            <Text style={styles.cardDesc}>
-              Je reçois de l'argent sur mon compte Mobile Money (MTN / Moov).
-            </Text>
+            <Text style={styles.cardTitle}>{t('roles.recipient.title')}</Text>
+            <Text style={styles.cardDesc}>{t('roles.recipient.desc')}</Text>
           </View>
           <ArrowIcon direction="right" color={colors.primary} size={20} thickness={2} />
         </TouchableOpacity>
@@ -117,9 +112,7 @@ export default function RoleSelectScreen({ navigation }) {
         {/* Note sécurité */}
         <View style={styles.footNote}>
           <Ionicons name="lock-closed" size={12} color={colors.onSurfaceVariant} />
-          <Text style={styles.footNoteText}>
-            Vos données sont protégées par la blockchain Celo
-          </Text>
+          <Text style={styles.footNoteText}>{t('auth.securityPromise')}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
